@@ -12,30 +12,13 @@
 		<!-- Include two libraries from THREE.js: Core and the Detector for WebGL -->
 		<script src="../js/three.min.js" type="text/javascript"></script>
 		<script src="../js/Detector.js" type="text/javascript"></script>
+		<script src="../js/OrbitControls.js" type="text/javascript"></script>
+		<script src="Scene.js" type="text/javascript"></script>
+		<script src="Data/World.js" type="text/javascript"></script>
 	</head>
 	<body>
-		<!-- Create a DIV element, which will be shown over the WebGL canvas. The last line
-		("Renderer: ") will be completed either by "WebGL Renderer" or by "Canvas Renderer". -->
-		<div id="overlaytext" style="position: absolute; top: 10px; left: 10px">
-			'F': Loop through the three texture filters (only for WebGL renderer)<br/>
-			'L': Toggle light (only for WebGL renderer)<br/>
-			'B': Toggle blending<br/>
-			Cursor left / right: Control y rotation speed<br/>
-			Cursor up / down: Control x rotation speed<br/>
-			Page up / down: Move along z axis<br/>
-			Renderer: "WebGL Renderer"
-		</div>
-
-		<!-- This is the DIV element which will contain the WebGL canvas. To be identifiable later on,
-		the id 'WebGLCanvas' is applied to it. -->
-		<div id="WebGLCanvas"/>
-
 		<!-- This JavaScript block encloses the Three.js commands -->
 		<script>
-			var scene;					// THREE.js objects	
-			var renderer;			
-			var camera;	
-
 			var xRotation = 0; 			// x and y rotation
 			var yRotation = 0;
 			var xSpeed = 0.0;			// Rotation speed around x and y axis
@@ -45,122 +28,201 @@
 			var lightIsOn = true;  		// Flag for toggling light
 			var blendingIsOn = true;	// Flag for toggling blending		
 	
-			var cubeMesh;				// cube mesh, material, etc.
-			var cubeGeometry;
-			var glassTexture;
-			var cubeMaterial;
-			
-			var ambientLight;
-			var directionalLight;
-			
 			// set up the THREE.js scene
 			initializeScene();
-			
+
+			// then initialize our demo's stuff
+			initializeDemo();
+
 			// Animate the scene
 			animateScene();
 
 			/**
 			 * Initialize the scene.
 			 */
-			function initializeScene() {
+			function initializeDemo() {
+								
+				drawAxes(10);
 
-				// Check whether the browser supports WebGL. 
-				if ( !Detector.webgl ) Detector.addGetWebGLMessage();
-			
-				// allocate the THREE.js renderer
-				renderer = new THREE.WebGLRenderer({antialias:true});
-			
-				// Set the background color of the renderer to black, with full opacity
-				renderer.setClearColor(0x000000, 1);
-			
-				// Get the size of the inner window (content area)
-				canvasWidth = window.innerWidth;
-				canvasHeight = window.innerHeight;
-			
-				// Set the renderers size to the content areas size
-				renderer.setSize(canvasWidth, canvasHeight);
-			
-				// Get the DIV element from the HTML document by its ID and append the renderer's DOM object
-				document.getElementById("WebGLCanvas").appendChild(renderer.domElement);
-			
-				// Create the scene, in which all objects are stored (e. g. camera, lights, geometries, ...)
-				scene = new THREE.Scene();
+				//drawSphere();
 				
-				camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 100);
-				camera.position.set(0, 6, 6);
-				camera.lookAt(scene.position);
-				scene.add(camera);
+				//drawCylinder();
 				
-				// Create the cube
-				cubeGeometry = new THREE.CubeGeometry(2.0, 2.0, 2.0);
+				createWorld();
 
+				//draw4();			
+			}
+
+			function createWorld() {
+				
 				// Load an image as texture
-				glassTexture = new THREE.ImageUtils.loadTexture("Glass.jpg");
+				var mudTexture = new THREE.ImageUtils.loadTexture("Data/Mud.png");
 
-				// Create a material, which contains the texture
-				cubeMaterial = new THREE.MeshLambertMaterial({
-					map:glassTexture,
-					depthWrite: false,
-					transparent: true,
-					opacity: 1.0,
-					side:THREE.DoubleSide,
-					combine: THREE.MixOperation
-				});
+				var mudMaterial = new THREE.MeshBasicMaterial( {
+				    map: mudTexture
+				  } );
+				mudMaterial.side = THREE.DoubleSide;
+
+				// object will just clamp them to 1, i.e. white
+
+				for ( i=0; i<nTriangles; i++ ) {
+					var i1 = i * 3;
+					var i2 = i * 3 + 1;
+					var i3 = i * 3 + 2;
+					var triGeom = new THREE.Geometry();
+					triGeom.vertices.push(new THREE.Vector3(world[i1][V_X],world[i1][V_Y],world[i1][V_Z]));
+					triGeom.vertices.push(new THREE.Vector3(world[i2][V_X],world[i2][V_Y],world[i2][V_Z]));
+					triGeom.vertices.push(new THREE.Vector3(world[i3][V_X],world[i3][V_Y],world[i3][V_Z]));
+
+					var uvs = [];
+					uvs.push( new THREE.Vector2( 0.0, 0.0 ) );
+					uvs.push( new THREE.Vector2( 1.0, 0.0 ) );
+					uvs.push( new THREE.Vector2( 1.0, 1.0 ) );
+					
+					//console.log(i1 + ": " + world[i1][V_X] + ", " + world[i1][V_Y] + ", " + world[i1][V_Z]);
+					//console.log(i2 + ": " + world[i2][V_X] + ", " + world[i2][V_Y] + ", " + world[i2][V_Z]);
+					//console.log(i3 + ": " + world[i3][V_X] + ", " + world[i3][V_Y] + ", " + world[i3][V_Z]);
+
+					triGeom.faces.push( new THREE.Face3( 0, 1, 2 ) ); // counter-clockwise winding order
+					triGeom.faceVertexUvs[ 0 ].push( [ uvs[0], uvs[1], uvs[2] ] );
+					
+					triGeom.computeFaceNormals();
+					triGeom.computeVertexNormals();
+					
+					/*
+					triGeom.faceVertexUvs[0].push([
+					                                new THREE.UV(0, 0),
+					                                new THREE.UV(0, 0),
+					                                new THREE.UV(0, 0),
+					                                new THREE.UV(0, 0)
+					                              ]);
+					*/
+					
+					var r    = Math.random();
+					var g    = Math.random();
+					var b    = Math.random();
+
+					var material = new THREE.MeshBasicMaterial({ color:"red"});
+					material.color.setRGB(r, g, b);
+					material.side = THREE.DoubleSide;
+
+					var mesh = new THREE.Mesh( triGeom, mudMaterial);
+					
+					scene.add(mesh);
+				}
+
+
+			}
+			
+			function drawSphere() {
+				// Sphere parameters: radius, segments along width, segments along height
+				var sphereGeometry = new THREE.SphereGeometry( 0.1, 32, 16 ); 
+				// use a "lambert" material rather than "basic" for realistic lighting.
+				//   (don't forget to add (at least one) light!)
+				var sphereMaterial = new THREE.MeshLambertMaterial( {color: 0x8888ff} ); 
+				var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+				sphere.position.set(0, 0, 0);
+				scene.add(sphere);
+			}
+			
+			function drawCylinder()
+			{
+				var geometry = new THREE.CylinderGeometry( 0.5, 0.5, 1.0, 32, 32 ); 
+				var material = new THREE.MeshLambertMaterial( {color: "magenta"} ); 
+				var cylinder = new THREE.Mesh( geometry, material ); 
 				
-				// Create a mesh and insert the geometry and the material. Translate the
-				// whole mesh by 'zTranslation' units on the z axis. Finally add the mesh
-				// to the scene.
-				cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
-				cubeMesh.position.set(0.0, 0.0, zTranslation);
-				scene.add(cubeMesh);
-
-				// Ambient light has no direction, it illuminates every object with the same
-				// intensity. If only ambient light is used, no shading effects will occur.
-				ambientLight = new THREE.AmbientLight(0x777777, 1.0);
-				scene.add(ambientLight);
-
-				// Directional light has a source and shines in all directions, like the sun.
-				// This behaviour creates shading effects.
-				directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-				directionalLight.position = camera.position;
-				scene.add(directionalLight);
-
-				// Add a listener for 'keydown' events. By this listener, all key events will be
-				// passed to the function 'onDocumentKeyDown'. There's another event type 'keypress'.
-				// It will report only the visible characters like 'a', but not the function keys
-				// like 'cursor up'.
-				document.addEventListener("keydown", onDocumentKeyDown, false);
+				cylinder.position.x = -0.5;
+				cylinder.rotation.z = Math.PI/2;
+				
+				scene.add( cylinder );
 			}
-
-			/**
-			 * This function is called, when a key is oushed down.
-			 */
-			function onDocumentKeyDown(event){
-				// Get the key code of the pressed key
-				var keyCode = event.which;
-
+			function draw4()
+			{
+				var a = { x:-1, y:-1 }
+				var b = { x:1,  y:1 }
+		
+				var geometry = new THREE.Geometry();
+		
+				geometry.vertices.push( new THREE.Vector3( a.x, a.y, 0.25 ) );
+				geometry.vertices.push( new THREE.Vector3( b.x, a.y, 0.25 ) );
+				geometry.vertices.push( new THREE.Vector3( b.x, b.y, 0.25 ) );
+				geometry.vertices.push( new THREE.Vector3( a.x, b.y, 0.25 ) );
+		
+				geometry.faces.push( new THREE.Face3( 0, 1, 2 ) ); // counter-clockwise winding order
+//				geometry.faces.push( new THREE.Face3( 0, 2, 3 ) );
+		
+				geometry.computeFaceNormals();
+				geometry.computeVertexNormals();
+				
+				var material = new THREE.MeshBasicMaterial({ color:"red"});
+				material.side = THREE.DoubleSide;
+				var mesh = new THREE.Mesh( geometry, material );
+				scene.add(mesh);
 			}
+			
+			function draw(g)
+		    {
+		        objectContainer = new THREE.Object3D();
 
+		        texture = THREE.ImageUtils.loadTexture('Data/Mud.png');
+		        texture.flipY = false;
+
+		        materials = [];
+		        materials.push(new THREE.MeshLambertMaterial({
+		            map: texture,
+		            vertexColors: THREE.VertexColors
+		        }));
+
+		        var faceIndices = ['a','b','c','d'];
+
+		        var color = new THREE.Color(0xffffff);
+		        color.setHex(0x333333);
+
+		        var uvs = [];
+		        uvs.push(new THREE.Vector2(0,1));
+		        uvs.push(new THREE.Vector2(0,0));
+		        uvs.push(new THREE.Vector2(1,1));
+		        uvs.push(new THREE.Vector2(1,0));
+
+		        for (i = 0; i < g.faces.length; i++)
+		        {
+		            face = g.faces[i];
+		            geo = new THREE.Geometry();
+		            geo.faces.push(new THREE.Face3(0,1,2));
+		            geo.faceVertexUvs[0] = [];
+		            geo.faceVertexUvs[0].push([uvs[0], uvs[1], uvs[3]]);
+		            geo.faces[0].materialIndex = 0;
+
+		            for (j = 0; j < 3; j++)
+		            {
+		                fi = face[faceIndices[j]];
+		                v = g.vertices[fi];
+		                geo.vertices.push(new THREE.Vector3(v.x,v.y,v.z));
+		                geo.faces[0].vertexColors[j] = color;
+		            }
+
+		            geo.computeVertexNormals(); 
+		            geo.computeBoundingBox();
+
+		            obj = new THREE.SceneUtils.createMultiMaterialObject(geo, materials);
+
+		            objectContainer.add(obj);
+		        }
+		        scene.add(objectContainer);
+		    }
+			
 			/**
 			 * Animate the scene and call rendering.
 			 */
 			function animateScene() {
 
-				// Update and set the rotation around x and y axis
-				xRotation += xSpeed;
-				yRotation += ySpeed;
-				cubeMesh.rotation.set(xRotation, yRotation, 0.0);
-
-				// Apply the the translation along the z axis
-				cubeMesh.position.z = zTranslation;
-
-				// Define the function, which is called by the browser supported timer loop. If the
-				// browser tab is not visible, the animation is paused. So 'animateScene()' is called
-				// in a browser controlled loop.
+				// Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
 
 				// Map the 3D scene down to the 2D screen (render the frame)
 				renderer.render(scene, camera);
+				
+				controls.update();
 			}
 		</script>
 	</body>

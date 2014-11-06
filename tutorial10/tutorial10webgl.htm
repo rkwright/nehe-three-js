@@ -58,9 +58,7 @@
 				// Load an image as texture
 				var mudTexture = new THREE.ImageUtils.loadTexture("Data/Mud.png");
 
-				var mudMaterial = new THREE.MeshBasicMaterial( {
-				    map: mudTexture
-				  } );
+				var mudMaterial = new THREE.MeshBasicMaterial( { map: mudTexture } );
 				mudMaterial.side = THREE.DoubleSide;
 
 				// object will just clamp them to 1, i.e. white

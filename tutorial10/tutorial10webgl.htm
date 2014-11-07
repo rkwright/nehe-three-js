@@ -56,12 +56,10 @@
 			function createWorld() {
 				
 				// Load an image as texture
-				var mudTexture = new THREE.ImageUtils.loadTexture("Data/Sammy.jpg");
+				var texture = new THREE.ImageUtils.loadTexture("Data/Sammy.jpg");
 
-				var mudMaterial = new THREE.MeshBasicMaterial( { map: mudTexture } );
-				mudMaterial.side = THREE.DoubleSide;
-
-				// object will just clamp them to 1, i.e. white
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				material.side = THREE.DoubleSide;
 
 				for ( i=0; i<nTriangles; i++ ) {
 					var i1 = i * 3;
@@ -72,7 +70,7 @@
 					triGeom.vertices.push(new THREE.Vector3(world[i2][V_X],world[i2][V_Y],world[i2][V_Z]));
 					triGeom.vertices.push(new THREE.Vector3(world[i3][V_X],world[i3][V_Y],world[i3][V_Z]));
 
-					// need to see which triangle we are on so we map correct half of the
+					// need to see which triangle we are on so we map the correct half of the
 					// texture.  Otherwise we end up mapping the same half twice.
 					var uvs = [];
 					if ((i & 1) == 0){				
@@ -95,30 +93,11 @@
 					
 					triGeom.computeFaceNormals();
 					triGeom.computeVertexNormals();
-					
-					/*
-					triGeom.faceVertexUvs[0].push([
-					                                new THREE.UV(0, 0),
-					                                new THREE.UV(0, 0),
-					                                new THREE.UV(0, 0),
-					                                new THREE.UV(0, 0)
-					                              ]);
-					*/
-					
-					var r    = Math.random();
-					var g    = Math.random();
-					var b    = Math.random();
 
-					var material = new THREE.MeshBasicMaterial({ color:"red"});
-					material.color.setRGB(r, g, b);
-					material.side = THREE.DoubleSide;
-
-					var mesh = new THREE.Mesh( triGeom, mudMaterial);
+					var mesh = new THREE.Mesh( triGeom, material);
 					
 					scene.add(mesh);
 				}
-
-
 			}
 			
 			function drawSphere() {
@@ -166,57 +145,6 @@
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add(mesh);
 			}
-			
-			function draw(g)
-		    {
-		        objectContainer = new THREE.Object3D();
-
-		        texture = THREE.ImageUtils.loadTexture('Data/Mud.png');
-		        texture.flipY = false;
-
-		        materials = [];
-		        materials.push(new THREE.MeshLambertMaterial({
-		            map: texture,
-		            vertexColors: THREE.VertexColors
-		        }));
-
-		        var faceIndices = ['a','b','c','d'];
-
-		        var color = new THREE.Color(0xffffff);
-		        color.setHex(0x333333);
-
-		        var uvs = [];
-		        uvs.push(new THREE.Vector2(0,1));
-		        uvs.push(new THREE.Vector2(0,0));
-		        uvs.push(new THREE.Vector2(1,1));
-		        uvs.push(new THREE.Vector2(1,0));
-
-		        for (i = 0; i < g.faces.length; i++)
-		        {
-		            face = g.faces[i];
-		            geo = new THREE.Geometry();
-		            geo.faces.push(new THREE.Face3(0,1,2));
-		            geo.faceVertexUvs[0] = [];
-		            geo.faceVertexUvs[0].push([uvs[0], uvs[1], uvs[3]]);
-		            geo.faces[0].materialIndex = 0;
-
-		            for (j = 0; j < 3; j++)
-		            {
-		                fi = face[faceIndices[j]];
-		                v = g.vertices[fi];
-		                geo.vertices.push(new THREE.Vector3(v.x,v.y,v.z));
-		                geo.faces[0].vertexColors[j] = color;
-		            }
-
-		            geo.computeVertexNormals(); 
-		            geo.computeBoundingBox();
-
-		            obj = new THREE.SceneUtils.createMultiMaterialObject(geo, materials);
-
-		            objectContainer.add(obj);
-		        }
-		        scene.add(objectContainer);
-		    }
 			
 			/**
 			 * Animate the scene and call rendering.

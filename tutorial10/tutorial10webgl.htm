@@ -56,7 +56,7 @@
 			function createWorld() {
 				
 				// Load an image as texture
-				var mudTexture = new THREE.ImageUtils.loadTexture("Data/Mud.png");
+				var mudTexture = new THREE.ImageUtils.loadTexture("Data/Sammy.jpg");
 
 				var mudMaterial = new THREE.MeshBasicMaterial( { map: mudTexture } );
 				mudMaterial.side = THREE.DoubleSide;
@@ -72,10 +72,19 @@
 					triGeom.vertices.push(new THREE.Vector3(world[i2][V_X],world[i2][V_Y],world[i2][V_Z]));
 					triGeom.vertices.push(new THREE.Vector3(world[i3][V_X],world[i3][V_Y],world[i3][V_Z]));
 
+					// need to see which triangle we are on so we map correct half of the
+					// texture.  Otherwise we end up mapping the same half twice.
 					var uvs = [];
-					uvs.push( new THREE.Vector2( 0.0, 0.0 ) );
-					uvs.push( new THREE.Vector2( 1.0, 0.0 ) );
-					uvs.push( new THREE.Vector2( 1.0, 1.0 ) );
+					if ((i & 1) == 0){				
+						uvs.push( new THREE.Vector2( 0.0, 0.0 ) );
+						uvs.push( new THREE.Vector2( 1.0, 0.0 ) );
+						uvs.push( new THREE.Vector2( 1.0, 1.0 ) );
+					}
+					else {
+						uvs.push( new THREE.Vector2( 0.0, 0.0 ) );
+						uvs.push( new THREE.Vector2( 0.0, 1.0 ) );
+						uvs.push( new THREE.Vector2( 1.0, 1.0 ) );					
+					}
 					
 					//console.log(i1 + ": " + world[i1][V_X] + ", " + world[i1][V_Y] + ", " + world[i1][V_Z]);
 					//console.log(i2 + ": " + world[i2][V_X] + ", " + world[i2][V_Y] + ", " + world[i2][V_Z]);

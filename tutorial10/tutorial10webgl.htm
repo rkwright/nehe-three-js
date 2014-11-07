@@ -91,7 +91,7 @@
 					//console.log(i3 + ": " + world[i3][V_X] + ", " + world[i3][V_Y] + ", " + world[i3][V_Z]);
 
 					triGeom.faces.push( new THREE.Face3( 0, 1, 2 ) ); // counter-clockwise winding order
-					triGeom.faceVertexUvs[ 0 ].push( [ uvs[0], uvs[1], uvs[2] ] );
+					triGeom.faceVertexUvs[ 0 ].push( [ uvs[2], uvs[1], uvs[0] ] );
 					
 					triGeom.computeFaceNormals();
 					triGeom.computeVertexNormals();

@@ -73,15 +73,15 @@
 					// need to see which triangle we are on so we map the correct half of the
 					// texture.  Otherwise we end up mapping the same half twice.
 					var uvs = [];
-					if ((i & 1) == 0){				
-						uvs.push( new THREE.Vector2( 0.0, 0.0 ) );
-						uvs.push( new THREE.Vector2( 1.0, 0.0 ) );
+					if ((i & 1) == 1) {				
+						uvs.push( new THREE.Vector2( 0.0, 1.0 ) );
 						uvs.push( new THREE.Vector2( 1.0, 1.0 ) );
+						uvs.push( new THREE.Vector2( 1.0, 0.0 ) );
 					}
 					else {
-						uvs.push( new THREE.Vector2( 0.0, 0.0 ) );
 						uvs.push( new THREE.Vector2( 0.0, 1.0 ) );
-						uvs.push( new THREE.Vector2( 1.0, 1.0 ) );					
+						uvs.push( new THREE.Vector2( 0.0, 0.0 ) );
+						uvs.push( new THREE.Vector2( 1.0, 0.0 ) );					
 					}
 					
 					//console.log(i1 + ": " + world[i1][V_X] + ", " + world[i1][V_Y] + ", " + world[i1][V_Z]);
@@ -89,7 +89,7 @@
 					//console.log(i3 + ": " + world[i3][V_X] + ", " + world[i3][V_Y] + ", " + world[i3][V_Z]);
 
 					triGeom.faces.push( new THREE.Face3( 0, 1, 2 ) ); // counter-clockwise winding order
-					triGeom.faceVertexUvs[ 0 ].push( [ uvs[2], uvs[1], uvs[0] ] );
+					triGeom.faceVertexUvs[ 0 ].push( [ uvs[0], uvs[1], uvs[2] ] );
 					
 					triGeom.computeFaceNormals();
 					triGeom.computeVertexNormals();

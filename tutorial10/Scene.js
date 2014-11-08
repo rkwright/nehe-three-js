@@ -13,17 +13,32 @@ var directionalLight;
 /**
  * Initialize the THREE.js scene.
  */
-function initializeScene() {
+function initializeScene( containerID ) {
 
 	// Check whether the browser supports WebGL. 
 	if ( !Detector.webgl ) Detector.addGetWebGLMessage();
 
 	// Create the scene, in which all objects are stored (e. g. camera, lights, geometries, ...)
 	scene = new THREE.Scene();
-	
+
 	// Get the size of the inner window (content area)
 	canvasWidth = window.innerWidth;
 	canvasHeight = window.innerHeight;
+
+	// if the caller supplied the container elm ID try to find it
+	var container;
+	if (containerID != null && typeof containerID != 'undefined')
+		container = document.getElementById(containerID);
+	
+	// couldn't find it, so create it ourselves
+	if (container == null || typeof container == 'undefined') {
+		container = document.createElement( 'div' );
+		document.body.appendChild( container );
+	}
+	else {
+		canvasWidth = container.clientWidth;
+		canvasHeight = container.clientHeight;
+	}
 
 	// set up the camera
 	camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 0.1, 1000);
@@ -40,11 +55,8 @@ function initializeScene() {
 	// Set the renderers size to the content areas size
 	renderer.setSize(canvasWidth, canvasHeight);
 
-	 var container = document.createElement( 'div' );
-	 document.body.appendChild( container );
-	 // Get the DIV element from the HTML document by its ID and append the renderer's DOM object
-	 //document.getElementById("WebGLCanvas").appendChild(renderer.domElement);
-	 container.appendChild(renderer.domElement);
+	// Get the DIV element from the HTML document by its ID and append the renderer's DOM object
+	container.appendChild(renderer.domElement);
 	
 	// Ambient light has no direction, it illuminates every object with the same
 	// intensity. If only ambient light is used, no shading effects will occur.

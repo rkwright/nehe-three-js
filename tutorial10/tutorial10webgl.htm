@@ -1,4 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- -------------------------------------
+  NeHe Tutorial 10
+  Original:  http://nehe.gamedev.net/tutorial/loading_and_moving_through_a_3d_world/22003/
+  
+  @author: rkwright@geofx.com
+-------------------------------------- -->
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>Three.js/NEHE Tutorial #10</title>
@@ -18,19 +24,14 @@
 	</head>
 	<body>	
 		<!-- This JavaScript block encloses the Three.js commands -->
-		<script>
-			var xRotation = 0; 			// x and y rotation
-			var yRotation = 0;
-			var xSpeed = 0.0;			// Rotation speed around x and y axis
-			var ySpeed = 0.0;
-			var zTranslation = 0.0; 	// Position along the z axis
-			
-			var lightIsOn = true;  		// Flag for toggling light
-			var blendingIsOn = true;	// Flag for toggling blending		
+		<script>			
 	
 			// set up the THREE.js scene
 			initializeScene();
 
+			// request the orbitControls be created and enabled
+			orbitControls();
+			
 			// then initialize our demo's stuff
 			initializeDemo();
 
@@ -41,16 +42,12 @@
 			 * Initialize the scene.
 			 */
 			function initializeDemo() {
-								
+				
+				// draw some 3D axes to orient the user
 				drawAxes(10);
-
-				//drawSphere();
-				
-				//drawCylinder();
-				
+		
+				// then read the data and create the objects
 				createWorld();
-
-				//draw4();			
 			}
 
 			function createWorld() {
@@ -58,21 +55,30 @@
 				// Load an image as texture
 				var texture = new THREE.ImageUtils.loadTexture("Data/Sammy.jpg");
 
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
-				material.side = THREE.DoubleSide;
+				// create the material by mapping our texture onto it.  Note that we map
+				// the texture onto both sides of each object
+				var material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
 
+				// loop through all the triangles in our "world"
 				for ( i=0; i<nTriangles; i++ ) {
+					// fetch three rows at a time, being the three vertices
 					var i1 = i * 3;
 					var i2 = i * 3 + 1;
-					var i3 = i * 3 + 2;
+					var i3 = i * 3 + 2; 
+					
+					// create a plain Geometry and push the vertices into it
 					var triGeom = new THREE.Geometry();
 					triGeom.vertices.push(new THREE.Vector3(world[i1][V_X],world[i1][V_Y],world[i1][V_Z]));
 					triGeom.vertices.push(new THREE.Vector3(world[i2][V_X],world[i2][V_Y],world[i2][V_Z]));
 					triGeom.vertices.push(new THREE.Vector3(world[i3][V_X],world[i3][V_Y],world[i3][V_Z]));
 
+					// now need to create the mapping between our texture and the two triangles that
+					// comprise the faces.  For a good intro into UV mapping, see
+					// http://solutiondesign.com/webgl-and-three-js-texture-mapping/
+					
+					var uvs = [];
 					// need to see which triangle we are on so we map the correct half of the
 					// texture.  Otherwise we end up mapping the same half twice.
-					var uvs = [];
 					if ((i & 1) == 1) {				
 						uvs.push( new THREE.Vector2( 0.0, 1.0 ) );
 						uvs.push( new THREE.Vector2( 1.0, 1.0 ) );
@@ -84,66 +90,21 @@
 						uvs.push( new THREE.Vector2( 1.0, 0.0 ) );					
 					}
 					
-					//console.log(i1 + ": " + world[i1][V_X] + ", " + world[i1][V_Y] + ", " + world[i1][V_Z]);
-					//console.log(i2 + ": " + world[i2][V_X] + ", " + world[i2][V_Y] + ", " + world[i2][V_Z]);
-					//console.log(i3 + ": " + world[i3][V_X] + ", " + world[i3][V_Y] + ", " + world[i3][V_Z]);
-
-					triGeom.faces.push( new THREE.Face3( 0, 1, 2 ) ); // counter-clockwise winding order
+					// create a new Face, whose indices point into the vertices we created above
+					triGeom.faces.push( new THREE.Face3( 0, 1, 2 ) );
+					// then set corresponding UV vertices
 					triGeom.faceVertexUvs[ 0 ].push( [ uvs[0], uvs[1], uvs[2] ] );
 					
+					// re-compute the normals for both the faces and vertexes
 					triGeom.computeFaceNormals();
 					triGeom.computeVertexNormals();
 
+					// and create the actual mesh
 					var mesh = new THREE.Mesh( triGeom, material);
 					
+					// and add it to the scene
 					scene.add(mesh);
 				}
-			}
-			
-			function drawSphere() {
-				// Sphere parameters: radius, segments along width, segments along height
-				var sphereGeometry = new THREE.SphereGeometry( 0.1, 32, 16 ); 
-				// use a "lambert" material rather than "basic" for realistic lighting.
-				//   (don't forget to add (at least one) light!)
-				var sphereMaterial = new THREE.MeshLambertMaterial( {color: 0x8888ff} ); 
-				var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-				sphere.position.set(0, 0, 0);
-				scene.add(sphere);
-			}
-			
-			function drawCylinder()
-			{
-				var geometry = new THREE.CylinderGeometry( 0.5, 0.5, 1.0, 32, 32 ); 
-				var material = new THREE.MeshLambertMaterial( {color: "magenta"} ); 
-				var cylinder = new THREE.Mesh( geometry, material ); 
-				
-				cylinder.position.x = -0.5;
-				cylinder.rotation.z = Math.PI/2;
-				
-				scene.add( cylinder );
-			}
-			function draw4()
-			{
-				var a = { x:-1, y:-1 }
-				var b = { x:1,  y:1 }
-		
-				var geometry = new THREE.Geometry();
-		
-				geometry.vertices.push( new THREE.Vector3( a.x, a.y, 0.25 ) );
-				geometry.vertices.push( new THREE.Vector3( b.x, a.y, 0.25 ) );
-				geometry.vertices.push( new THREE.Vector3( b.x, b.y, 0.25 ) );
-				geometry.vertices.push( new THREE.Vector3( a.x, b.y, 0.25 ) );
-		
-				geometry.faces.push( new THREE.Face3( 0, 1, 2 ) ); // counter-clockwise winding order
-//				geometry.faces.push( new THREE.Face3( 0, 2, 3 ) );
-		
-				geometry.computeFaceNormals();
-				geometry.computeVertexNormals();
-				
-				var material = new THREE.MeshBasicMaterial({ color:"red"});
-				material.side = THREE.DoubleSide;
-				var mesh = new THREE.Mesh( geometry, material );
-				scene.add(mesh);
 			}
 			
 			/**
@@ -157,7 +118,9 @@
 				// Map the 3D scene down to the 2D screen (render the frame)
 				renderer.render(scene, camera);
 				
-				controls.update();
+				// the orbit controls, if used, have to be updated as well
+				if (controls != null && typeof controls != 'undefined') 
+					controls.update();
 			}
 		</script>
 	</body>

@@ -3,6 +3,8 @@
  * x, y, z, u, v
  * Each 3 rows represent one triangle and two triangles a wall or floor.
  * 
+ *  Note: This WebGL demo ignores the u,v values as they don't seem to make 
+ *  sense since the values are supposed to vary from 0..1, not 0..6 ?!
  */
 
 var	V_X = 0;

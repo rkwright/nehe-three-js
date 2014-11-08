@@ -10,6 +10,7 @@ var controls;
 var ambientLight;
 var directionalLight;
 
+
 /**
  * Initialize the THREE.js scene.
  */
@@ -68,7 +69,9 @@ function initializeScene( containerID ) {
 	directionalLight = new THREE.PointLight(0xffffff);
 	directionalLight.position.set(250,250,250); 
 	scene.add(directionalLight);
-	
+}
+
+function orbitControls() {
 	// add the controls
 	controls = new THREE.OrbitControls( camera, renderer.domElement );
 }

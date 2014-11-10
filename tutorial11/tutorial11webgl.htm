@@ -25,7 +25,9 @@
 		<!-- This JavaScript block encloses the Three.js commands -->
 		<script>			
 			var nScene = new Scene( { axisHeight:10, controls:true });
-			var	zRotation = 0;
+			
+			var wiggle_count = 0;		// Counter Used To Control How Fast Flag Waves
+			var points = [];
 			
 			// set up the THREE.js scene
 			nScene.initialize();
@@ -41,26 +43,108 @@
 			 */
 			function initializeDemo() {
 				
-				// Create an array of materials to be used in a cube, one for each side
-				var cubeMaterialArray = [];
-				// order to add materials: x+,x-,y+,y-,z+,z-
-				cubeMaterialArray.push( new THREE.MeshLambertMaterial( { color: 0xff3333 } ) );
-				cubeMaterialArray.push( new THREE.MeshLambertMaterial( { color: 0xff8800 } ) );
-				cubeMaterialArray.push( new THREE.MeshLambertMaterial( { color: 0xffff33 } ) );
-				cubeMaterialArray.push( new THREE.MeshLambertMaterial( { color: 0x33ff33 } ) );
-				cubeMaterialArray.push( new THREE.MeshLambertMaterial( { color: 0x3333ff } ) );
-				cubeMaterialArray.push( new THREE.MeshLambertMaterial( { color: 0x8833ff } ) );
-				var cubeMaterials = new THREE.MeshFaceMaterial( cubeMaterialArray );
-				// Cube parameters: width (x), height (y), depth (z), 
-				//        (optional) segments along x, segments along y, segments along z
-				var boxGeometry = new THREE.BoxGeometry( 2, 2, 2, 1, 1, 1 );
-				// using THREE.MeshFaceMaterial() in the constructor below
-				//   causes the mesh to use the materials stored in the geometry
-				cube = new THREE.Mesh( boxGeometry, cubeMaterials );
-				cube.position.set(0, 0, 0);
-				nScene.addToScene( cube );		
+				for ( var x=0; x<45; x++ )
+				{
+					points[x] = [];
+					for( var y=0; y<45; y++ )
+					{
+						points[x][y] = [];
+						points[x][y][0] = ((x/5.0)-4.5);
+						points[x][y][1] = ((y/5.0)-4.5);
+						points[x][y][2] = (Math.sin((((x/5.0)*40.0)/360.0)*Math.PI*2.0));
+					}
+				}
+
+
+				var texture = new THREE.ImageUtils.loadTexture("Data/Tim.bmp");
+				var material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
+
+				for( var x = 0; x < 44; x++ )
+				{
+					for( var y = 0; y < 44; y++ )
+					{
+						var tx1 = (x)/44.0;
+						var ty1 = (y)/44.0;
+						var tx2 = (x+1)/44.0;
+						var ty2 = (y+1)/44.0;
+						
+						// create a plain Geometry and push the vertices into it
+						var triGeom1 = new THREE.Geometry();
+						triGeom1.vertices.push(new THREE.Vector3(points[x][y][0], points[x][y][1], points[x][y][2]));
+						triGeom1.vertices.push(new THREE.Vector3(points[x+1][y][0], points[x+1][y][1], points[x+1][y][2]));
+						triGeom1.vertices.push(new THREE.Vector3(points[x][y+1][0], points[x][y+1][1], points[x][y+1][2]));
+
+						// now need to create the mapping between our texture and the two triangles that
+						// comprise the faces.  For a good intro into UV mapping, see
+						// http://solutiondesign.com/webgl-and-three-js-texture-mapping/
+						
+						var uvs = [];
+						uvs.push( new THREE.Vector2( tx1,ty1 ) );
+						uvs.push( new THREE.Vector2( tx2,ty1 ) );
+						uvs.push( new THREE.Vector2( tx1,ty2 ) );
+						
+						// create a new Face, whose indices point into the vertices we created above
+						triGeom1.faces.push( new THREE.Face3( 0, 1, 2 ) );
+						// then set corresponding UV vertices
+						triGeom1.faceVertexUvs[ 0 ].push( [ uvs[0], uvs[1], uvs[2] ] );
+						
+						// re-compute the normals for both the faces and vertexes
+						triGeom1.computeFaceNormals();
+						triGeom1.computeVertexNormals();
+
+						// and create the actual mesh
+						var mesh = new THREE.Mesh( triGeom1, material);
+						// and add it to the scene
+						nScene.addToScene(mesh);
+						// create a plain Geometry and push the vertices into it
+						var triGeom2 = new THREE.Geometry();
+						triGeom2.vertices.push(new THREE.Vector3(points[x+1][y][0], points[x+1][y][1], points[x+1][y][2]));
+						triGeom2.vertices.push(new THREE.Vector3(points[x+1][y+1][0], points[x+1][y+1][1], points[x+1][y+1][2]));
+						triGeom2.vertices.push(new THREE.Vector3(points[x][y+1][0], points[x][y+1][1], points[x][y+1][2]));
+
+						// now need to create the mapping between our texture and the two triangles that
+						// comprise the faces.  For a good intro into UV mapping, see
+						// http://solutiondesign.com/webgl-and-three-js-texture-mapping/
+						
+						var uvs2 = [];
+						uvs2.push( new THREE.Vector2( tx2,ty1 ) );
+						uvs2.push( new THREE.Vector2( tx2,ty2 ) );
+						uvs2.push( new THREE.Vector2( tx1,ty2 ) );
+						
+						// create a new Face, whose indices point into the vertices we created above
+						triGeom2.faces.push( new THREE.Face3( 0, 1, 2 ) );
+						// then set corresponding UV vertices
+						triGeom2.faceVertexUvs[ 0 ].push( [ uvs2[0], uvs2[1], uvs2[2] ] );
+						
+						// re-compute the normals for both the faces and vertexes
+						triGeom2.computeFaceNormals();
+						triGeom2.computeVertexNormals();
+
+						// and create the actual mesh
+						var mesh2 = new THREE.Mesh( triGeom2, material);
+						// and add it to the scene
+						nScene.addToScene(mesh2);
+					}
+				}
 			}
 		
+			function wiggleTheMesh()
+			{
+				if ( wiggle_count++ == 2 )
+				{
+					for ( y = 0; y < 45; y++ )
+					{
+						var temp = points[0][y][2];
+						for ( x = 0; x < 44; x++ )
+						{
+							points[x][y][2] = points[x+1][y][2];
+						}
+						points[44][y][2] = temp;
+					}
+					wiggle_count = 0;
+				}
+			}
+			
 			/**
 			 * Animate the scene and call rendering.
 			 */
@@ -68,8 +152,6 @@
 
 				// Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
-
-				cube.rotation.y -= 0.05; //clock.getDelta();
 
 				// Map the 3D scene down to the 2D screen (render the frame)
 				nScene.renderScene();

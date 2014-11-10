@@ -17,12 +17,6 @@ Scene = function ( parameters ) {
 
 	this.axisHeight = 0;
 
-	for(var propertyName in this) {
-		   // propertyName is what you want
-		   // you can get the value like this: myObject[propertyName]
-		console.log("prop: " + propertyName);
-	}
-	
 	this.setParameters( parameters );
 };
 

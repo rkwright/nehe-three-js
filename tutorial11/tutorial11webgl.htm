@@ -23,14 +23,15 @@
 	</head>
 	<body>	
 		<!-- This JavaScript block encloses the Three.js commands -->
-		<script>			
+		<script>
+			// allocate the Scene object, requestion orbitControls and an set of 3D axes 10 units high
 			var nScene = new Scene( { axisHeight:10, controls:true });
 			
 			var wiggle_count = 0;		// Counter Used To Control How Fast Flag Waves
 			var points = [];
 			var material;
 		
-			// set up the THREE.js scene
+			// set up the THREE.js scene via our Scene object
 			nScene.initialize();
 			
 			// then initialize our demo's stuff
@@ -40,10 +41,12 @@
 			animateScene();
 
 			/**
-			 * Initialize the scene.
+			 * Initialize the Demo.  This is NeHe #1: http://nehe.gamedev.net/tutorial/flag_effect_%28waving_texture%29/16002/
+			 * Create a image mapped texture which is then oscillated (in a sine wave)
 			 */
 			function initializeDemo() {
 				
+				 // set up the set of points which will be varied to create the "wave"
 				for ( var x=0; x<45; x++ )
 				{
 					points[x] = [];
@@ -56,12 +59,16 @@
 					}
 				}
 
+				// load the image and create the mesh-material
 				var texture = new THREE.ImageUtils.loadTexture("Data/Tim.bmp");
 				material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
 				
+				// now go create the mesh
 				createMesh();
 			};
 			
+			// this is the simple callback function we pass to the ParametricGeometry
+			// the ParametricGeometry will call this for each slice/stack so that u and v vary from 0..1
 			function sineWave ( u, v ) {
 				x = u * 9 - 4.5;
 				y = v * 9 - 4.5;
@@ -70,12 +77,17 @@
 				return new THREE.Vector3(x, y, z);
 			}
 			
+			// just create the Parametric geometry and add it to the Scene
+			// works, but performance is very slow
 			function createMesh() {
 			    var paraGeom = new THREE.ParametricGeometry(sineWave, 45, 45);
 				var mesh = new THREE.Mesh( paraGeom, material);
 				nScene.addToScene(mesh);
 			}
 			
+			// this is the orginal approach, much more akin to the original C++ implementation
+			// create a series of quads consisting of two triangles
+			// works fine but performance is absymal
 			function createMeshByTriangles() {
 				
 				for( var x = 0; x < 44; x++ )
@@ -95,6 +107,7 @@
 				}
 			}
 		
+			// add one half of each quad as a simple triangle
 			function addTriangle ( x1, y1, x2, y2, x3, y3, u1, v1, u2, v2, u3, v3, meshMat ) {
 				
 				// create a plain Geometry and push the vertices into it
@@ -127,6 +140,7 @@
 				nScene.addToScene(mesh);
 			}
 			
+			// move the points over one step to "wiggle" the mesh
 			function wiggleTheMesh() {
 				console.log("Wiggle count: " + wiggle_count);
 				if ( wiggle_count++ == 2 )
@@ -152,9 +166,11 @@
 				// Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
 
+				// re-create the mesh - this is an expensive operation.  How to avoid it?
 				createMesh();
 				
-				//wiggleTheMesh();
+				// then wiggle the mesh for next time
+				wiggleTheMesh();
 				
 				// Map the 3D scene down to the 2D screen (render the frame)
 				nScene.renderScene();

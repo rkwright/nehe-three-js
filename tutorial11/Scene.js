@@ -12,6 +12,9 @@ Scene = function ( parameters ) {
 	this.controls = false;
 	this.orbitControls;
 
+	this.displayStats = false;
+	this.stats;
+
 	this.ambientLight;
 	this.directionalLight;
 
@@ -117,6 +120,16 @@ Scene.prototype = {
 		
 		if ( this.axisHeight != 0 )
 			this.drawAxes(this.axisHeight);
+		
+		//------ STATS --------------------	
+		// displays current and past frames per second attained by scene
+		if (this.displayStats == true) {
+			this.stats = new Stats();
+			this.stats.domElement.style.position = 'absolute';
+			this.stats.domElement.style.bottom = '0px';
+			this.stats.domElement.style.zIndex = 100;
+			container.appendChild( this.stats.domElement );
+		}
 	},
 
 	addToScene: function ( obj ) {
@@ -133,6 +146,9 @@ Scene.prototype = {
 		// the orbit controls, if used, have to be updated as well
 		if (this.orbitControls != null && typeof this.orbitControls != 'undefined') 
 			this.orbitControls.update();
+
+		if (this.stats != null && typeof this.stats != 'undefined') 
+			this.stats.update();
 
 },
 

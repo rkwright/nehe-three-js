@@ -83,6 +83,10 @@
 			    var paraGeom = new THREE.ParametricGeometry(sineWave, 45, 45);
 				var mesh = new THREE.Mesh( paraGeom, material);
 				nScene.addToScene(mesh);
+				
+				var vertices = paraGeom.vertices;
+				console.log("verts: " + vertices.length );
+
 			}
 			
 			// this is the orginal approach, much more akin to the original C++ implementation

@@ -188,9 +188,7 @@ Scene.prototype = {
 	},
 
 	drawAxes: function( height ) {
-			
-		console.log("X_AXIS: " + X_AXIS);
-	
+		
 		this.drawAxis(X_AXIS, 0xff0000, height);
 		this.drawAxis(Y_AXIS, 0x00ff00, height);
 		this.drawAxis(Z_AXIS, 0x0000ff, height);

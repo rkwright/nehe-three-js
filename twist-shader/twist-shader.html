@@ -94,7 +94,7 @@
 			function addSphere() {
 				
 				// Sphere parameters: radius, segments along width, segments along height
-				var sphereGeometry = new THREE.SphereGeometry( 1, 32, 16 ); 
+				var sphereGeometry = new THREE.SphereGeometry( 1, 64, 64 ); 
 			
 				// add a uniform for the amplitude
 				uniforms = {
@@ -121,6 +121,7 @@
 						fragmentShader: fs
 					});
 				
+
 				// now populate the array of attributes
 				var verts  = sphereGeometry.vertices;
 

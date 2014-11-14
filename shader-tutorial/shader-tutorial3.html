@@ -1,0 +1,58 @@
+<html>
+<head>
+<script src="../js/three.js"></script>
+<script src="render3.js"></script>
+
+<script id="vertShader" type="shader">
+	varying vec2 vUv;
+	varying vec3 vecPos;
+	varying vec3 vecNormal;
+ 
+	void main() {
+    	vUv = uv;
+    	// Since the light is on world coordinates,
+    	// I'll need the vertex position in world coords too
+    	// (or I could transform the light position to view
+    	// coordinates, but that would be more expensive)
+    	vecPos = (modelMatrix * vec4(position, 1.0 )).xyz;
+    	
+		// That's NOT exacly how you should transform your
+    	// normals but this will work fine, since my model
+    	// matrix is pretty basic
+    	vecNormal = (modelMatrix * vec4(normal, 0.0)).xyz;
+    	gl_Position = projectionMatrix * viewMatrix * vec4(vecPos, 1.0);
+	}
+
+</script>
+<script id="fragShader" type="shader">
+	precision highp float;
+ 
+	varying vec2 vUv;
+	varying vec3 vecPos;
+	varying vec3 vecNormal;
+ 
+	uniform float color;
+	uniform sampler2D evilCreature;
+ 
+	uniform vec3 pointLightColor[MAX_POINT_LIGHTS];
+	uniform vec3 pointLightPosition[MAX_POINT_LIGHTS];
+	uniform float pointLightDistance[MAX_POINT_LIGHTS];
+ 
+	void main(void) {
+    	// Pretty basic lambertian lighting...
+    	vec4 addedLights = vec4(0.0,0.0,0.0, 1.0);
+    	for(int l = 0; l < MAX_POINT_LIGHTS; l++) {
+        	vec3 lightDirection = normalize(vecPos
+                              -pointLightPosition[l]);
+        	addedLights.rgb += clamp(dot(-lightDirection,
+                                 vecNormal), 0.0, 1.0)
+                           * pointLightColor[l];
+    	}
+    
+		gl_FragColor = texture2D(evilCreature, vUv) * addedLights;
+	}
+</script>
+
+</head>
+<body style="margin: 0px;" onload="init()"></body>
+</html>

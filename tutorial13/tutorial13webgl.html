@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<!-- This demo based on work by Lee Stemkoski, see https://stemkoski.github.io/Three.js -->
+	<title>Sprite Text Labels</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link rel=stylesheet href="../css/NEHE.css"/>
+	
+	<script src="../js/Three.js"></script>
+	<script src="../js/Detector.js"></script>
+	<script src="../js/Stats.js"></script>
+	<script src="../js/OrbitControls.js"></script>
+	<script src="../js/Scene.js"></script>
+</head>
+<body>
+
+<script>
+//custom global variables
+var cube;
+var projector, mouse = { x: 0, y: 0 }, INTERSECTED;
+var sprite1;
+var canvas1, context1, texture1;
+
+// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+var nScene = new Scene( { axisHeight:10, controls:true, displayStats:true });
+
+// set up the THREE.js scene via our Scene object
+nScene.initialize();
+
+// then initialize our demo's stuff
+initializeDemo();
+
+// Animate the scene
+animateScene();
+
+/**
+ * Initialize the Demo.  This is roughly equivalent to NeHe #12: 
+ */
+	
+function initializeDemo() 
+{
+	var cubeGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+	var cubeMaterial = new THREE.MeshNormalMaterial( { wireframe:true } );
+	cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+	cube.position.set(0,0,0);
+	cube.name = "Cube";
+	nScene.addToScene(cube);
+	
+	var materialC = new THREE.SpriteMaterial( { color: 0xff00ff, fog: false } );
+	var sprite = new THREE.Sprite( materialC );
+	sprite.position.set( 0.5, 0.5, 0.5 );
+	sprite.position.normalize();
+	sprite.scale.set(0.5, 0.5, 1.0);
+
+//	nScene.addToScene( sprite );
+
+	var sphere = new THREE.Mesh( new THREE.SphereGeometry(0.05, 32, 32), new THREE.MeshNormalMaterial());
+	sphere.position.set(0.5,0.5,0.5);
+	nScene.addToScene(sphere);
+	
+
+	var spritey = makeTextSprite( " Hello, ", 
+		{ fontsize: 24, borderColor: {r:255, g:0, b:0, a:1.0}, backgroundColor: {r:255, g:100, b:100, a:0.8} } );
+	spritey.position.set(-0.5,0.5,0.5);
+	nScene.addToScene( spritey );
+    
+	var spritey = makeTextSprite( " World! ", 
+		{ fontsize: 32, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0} } );
+	spritey.position.set(0.5,0.5,0.5);
+	nScene.addToScene( spritey );
+	
+	
+	//text = addText(new Array(1, 1), "it fucking works!!");
+    //nScene.addToScene( text );
+    //console.log(text.position);
+}
+
+function makeTextSprite( message, parameters )
+{
+	if ( parameters === undefined ) parameters = {};
+	
+	var fontface = parameters.hasOwnProperty("fontface") ? 
+		parameters["fontface"] : "Arial";
+	
+	var fontsize = parameters.hasOwnProperty("fontsize") ? 
+		parameters["fontsize"] : 18;
+	
+	var borderThickness = parameters.hasOwnProperty("borderThickness") ? 
+		parameters["borderThickness"] : 4;
+	
+	var borderColor = parameters.hasOwnProperty("borderColor") ?
+		parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
+	
+	var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?
+		parameters["backgroundColor"] : { r:255, g:255, b:255, a:1.0 };
+
+	var canvas = document.createElement('canvas');	
+	var context = canvas.getContext('2d');
+	context.font = "Bold " + fontsize + "px " + fontface;
+    
+	// get size data (height depends only on font size)
+	var metrics = context.measureText( message );
+	var textWidth = metrics.width;
+
+//	canvas.setAttribute('width', textWidth + borderThickness);
+//	canvas.setAttribute('height', fontsize * 1.4 + borderThickness);
+
+	var cx = canvas.width / 2;
+	var cy = canvas.height / 2;
+	var tx = textWidth / 2;
+	var ty = fontsize / 2.0;
+
+	// background color
+	context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + ","
+								  + backgroundColor.b + "," + backgroundColor.a + ")";
+	// border color
+	context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + ","
+								  + borderColor.b + "," + borderColor.a + ")";
+
+	context.lineWidth = borderThickness;
+	//roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness, fontsize * 1.4 + borderThickness, 1);
+//	roundRect(context, cx - tx + borderThickness/2, cy - fontsize/2 - borderThickness, textWidth +  borderThickness, fontsize * 1.4 + borderThickness, 6);
+	roundRect(context, cx - tx + borderThickness/2, cy - fontsize/2 - borderThickness, textWidth +  borderThickness, fontsize * 1.4 + borderThickness, 6);
+	// 1.4 is extra height factor for text below baseline: g,j,p,q.
+	
+	// text color
+	context.fillStyle = "rgba(0, 0, 0, 1.0)";
+
+	//context.fillText( message, borderThickness, fontsize + borderThickness);
+	context.fillText( message, cx - tx + borderThickness, cy + ty - borderThickness/2);
+	
+	// canvas contents will be used for a texture
+	var texture = new THREE.Texture(canvas) 
+	texture.needsUpdate = true;
+
+	var spriteMaterial = new THREE.SpriteMaterial( { map: texture } );
+	var sprite = new THREE.Sprite( spriteMaterial );
+	sprite.scale.set(1.5,1.0,1.0);
+	return sprite;	
+}
+
+// function for drawing rounded rectangles
+function roundRect(ctx, x, y, w, h, r) 
+{
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y);
+    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+    ctx.lineTo(x+w, y+h-r);
+    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    ctx.lineTo(x+r, y+h);
+    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+    ctx.lineTo(x, y+r);
+    ctx.quadraticCurveTo(x, y, x+r, y);
+    ctx.closePath();
+    ctx.fill();
+	ctx.stroke();   
+}
+
+function addText(position, text) {
+	var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    context.fillStyle = '#FF0000';
+    var  metrics = null,
+    textHeight = 30,
+    textWidth = 0,
+    actualFontSize = 1; //0.12;
+    
+    // 2d duty
+    metrics = context.measureText(text);
+    var textWidth = metrics.width;
+
+    canvas.width = textWidth;
+    canvas.height = textHeight;
+    context.font = "normal " + textHeight + "px Arial";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillStyle = "#ff0000";
+    context.fillText(text, textWidth / 2, textHeight / 2);
+
+    var texture = new THREE.Texture(canvas);
+    texture.needsUpdate = true;
+    var material = new THREE.SpriteMaterial({ map: texture, useScreenCoordinates: false });
+    var sprite = new THREE.Sprite( material );
+
+    var textObject = new THREE.Object3D();
+   // var sprite = new THREE.Sprite(texture);
+    textObject.textHeight = actualFontSize;
+    textObject.textWidth = (textWidth / textHeight) * textObject.textHeight;
+    sprite.scale.set(textWidth / textHeight * actualFontSize, actualFontSize, 1);
+
+    sprite.position.set(1,1,0);
+
+    textObject.add(sprite);
+    return textObject;
+  }
+
+  var scene = new THREE.Scene();
+/**
+ * Animate the scene and call rendering.
+ */
+function animateScene() {
+
+	// Tell the browser to call this function when page is visible
+	requestAnimationFrame(animateScene);
+	
+	// Map the 3D scene down to the 2D screen (render the frame)
+	nScene.renderScene();
+}
+
+</script>
+
+</body>
+</html>

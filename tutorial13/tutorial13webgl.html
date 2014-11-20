@@ -55,19 +55,22 @@ function initializeDemo()
 
 //	nScene.addToScene( sprite );
 
-	var sphere = new THREE.Mesh( new THREE.SphereGeometry(0.05, 32, 32), new THREE.MeshNormalMaterial());
-	sphere.position.set(0.5,0.5,0.5);
+	var sphere = new THREE.Mesh( new THREE.SphereGeometry(0.01, 32, 32), new THREE.MeshNormalMaterial());
+	sphere.position.set(0.5,0.5,0);
 	nScene.addToScene(sphere);
 	
+	sphere = new THREE.Mesh( new THREE.SphereGeometry(0.01, 32, 32), new THREE.MeshNormalMaterial());
+	sphere.position.set(-0.5,0.5,0);
+	nScene.addToScene(sphere);
 
 	var spritey = makeTextSprite( " Hello, ", 
 		{ fontsize: 24, borderColor: {r:255, g:0, b:0, a:1.0}, backgroundColor: {r:255, g:100, b:100, a:0.8} } );
-	spritey.position.set(-0.5,0.5,0.5);
+	spritey.position.set(-0.5,0.5,0);
 	nScene.addToScene( spritey );
     
-	var spritey = makeTextSprite( " World! ", 
-		{ fontsize: 32, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0} } );
-	spritey.position.set(0.5,0.5,0.5);
+	var spritey = makeTextSprite( "Wiggle!W", 
+		{ fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, borderThickness:4 } );
+	spritey.position.set(0.5,0.5,0);
 	nScene.addToScene( spritey );
 	
 	
@@ -95,16 +98,31 @@ function makeTextSprite( message, parameters )
 	var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?
 		parameters["backgroundColor"] : { r:255, g:255, b:255, a:1.0 };
 
-	var canvas = document.createElement('canvas');	
+	var radius = parameters.hasOwnProperty("radius") ?
+				parameters["radius"] : 6;
+		
+	var canvas = document.createElement('canvas');
 	var context = canvas.getContext('2d');
-	context.font = "Bold " + fontsize + "px " + fontface;
+	
+	context.font = fontsize + "px " + fontface;
+	context.textBaseline = "alphabetic";
+	context.textAlign = "left";
     
 	// get size data (height depends only on font size)
 	var metrics = context.measureText( message );
 	var textWidth = metrics.width;
-
-//	canvas.setAttribute('width', textWidth + borderThickness);
-//	canvas.setAttribute('height', fontsize * 1.4 + borderThickness);
+	
+	if ( textWidth > canvas.width ) {
+		canvas.width = textWidth * 2;
+		canvas.height = textWidth;
+		// need to re-fetch and refresh the context after resizing
+		context = canvas.getContext('2d');
+		context.font = fontsize + "px " + fontface;
+		context.textBaseline = "alphabetic";
+		context.textAlign = "left";
+	 	metrics = context.measureText( message );
+		textWidth = metrics.width;
+	}
 
 	var cx = canvas.width / 2;
 	var cy = canvas.height / 2;
@@ -121,22 +139,43 @@ function makeTextSprite( message, parameters )
 	context.lineWidth = borderThickness;
 	//roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness, fontsize * 1.4 + borderThickness, 1);
 //	roundRect(context, cx - tx + borderThickness/2, cy - fontsize/2 - borderThickness, textWidth +  borderThickness, fontsize * 1.4 + borderThickness, 6);
-	roundRect(context, cx - tx + borderThickness/2, cy - fontsize/2 - borderThickness, textWidth +  borderThickness, fontsize * 1.4 + borderThickness, 6);
+	roundRect(context, cx - tx , cy - ty, textWidth +  borderThickness, fontsize * 1.28 + borderThickness, 6);
 	// 1.4 is extra height factor for text below baseline: g,j,p,q.
 	
 	// text color
-	context.fillStyle = "rgba(0, 0, 0, 1.0)";
+	context.fillStyle = 'blue'; //"rgba(1, 0, 0, 1.0)";
 
 	//context.fillText( message, borderThickness, fontsize + borderThickness);
-	context.fillText( message, cx - tx + borderThickness, cy + ty - borderThickness/2);
-	
-	// canvas contents will be used for a texture
+	context.fillText( message, cx - tx, cy + ty);
+
+    context.strokeStyle = "rgba(255,0,0,1)";
+    context.lineWidth = 2;
+    context.beginPath(); 
+    context.moveTo(cx-150,cy);
+    context.lineTo(cx+150,cy);
+    context.stroke();
+    
+    context.strokeStyle = "rgba(255,0,0,1)";
+    context.lineWidth = 2;
+    context.beginPath(); 
+    context.moveTo(0,0);
+    context.lineTo(canvas.width, canvas.height);
+    context.stroke();
+
+    context.strokeStyle = "rgba(255,0,0,1)";
+    context.lineWidth = 2;
+    context.beginPath(); 
+    context.moveTo(0,canvas.height);
+    context.lineTo(canvas.width, 0);
+    context.stroke();
+
+    // canvas contents will be used for a texture
 	var texture = new THREE.Texture(canvas) 
 	texture.needsUpdate = true;
 
 	var spriteMaterial = new THREE.SpriteMaterial( { map: texture } );
 	var sprite = new THREE.Sprite( spriteMaterial );
-	sprite.scale.set(1.5,1.0,1.0);
+	sprite.scale.set(1.5,0.75,1.0);
 	return sprite;	
 }
 
@@ -155,7 +194,8 @@ function roundRect(ctx, x, y, w, h, r)
     ctx.quadraticCurveTo(x, y, x+r, y);
     ctx.closePath();
     ctx.fill();
-	ctx.stroke();   
+    if (r > 0)
+    	ctx.stroke();   
 }
 
 function addText(position, text) {

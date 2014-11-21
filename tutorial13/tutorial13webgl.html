@@ -21,6 +21,7 @@ var cube;
 var projector, mouse = { x: 0, y: 0 }, INTERSECTED;
 var sprite1;
 var canvas1, context1, texture1;
+var DESCENDER_ADJUST = 1.28;
 
 // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 var nScene = new Scene( { axisHeight:10, controls:true, displayStats:true });
@@ -53,7 +54,7 @@ function initializeDemo()
 	sprite.position.normalize();
 	sprite.scale.set(0.5, 0.5, 1.0);
 
-//	nScene.addToScene( sprite );
+	//	nScene.addToScene( sprite );
 
 	var sphere = new THREE.Mesh( new THREE.SphereGeometry(0.01, 32, 32), new THREE.MeshNormalMaterial());
 	sphere.position.set(0.5,0.5,0);
@@ -63,20 +64,15 @@ function initializeDemo()
 	sphere.position.set(-0.5,0.5,0);
 	nScene.addToScene(sphere);
 
-	var spritey = makeTextSprite( " Hello, ", 
-		{ fontsize: 24, borderColor: {r:255, g:0, b:0, a:1.0}, backgroundColor: {r:255, g:100, b:100, a:0.8} } );
-	spritey.position.set(-0.5,0.5,0);
-	nScene.addToScene( spritey );
+	//var spritey = makeTextSprite( " Hello, ", 
+	//	{ fontsize: 24, borderColor: {r:255, g:0, b:0, a:1.0}, backgroundColor: {r:255, g:100, b:100, a:0.8} } );
+	//spritey.position.set(-0.5,0.5,0);
+	//nScene.addToScene( spritey );
     
 	var spritey = makeTextSprite( "Wiggle!W", 
-		{ fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, borderThickness:4 } );
+		{ fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, borderThickness:4, radius:4 } );
 	spritey.position.set(0.5,0.5,0);
 	nScene.addToScene( spritey );
-	
-	
-	//text = addText(new Array(1, 1), "it fucking works!!");
-    //nScene.addToScene( text );
-    //console.log(text.position);
 }
 
 function makeTextSprite( message, parameters )
@@ -136,10 +132,8 @@ function makeTextSprite( message, parameters )
 	context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + ","
 								  + borderColor.b + "," + borderColor.a + ")";
 
-	context.lineWidth = borderThickness;
-	//roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness, fontsize * 1.4 + borderThickness, 1);
-//	roundRect(context, cx - tx + borderThickness/2, cy - fontsize/2 - borderThickness, textWidth +  borderThickness, fontsize * 1.4 + borderThickness, 6);
-	roundRect(context, cx - tx , cy - ty, textWidth +  borderThickness, fontsize * 1.28 + borderThickness, 6);
+	//context.lineWidth = borderThickness;
+	roundRect(context, cx - tx , cy - ty, textWidth, fontsize * DESCENDER_ADJUST, radius, borderThickness);
 	// 1.4 is extra height factor for text below baseline: g,j,p,q.
 	
 	// text color
@@ -148,13 +142,20 @@ function makeTextSprite( message, parameters )
 	//context.fillText( message, borderThickness, fontsize + borderThickness);
 	context.fillText( message, cx - tx, cy + ty);
 
-    context.strokeStyle = "rgba(255,0,0,1)";
+    context.strokeStyle = "rgba(0,255,0,1)";
     context.lineWidth = 2;
     context.beginPath(); 
     context.moveTo(cx-150,cy);
     context.lineTo(cx+150,cy);
     context.stroke();
-    
+
+    context.strokeStyle = "rgba(0,255,0,1)";
+    context.lineWidth = 2;
+    context.beginPath(); 
+    context.moveTo(cx,cy-150);
+    context.lineTo(cx,cy+150);
+    context.stroke();
+
     context.strokeStyle = "rgba(255,0,0,1)";
     context.lineWidth = 2;
     context.beginPath(); 
@@ -180,8 +181,13 @@ function makeTextSprite( message, parameters )
 }
 
 // function for drawing rounded rectangles
-function roundRect(ctx, x, y, w, h, r) 
+function roundRect(ctx, x, y, w, h, r, thick) 
 {
+	x -= thick + r;
+	y -= thick + r;
+	w += thick * 2 + r * 2;
+	h += thick * 2 + r * 2;
+	
     ctx.beginPath();
     ctx.moveTo(x+r, y);
     ctx.lineTo(x+w-r, y);
@@ -193,50 +199,14 @@ function roundRect(ctx, x, y, w, h, r)
     ctx.lineTo(x, y+r);
     ctx.quadraticCurveTo(x, y, x+r, y);
     ctx.closePath();
+    
+	ctx.lineWidth = thick;
+
     ctx.fill();
-    if (r > 0)
+    if (thick > 0)
     	ctx.stroke();   
 }
 
-function addText(position, text) {
-	var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
-    context.fillStyle = '#FF0000';
-    var  metrics = null,
-    textHeight = 30,
-    textWidth = 0,
-    actualFontSize = 1; //0.12;
-    
-    // 2d duty
-    metrics = context.measureText(text);
-    var textWidth = metrics.width;
-
-    canvas.width = textWidth;
-    canvas.height = textHeight;
-    context.font = "normal " + textHeight + "px Arial";
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.fillStyle = "#ff0000";
-    context.fillText(text, textWidth / 2, textHeight / 2);
-
-    var texture = new THREE.Texture(canvas);
-    texture.needsUpdate = true;
-    var material = new THREE.SpriteMaterial({ map: texture, useScreenCoordinates: false });
-    var sprite = new THREE.Sprite( material );
-
-    var textObject = new THREE.Object3D();
-   // var sprite = new THREE.Sprite(texture);
-    textObject.textHeight = actualFontSize;
-    textObject.textWidth = (textWidth / textHeight) * textObject.textHeight;
-    sprite.scale.set(textWidth / textHeight * actualFontSize, actualFontSize, 1);
-
-    sprite.position.set(1,1,0);
-
-    textObject.add(sprite);
-    return textObject;
-  }
-
-  var scene = new THREE.Scene();
 /**
  * Animate the scene and call rendering.
  */

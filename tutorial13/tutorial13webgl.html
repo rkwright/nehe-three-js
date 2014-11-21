@@ -61,19 +61,53 @@ function initializeDemo()
 	nScene.addToScene(sphere);
 	
 	sphere = new THREE.Mesh( new THREE.SphereGeometry(0.01, 32, 32), new THREE.MeshNormalMaterial());
-	sphere.position.set(-0.5,0.5,0);
+	sphere.position.set(-0.5,0.5,0.25);
 	nScene.addToScene(sphere);
-
-	//var spritey = makeTextSprite( " Hello, ", 
-	//	{ fontsize: 24, borderColor: {r:255, g:0, b:0, a:1.0}, backgroundColor: {r:255, g:100, b:100, a:0.8} } );
-	//spritey.position.set(-0.5,0.5,0);
-	//nScene.addToScene( spritey );
-    
-	var spritey = makeTextSprite( "Wiggle!W", 
-		{ fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, borderThickness:4, radius:4 } );
-	spritey.position.set(0.5,0.5,0);
+ 
+	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:0, radius:0, vAlign:"top", hAlign:"left" } );
+	spritey.position.set(-0.5,-0.5,0.25);
 	nScene.addToScene( spritey );
-}
+	
+	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:0, radius:0, vAlign:"bottom", hAlign:"right" } );
+	spritey.position.set(0.5,0.5,0.25);
+	nScene.addToScene( spritey );
+
+	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:0, radius:0, vAlign:"bottom", hAlign:"left" } );
+	spritey.position.set(-0.5,0.5,0.25);
+	nScene.addToScene( spritey );
+	
+	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:0, radius:0, vAlign:"center", hAlign:"left" } );
+	spritey.position.set(-0.5,0,0.25);
+	nScene.addToScene( spritey );
+
+	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:0, radius:0, vAlign:"center", hAlign:"right" } );
+	spritey.position.set(0.5,0,0.25);
+	nScene.addToScene( spritey );
+
+	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:0, radius:0, vAlign:"top", hAlign:"right" } );
+	spritey.position.set(0.5,-0.5,0.25);
+	nScene.addToScene( spritey );
+
+	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:0, radius:0, vAlign:"bottom", hAlign:"center" } );
+	spritey.position.set(0,0.5,0.25);
+	nScene.addToScene( spritey );
+
+	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:0, radius:0, vAlign:"center", hAlign:"center" } );
+	spritey.position.set(0,0,0.25);
+	nScene.addToScene( spritey );
+
+	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:0, radius:0, vAlign:"top", hAlign:"center" } );
+	spritey.position.set(0,-0.5,0.25);
+	nScene.addToScene( spritey );}
 
 function makeTextSprite( message, parameters )
 {
@@ -96,7 +130,13 @@ function makeTextSprite( message, parameters )
 
 	var radius = parameters.hasOwnProperty("radius") ?
 				parameters["radius"] : 6;
-		
+
+	var vAlign = parameters.hasOwnProperty("vAlign") ?
+						parameters["vAlign"] : "center";
+
+	var hAlign = parameters.hasOwnProperty("hAlign") ?
+						parameters["hAlign"] : "center";
+
 	var canvas = document.createElement('canvas');
 	var context = canvas.getContext('2d');
 	
@@ -122,9 +162,19 @@ function makeTextSprite( message, parameters )
 
 	var cx = canvas.width / 2;
 	var cy = canvas.height / 2;
-	var tx = textWidth / 2;
+	var tx = textWidth/ 2.0;
 	var ty = fontsize / 2.0;
 
+	if ( vAlign == "bottom")
+		ty = 0;
+	else if (vAlign == "top")
+		ty = fontsize;
+	
+	if (hAlign == "left")
+		tx = textWidth;
+	else if (hAlign == "right")
+		tx = 0;
+	
 	// background color
 	context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + ","
 								  + backgroundColor.b + "," + backgroundColor.a + ")";
@@ -133,7 +183,7 @@ function makeTextSprite( message, parameters )
 								  + borderColor.b + "," + borderColor.a + ")";
 
 	//context.lineWidth = borderThickness;
-	roundRect(context, cx - tx , cy - ty, textWidth, fontsize * DESCENDER_ADJUST, radius, borderThickness);
+	roundRect(context, cx - tx , cy + ty + 0.28 * fontsize, textWidth, fontsize * DESCENDER_ADJUST, radius, borderThickness);
 	// 1.4 is extra height factor for text below baseline: g,j,p,q.
 	
 	// text color
@@ -156,6 +206,7 @@ function makeTextSprite( message, parameters )
     context.lineTo(cx,cy+150);
     context.stroke();
 
+    /*
     context.strokeStyle = "rgba(255,0,0,1)";
     context.lineWidth = 2;
     context.beginPath(); 
@@ -169,7 +220,7 @@ function makeTextSprite( message, parameters )
     context.moveTo(0,canvas.height);
     context.lineTo(canvas.width, 0);
     context.stroke();
-
+	*/
     // canvas contents will be used for a texture
 	var texture = new THREE.Texture(canvas) 
 	texture.needsUpdate = true;
@@ -184,19 +235,19 @@ function makeTextSprite( message, parameters )
 function roundRect(ctx, x, y, w, h, r, thick) 
 {
 	x -= thick + r;
-	y -= thick + r;
+	y += thick + r;
 	w += thick * 2 + r * 2;
 	h += thick * 2 + r * 2;
 	
     ctx.beginPath();
     ctx.moveTo(x+r, y);
     ctx.lineTo(x+w-r, y);
-    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-    ctx.lineTo(x+w, y+h-r);
-    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-    ctx.lineTo(x+r, y+h);
-    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-    ctx.lineTo(x, y+r);
+    ctx.quadraticCurveTo(x+w, y, x+w, y-r);
+    ctx.lineTo(x+w, y-h-r);
+    ctx.quadraticCurveTo(x+w, y-h, x+w-r, y-h);
+    ctx.lineTo(x+r, y-h);
+    ctx.quadraticCurveTo(x, y-h, x, y-h+r);
+    ctx.lineTo(x, y-r);
     ctx.quadraticCurveTo(x, y, x+r, y);
     ctx.closePath();
     

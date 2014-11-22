@@ -64,50 +64,52 @@ function initializeDemo()
 	sphere.position.set(-0.5,0.5,0.25);
 	nScene.addToScene(sphere);
  
-	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:0, vAlign:"top", hAlign:"left" } );
+	var spritey = makeTextSprite( "Wiggle!X", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:8, radius:8, vAlign:"top", hAlign:"left" } );
 	spritey.position.set(-0.5,-0.5,0.25);
 	nScene.addToScene( spritey );
 	
 	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:0, vAlign:"bottom", hAlign:"right" } );
+		borderThickness:0, radius:8, vAlign:"bottom", hAlign:"right" } );
 	spritey.position.set(0.5,0.5,0.25);
 	nScene.addToScene( spritey );
 
 	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:0, vAlign:"bottom", hAlign:"left" } );
+		borderThickness:4, radius:0, vAlign:"bottom", hAlign:"left" } );
 	spritey.position.set(-0.5,0.5,0.25);
 	nScene.addToScene( spritey );
 	
 	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:0, vAlign:"center", hAlign:"left" } );
+		borderThickness:6, radius:12, vAlign:"center", hAlign:"left" } );
 	spritey.position.set(-0.5,0,0.25);
 	nScene.addToScene( spritey );
 
 	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:0, vAlign:"center", hAlign:"right" } );
+		borderThickness:8, radius:0, vAlign:"center", hAlign:"right" } );
 	spritey.position.set(0.5,0,0.25);
 	nScene.addToScene( spritey );
 
 	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:0, vAlign:"top", hAlign:"right" } );
+		borderThickness:0, radius:8, vAlign:"top", hAlign:"right" } );
 	spritey.position.set(0.5,-0.5,0.25);
 	nScene.addToScene( spritey );
 
 	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:0, vAlign:"bottom", hAlign:"center" } );
+		borderThickness:4, radius:2, vAlign:"bottom", hAlign:"center" } );
 	spritey.position.set(0,0.5,0.25);
 	nScene.addToScene( spritey );
 
 	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:0, vAlign:"center", hAlign:"center" } );
+		borderThickness:10, radius:10, vAlign:"center", hAlign:"center" } );
 	spritey.position.set(0,0,0.25);
 	nScene.addToScene( spritey );
 
 	var spritey = makeTextSprite( "Wiggle!W", { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:0, vAlign:"top", hAlign:"center" } );
+		borderThickness:20, radius:10, vAlign:"top", hAlign:"center" } );
 	spritey.position.set(0,-0.5,0.25);
-	nScene.addToScene( spritey );}
+	nScene.addToScene( spritey );
+	
+}
 
 function makeTextSprite( message, parameters )
 {
@@ -148,23 +150,28 @@ function makeTextSprite( message, parameters )
 	var metrics = context.measureText( message );
 	var textWidth = metrics.width;
 	
-	if ( textWidth > canvas.width ) {
-		canvas.width = textWidth * 2;
-		canvas.height = textWidth;
-		// need to re-fetch and refresh the context after resizing
-		context = canvas.getContext('2d');
-		context.font = fontsize + "px " + fontface;
-		context.textBaseline = "alphabetic";
-		context.textAlign = "left";
-	 	metrics = context.measureText( message );
-		textWidth = metrics.width;
-	}
+	
+	// need to ensure that our canvas is always large enough 
+	// to support the borders and justification, if any
+	// Note that this will fail for vertical text (e.g. Japanese)
+	var larger = textWidth > fontsize ? textWidth : fontsize;
+	canvas.width = larger * 4;
+	canvas.height = larger * 2;
+	// need to re-fetch and refresh the context after resizing
+	context = canvas.getContext('2d');
+	context.font = fontsize + "px " + fontface;
+	context.textBaseline = "alphabetic";
+	context.textAlign = "left";
+ 	metrics = context.measureText( message );
+	textWidth = metrics.width;
 
+	// find the center of the canvas and the half of the font width and height
 	var cx = canvas.width / 2;
 	var cy = canvas.height / 2;
 	var tx = textWidth/ 2.0;
 	var ty = fontsize / 2.0;
 
+	// then adjust for the justification
 	if ( vAlign == "bottom")
 		ty = 0;
 	else if (vAlign == "top")
@@ -189,7 +196,6 @@ function makeTextSprite( message, parameters )
 	// text color
 	context.fillStyle = 'blue'; //"rgba(1, 0, 0, 1.0)";
 
-	//context.fillText( message, borderThickness, fontsize + borderThickness);
 	context.fillText( message, cx - tx, cy + ty);
 
     context.strokeStyle = "rgba(0,255,0,1)";
@@ -221,6 +227,7 @@ function makeTextSprite( message, parameters )
     context.lineTo(canvas.width, 0);
     context.stroke();
 	*/
+    
     // canvas contents will be used for a texture
 	var texture = new THREE.Texture(canvas) 
 	texture.needsUpdate = true;
@@ -243,7 +250,7 @@ function roundRect(ctx, x, y, w, h, r, thick)
     ctx.moveTo(x+r, y);
     ctx.lineTo(x+w-r, y);
     ctx.quadraticCurveTo(x+w, y, x+w, y-r);
-    ctx.lineTo(x+w, y-h-r);
+    ctx.lineTo(x+w, y-h+r);
     ctx.quadraticCurveTo(x+w, y-h, x+w-r, y-h);
     ctx.lineTo(x+r, y-h);
     ctx.quadraticCurveTo(x, y-h, x, y-h+r);

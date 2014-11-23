@@ -1,5 +1,5 @@
 <!-- -------------------------------------
-  Roughly based (or inspired by NeHe Tutorial 13)  
+  Roughly based (or inspired by) NeHe Tutorial 13)  
   Original:  http://nehe.gamedev.net/tutorial/bitmap_fonts/17002/
   
   @author: rkwright@geofx.com
@@ -54,42 +54,42 @@ function initializeDemo()
 	cube.name = "Cube";
 	nScene.addToScene(cube);
  
-	var spritey = makeTextSprite( "Wiggle!X", -0.5, -0.5, 0.25, { fontsize: 72, fontface: "Georgia", textColor: {r:255, g:0, b:0, a:1.0}, 
-		borderColor: {r:0, g:0, b:255, a:1.0}, borderThickness:8, fillColor: {r:255, g:255, b:255, a:1.0}, radius:8, vAlign:"top", hAlign:"left" } );
-	nScene.addToScene( spritey );
-	
-	var spritey = makeTextSprite( "Wiggle!W", 0.5, 0.5, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:8, fillColor: {r:255, g:255, b:255, a:1.0}, vAlign:"bottom", hAlign:"right" } );
-	nScene.addToScene( spritey );
-
-	var spritey = makeTextSprite( "Wiggle!W", -0.5, 0.5, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+	var txSprite = makeTextSprite( "Bottom-Left", -1, 1, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
 		borderThickness:4, fillColor: {r:255, g:255, b:255, a:1.0}, radius:0, vAlign:"bottom", hAlign:"left" } );
-	nScene.addToScene( spritey );
-	
-	var spritey = makeTextSprite( "Wiggle!W", -0.5, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+	nScene.addToScene( txSprite );
+
+	var txSprite = makeTextSprite( "Center-Left", -1, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
 		borderThickness:6, fillColor: {r:255, g:255, b:255, a:1.0}, radius:12, vAlign:"center", hAlign:"left" } );
-	nScene.addToScene( spritey );
+	nScene.addToScene( txSprite );
 
-	var spritey = makeTextSprite( "Wiggle!W", 0.5, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:8, fillColor: {r:255, g:255, b:255, a:1.0}, radius:0, vAlign:"center", hAlign:"right" } );
-	nScene.addToScene( spritey );
-
-	var spritey = makeTextSprite( "Wiggle!W", 0.5, -0.5, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:8, fillColor: {r:255, g:255, b:255, a:1.0}, vAlign:"top", hAlign:"right" } );
-	nScene.addToScene( spritey );
-
-	var spritey = makeTextSprite( "Wiggle!W", 0, 0.5, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+	var txSprite = makeTextSprite( "Top-Left", -1, -1, 0.25, { fontsize: 72, fontface: "Georgia", 
+		borderColor: {r:0, g:0, b:255, a:1.0}, borderThickness:8, fillColor: {r:255, g:255, b:255, a:1.0}, radius:8, vAlign:"top", hAlign:"left" } );
+	nScene.addToScene( txSprite );
+		
+	var txSprite = makeTextSprite( "Bottom-Center", 0, 1, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
 		borderThickness:4, radius:2, fillColor: {r:255, g:255, b:255, a:1.0}, vAlign:"bottom", hAlign:"center" } );
-	nScene.addToScene( spritey );
+	nScene.addToScene( txSprite );
 
-	var spritey = makeTextSprite( "Wiggle!W", 0, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+	var txSprite = makeTextSprite( "Center-Center", 0, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
 		borderThickness:10, radius:10, fillColor: {r:255, g:255, b:255, a:1.0}, vAlign:"center", hAlign:"center" } );
-	nScene.addToScene( spritey );
+	nScene.addToScene( txSprite );
 
-	var spritey = makeTextSprite( "Wiggle!W", 0, -0.5, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:20, radius:10, vAlign:"top", hAlign:"center" } );
-	nScene.addToScene( spritey );
+	var txSprite = makeTextSprite( "Top-Center", 0, -1, 0.25, { fontsize: 72, fontface: "Georgia",  borderColor: {r:0, g:0, b:255, a:1.0},
+		borderThickness:20, fillColor: {r:255, g:255, b:255, a:1.0}, radius:10, vAlign:"top", hAlign:"center" } );
+	nScene.addToScene( txSprite );
 	
+	var txSprite = makeTextSprite( "Bottom-Right-NoFill", 1, 1, 0.25, { fontsize: 72, fontface: "Georgia", radius:8, 
+		textColor: {r:0, g:255, b:0, a:1.0}, vAlign:"bottom", hAlign:"right" } );
+	nScene.addToScene( txSprite );
+
+	var txSprite = makeTextSprite( "Center-Right", 1, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:8, fillColor: {r:255, g:255, b:255, a:1.0}, radius:0, vAlign:"center", hAlign:"right" } );
+	nScene.addToScene( txSprite );
+
+	var txSprite = makeTextSprite( "Top-Right", 1, -1, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:0, radius:8, fillColor: {r:255, g:255, b:255, a:1.0}, vAlign:"top", hAlign:"right" } );
+	nScene.addToScene( txSprite );
+
 }
 
 /**
@@ -131,6 +131,10 @@ function makeTextSprite( message, x, y, z, parameters )
 	var canvas = document.createElement('canvas');
 	var context = canvas.getContext('2d');
 	
+	// set a large-enough fixed-size canvas 
+	canvas.width = 1800;
+	canvas.height = 900;
+	
 	context.font = fontsize + "px " + fontface;
 	context.textBaseline = "alphabetic";
 	context.textAlign = "left";
@@ -139,9 +143,14 @@ function makeTextSprite( message, x, y, z, parameters )
 	var metrics = context.measureText( message );
 	var textWidth = metrics.width;
 	
+	/*
 	// need to ensure that our canvas is always large enough 
 	// to support the borders and justification, if any
 	// Note that this will fail for vertical text (e.g. Japanese)
+	// The other problem with this approach is that the size of the canvas 
+	// varies with the length of the text, so 72-point text is different
+	// sizes for different text strings.  There are ways around this 
+	// by dynamically adjust the sprite scale etc. but not in this demo...
 	var larger = textWidth > fontsize ? textWidth : fontsize;
 	canvas.width = larger * 4;
 	canvas.height = larger * 2;
@@ -153,6 +162,9 @@ function makeTextSprite( message, x, y, z, parameters )
  	metrics = context.measureText( message );
 	textWidth = metrics.width;
 
+ 	console.log("canvas: " + canvas.width + ", " + canvas.height + ", texW: " + textWidth);
+	*/
+	
 	// find the center of the canvas and the half of the font width and height
 	// we do it this way because the sprite's position is the CENTER of the sprite
 	var cx = canvas.width / 2;

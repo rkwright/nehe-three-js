@@ -43,7 +43,6 @@
 
 				gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
 			}
-
 		</script>
 			
 		<script id="fragmentShader" type="x-shader/x-fragment">
@@ -118,6 +117,9 @@
 				
 				// load the image as a texture
 				texture = new THREE.ImageUtils.loadTexture("images/wood-grain.png");
+				// ensure that our texture gets wrapped so the coverage is complete and uniform
+				// also note that the texture needs to be big enough (e.g. at least 512x512) or
+				// the sharper curvers will be so stretched it will blur
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 				// add a uniform for the texture.  This is the read-only 

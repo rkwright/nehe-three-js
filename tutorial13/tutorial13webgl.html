@@ -55,16 +55,16 @@ function initializeDemo()
 	cube.name = "Cube";
 	nScene.addToScene(cube);
  
-	var txSprite = makeTextSprite( "Bottom-Left", -1, 1, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:4, fillColor: {r:255, g:255, b:255, a:1.0}, radius:0, vAlign:"bottom", hAlign:"left" } );
+	var txSprite = makeTextSprite( "Bottom-Right", -1, 1, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:4, fillColor: {r:255, g:255, b:255, a:1.0}, radius:0, vAlign:"bottom", hAlign:"right" } );
 	nScene.addToScene( txSprite );
 
-	var txSprite = makeTextSprite( "Center-Left", -1, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:6, fillColor: {r:255, g:255, b:255, a:1.0}, radius:12, vAlign:"center", hAlign:"left" } );
+	var txSprite = makeTextSprite( "Center-Rightt", -1, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:6, fillColor: {r:255, g:255, b:255, a:1.0}, radius:12, vAlign:"center", hAlign:"right" } );
 	nScene.addToScene( txSprite );
 
-	var txSprite = makeTextSprite( "Top-Left", -1, -1, 0.25, { fontsize: 72, fontface: "Georgia", 
-		borderColor: {r:0, g:0, b:255, a:1.0}, borderThickness:8, fillColor: {r:255, g:255, b:255, a:1.0}, radius:8, vAlign:"top", hAlign:"left" } );
+	var txSprite = makeTextSprite( "Top-Right", -1, -1, 0.25, { fontsize: 72, fontface: "Georgia", 
+		borderColor: {r:0, g:0, b:255, a:1.0}, borderThickness:8, fillColor: {r:255, g:255, b:255, a:1.0}, radius:8, vAlign:"top", hAlign:"right" } );
 	nScene.addToScene( txSprite );
 		
 	var txSprite = makeTextSprite( "Bottom-Center", 0, 1, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
@@ -79,16 +79,16 @@ function initializeDemo()
 		borderThickness:20, fillColor: {r:255, g:255, b:255, a:1.0}, radius:10, vAlign:"top", hAlign:"center" } );
 	nScene.addToScene( txSprite );
 	
-	var txSprite = makeTextSprite( "Bottom-Right-NoFill", 1, 1, 0.25, { fontsize: 72, fontface: "Georgia", radius:8, 
-		textColor: {r:0, g:255, b:0, a:1.0}, vAlign:"bottom", hAlign:"right" } );
+	var txSprite = makeTextSprite( "Bottom-Left-NoFill", 1, 1, 0.25, { fontsize: 72, fontface: "Georgia", radius:8, 
+		textColor: {r:0, g:255, b:0, a:1.0}, vAlign:"bottom", hAlign:"left" } );
 	nScene.addToScene( txSprite );
 
-	var txSprite = makeTextSprite( "Center-Right", 1, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:8, fillColor: {r:255, g:255, b:255, a:1.0}, radius:0, vAlign:"center", hAlign:"right" } );
+	var txSprite = makeTextSprite( "Center-Left", 1, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:8, fillColor: {r:255, g:255, b:255, a:1.0}, radius:0, vAlign:"center", hAlign:"left" } );
 	nScene.addToScene( txSprite );
 
-	var txSprite = makeTextSprite( "Top-Right", 1, -1, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
-		borderThickness:0, radius:8, fillColor: {r:255, g:255, b:255, a:1.0}, vAlign:"top", hAlign:"right" } );
+	var txSprite = makeTextSprite( "Top-Left", 1, -1, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
+		borderThickness:0, radius:8, fillColor: {r:255, g:255, b:255, a:1.0}, vAlign:"top", hAlign:"left" } );
 	nScene.addToScene( txSprite );
 
 }
@@ -180,9 +180,9 @@ function makeTextSprite( message, x, y, z, parameters )
 		ty = fontsize;
 	
 	if (hAlign == "left")
-		tx = textWidth;
-	else if (hAlign == "right")
 		tx = 0;
+	else if (hAlign == "right")
+		tx = textWidth;
 	
 	// the DESCENDER_ADJUST is extra height factor for text below baseline: g,j,p,q. since we don't know the true bbox
 	roundRect(context, cx - tx , cy + ty + 0.28 * fontsize, 

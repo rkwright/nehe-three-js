@@ -51,13 +51,12 @@
 			varying vec3 		vNormal;
 			varying vec2 		vUv;
 			uniform sampler2D 	texImage;
-	
+
 			void main(void) {
-				
+			
 				gl_FragColor = texture2D(texImage, vUv);
 			}
 		</script>
-	
 	<!-- --------------------------------------------------------------- -->
 	</head>
 	<body>	
@@ -118,14 +117,15 @@
 				// Finally, go easy on the beveling as large bevels tend to look odd (more bugs?)
 				
 				// load the image as a texture
-				texture = new THREE.ImageUtils.loadTexture("images/pebbled-leather.png");
-				
+				texture = new THREE.ImageUtils.loadTexture("images/wood-grain.png");
+				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
 				// add a uniform for the texture.  This is the read-only 
 				// variables that get passed to our shaders
 				uniforms = {
 						texImage:	{ type: 't', value: texture }
 				};
-	
+				
 				// find the shaders
 				var vs = document.getElementById("vertexShader").textContent;
 				var fs = document.getElementById("fragmentShader").textContent;
@@ -138,9 +138,9 @@
 						vertexShader:   vs,					// pointers to the shaders
 						fragmentShader: fs
 					});
-				
+
 				var materialFront = shaderMaterial;
-				var materialSide  = shaderMaterial
+				var materialSide  = shaderMaterial;
 				var materialArray = [ materialFront, materialSide ];
 
 				textGeom = new THREE.TextGeometry( text , {

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<!-- The previous line tells the browser, that the page uses the HTML5 standard. -->
-
+<!-- The previous line tells the browser that the page uses the HTML5 standard. -->
 <html>
 	<head>
-		<title>Three.js tutorial - Lesson 07</title>
+		<title>Three.js tutorial - Lesson 08</title>
 		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
 		<!-- The following meta line optimizes the site for mobile devices. It sets the viewport size
@@ -25,7 +24,7 @@
 		<!-- Include two libraries
 		1. Three.js (core library)
 		2. Detector.js (checks the browsers WebGL capabilities) -->
-		<script src="../js/three.r59.js"></script>
+		<script src="../js/Three.r59.js"></script>
 		<script src="../js/Detector.js"></script>
 	</head>
 	<body>
@@ -34,6 +33,7 @@
 		<div id="overlaytext" style="position: absolute; top: 10px; left: 10px">
 			'F': Loop through the three texture filters (only for WebGL renderer)<br/>
 			'L': Toggle light (only for WebGL renderer)<br/>
+			'B': Toggle blending<br/>
 			Cursor left / right: Control y rotation speed<br/>
 			Cursor up / down: Control x rotation speed<br/>
 			Page up / down: Move along z axis<br/>
@@ -43,7 +43,6 @@
 		<!-- This is the DIV element which will contain the WebGL canvas. To be identifiable later on,
 		the id 'WebGLCanvas' is applied to it. -->
 		<div id="WebGLCanvas">
-		</div>
 
 		<!-- This JavaScript block encloses the Three.js commands -->
 		<script>
@@ -66,7 +65,7 @@
 
 			// The x and y speed is controlled by the cursor keys.
 			// The translation on the z axis by 'Page up / down'.
-			// 'crateTexture' is the texture object. We set it global, to modify it's attributes
+			// 'glassTexture' is the texture object. We set it global, to modify it's attributes
 			// lateron.
 			// 'textureFilter' will have three states (0, 1 or 2), controlling the current texture
 			// filtering (nearest, linear or mipmapped).
@@ -74,11 +73,14 @@
 			// 'enableLights' is the flag, which is switched by the key 'f'.
 
 			// Texture and flag for current texture filter
-			var crateTexture;
+			var glassTexture;
 			var textureFilter = 0;
 
 			// Flag for toggling light
 			var lightIsOn = true;
+
+			// Flag for toggling blending
+			var blendingIsOn = true;
 
 			// Global mesh object of the cube
 			var cubeMesh;
@@ -122,7 +124,7 @@
 				canvasWidth = window.innerWidth - 10;
 				canvasHeight = window.innerHeight - 20;
 
-				// Set the renderers size to the content area's size
+				// Set the renderers size to the content areas size
 				renderer.setSize(canvasWidth, canvasHeight);
 
 				// Get the DIV element from the HTML document by its ID and append the renderers DOM
@@ -166,32 +168,32 @@
 				//var cubeGeometry = new THREE.CubeGeometry(2.0, 2.0, 2.0, 4, 4, 4);
 
 				// Load an image as texture
-				crateTexture = new THREE.ImageUtils.loadTexture("Crate.jpg");
+				glassTexture = new THREE.ImageUtils.loadTexture("Glass.jpg");
 
-				// Create a material, which contains the texture.
+				// Create a material, which contains the texture
 				// Unfortunately, the CanvasRenderer doesn't support MeshLambertMaterial in combination
 				// with Textures. Otherwise, the MeshBasicMaterial doesn't support lighting. As
 				// compromise, the CanvasRenderer will show the texture without lighting via
 				// MeshBasicMaterial.
-				// Activate the 'doubleSided' attribute to force the rendering of both sides of each
-				// face (front and back). This prevents the so called 'backface culling'. Usually,
-				// only the side is rendered, whose normal vector points towards the camera. The other
-				// side is not rendered (backface culling). But this performance optimization sometimes
-				// leads to wholes in the surface. When this happens in your surface, simply set
-				// 'doubleSided' to 'true'.
 				var cubeMaterial = new THREE.MeshLambertMaterial({
-					map:crateTexture,
-					side:THREE.DoubleSide
+					map:glassTexture,
+					depthWrite: false,
+					transparent: true,
+					opacity: 0.5,
+					side:THREE.DoubleSide,
+					combine: THREE.MixOperation
 				});
 				if(!webGLAvailable){
 					cubeMaterial = new THREE.MeshBasicMaterial({
-						map:crateTexture,
+						map:glassTexture,
+						transparent: true,
+						opacity: 0.5,
 						side:THREE.DoubleSide
 					});
 				}
 
 				// Create a mesh and insert the geometry and the material. Translate the
-				// whole mesh by 'zTranslation' units on the z axis. Finally add the mesh 
+				// whole mesh by 'zTranslation' units on the z axis. Finally add the mesh
 				// to the scene.
 				cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
 				cubeMesh.position.set(0.0, 0.0, zTranslation);
@@ -227,22 +229,22 @@
 					// The CanvasRenderer doesn't support texture filters.
 					switch(textureFilter){
 						case 0:
-							crateTexture.minFilter = THREE.NearestFilter;
-							crateTexture.magFilter = THREE.NearestFilter;
+							glassTexture.minFilter = THREE.NearestFilter;
+							glassTexture.magFilter = THREE.NearestFilter;
 							textureFilter = 1;
 							break;
 						case 1:
-							crateTexture.minFilter = THREE.LinearFilter;
-							crateTexture.magFilter = THREE.LinearFilter;
+							glassTexture.minFilter = THREE.LinearFilter;
+							glassTexture.magFilter = THREE.LinearFilter;
 							textureFilter = 2;
 							break;
 						case 2:
-							crateTexture.minFilter = THREE.LinearFilter;
-							crateTexture.magFilter = THREE.LinearMipMapNearestFilter;
+							glassTexture.minFilter = THREE.LinearFilter;
+							glassTexture.magFilter = THREE.LinearMipMapNearestFilter;
 							textureFilter = 0;
-							break;
+						break;
 					};
-					crateTexture.needsUpdate = true;
+					glassTexture.needsUpdate = true;
 
 				// 'L' - Toggle light
 				} else if(keyCode == 76){
@@ -250,25 +252,53 @@
 					// invisible, we would get a black cube due to the MeshLambertMaterial (it needs
 					// light). So we just switch the material to toggle the light
 					if(lightIsOn){
-						cubeMesh.material = new THREE.MeshBasicMaterial({
-							map:crateTexture,
-							side:THREE.DoubleSide
-						});
+						cubeMesh.material = new THREE.MeshBasicMaterial({map:glassTexture});
+						cubeMesh.material.side = THREE.DoubleSide;
+						if(blendingIsOn){
+							cubeMesh.material.depthWrite = false;
+							cubeMesh.material.transparent = true;
+							cubeMesh.material.opacity = 0.5;
+							cubeMesh.material.combine = THREE.MixOperation;
+						} else {
+							cubeMesh.material.depthWrite = true;
+							cubeMesh.material.opacity = 1.0;
+							cubeMesh.material.combine = THREE.MultiplyOperation;
+						}
 						lightIsOn = false;
 
 					} else {
-						if(webGLAvailable){
-							cubeMesh.material = new THREE.MeshLambertMaterial({
-								map:crateTexture,
-								side:THREE.DoubleSide
-							});
+						cubeMesh.material = new THREE.MeshLambertMaterial({map:glassTexture});
+						if(!webGLAvailable){
+							cubeMesh.material = new THREE.MeshBasicMaterial({map:glassTexture});
+						}
+						cubeMesh.material.side = THREE.DoubleSide;
+						if(blendingIsOn){
+							cubeMesh.material.depthWrite = false;
+							cubeMesh.material.transparent = true;
+							cubeMesh.material.opacity = 0.5;
+							cubeMesh.material.combine = THREE.MixOperation;
 						} else {
-							cubeMesh.material = new THREE.MeshBasicMaterial({
-								map:crateTexture,
-								side:THREE.DoubleSide
-							});
+							cubeMesh.material.depthWrite = true;
+							cubeMesh.material.opacity = 1.0;
+							cubeMesh.material.combine = THREE.MultiplyOperation;
 						}
 						lightIsOn = true;
+					}
+					cubeMesh.material.needsUpdate = true;
+
+				// 'B' - Toggle blending
+				} else if(keyCode == 66){
+					if(blendingIsOn){
+						cubeMesh.material.depthWrite = true;
+						cubeMesh.material.opacity = 1.0;
+						cubeMesh.material.combine = THREE.MultiplyOperation;
+						blendingIsOn = false;
+					} else {
+						cubeMesh.material.depthWrite = false;
+						cubeMesh.material.transparent = true;
+						cubeMesh.material.opacity = 0.5;
+						cubeMesh.material.combine = THREE.MixOperation;
+						blendingIsOn = true;
 					}
 					cubeMesh.material.needsUpdate = true;
 

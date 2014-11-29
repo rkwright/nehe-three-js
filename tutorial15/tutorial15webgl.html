@@ -46,7 +46,8 @@
 				gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
 			}
 		</script>
-			
+		
+		<!-- Note we have two fragment shaders - one for each texture 	 -->	
 		<script id="fragmentShader" type="x-shader/x-fragment">
 			// create the shared variables. which are set in the vertex shader
 			varying vec3 		vNormal;
@@ -58,12 +59,24 @@
 				gl_FragColor = texture2D(texImage, vUv);
 			}
 		</script>
+		
+		<script id="fragmentShader-L" type="x-shader/x-fragment">
+			// create the shared variables. which are set in the vertex shader
+			varying vec3 		vNormal;
+			varying vec2 		vUv;
+			uniform sampler2D 	leatherImage;
+
+			void main(void) {
+			
+				gl_FragColor = texture2D(leatherImage, vUv);
+			}
+		</script>
 	<!-- --------------------------------------------------------------- -->
 	</head>
 	<body>	
 		<script>
 			// global variables
-			var textGeom;
+			var 	textGeom;
 		
 			var 	size = 1;				// this is actually the HEIGHT of the text. in user-space
 			var 	height = 0.2;			// this is TOTALLY misnamed.  It is the thickness of the extruded text
@@ -80,6 +93,7 @@
 			var 	extrudeMaterial = 0;
 			var		text= "Shazaam!";
 			var     texture;
+			var     leather;
 			
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var nScene = new Scene( { axisHeight:10, controls:true, displayStats:true });
@@ -118,21 +132,31 @@
 				// Finally, go easy on the beveling as large bevels tend to look odd (more bugs?)
 				
 				// load the image as a texture
-				texture = new THREE.ImageUtils.loadTexture("images/wood-grain.png");
+				// Note that we load TWO textures, one for the face and one for the sides.  Just to see how
+				// it is done.  We then have to have TWO fragment shaders, one for each texture.  However,
+				// we still only need one vertex shader since they both do exactly the same thing.
+				texture = new THREE.ImageUtils.loadTexture("images/wood-grain.jpg");
+				leather = new THREE.ImageUtils.loadTexture("images/green-pebbled-leather.jpg");
 				// ensure that our texture gets wrapped so the coverage is complete and uniform
 				// also note that the texture needs to be big enough (e.g. at least 512x512) or
 				// the sharper curvers will be so stretched it will blur
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				leather.wrapS = leather.wrapT = THREE.RepeatWrapping;
 
 				// add a uniform for the texture.  This is the read-only 
 				// variables that get passed to our shaders
-				uniforms = {
+				var uniforms = {
 						texImage:	{ type: 't', value: texture }
 				};
-				
+
+				var uniformsL = {
+						leatherImage:	{ type: 't', value: leather }
+				};
+
 				// find the shaders
 				var vs = document.getElementById("vertexShader").textContent;
 				var fs = document.getElementById("fragmentShader").textContent;
+				var fsL = document.getElementById("fragmentShader-L").textContent;
 
 				// and create our shader material...
 				var shaderMaterial = new THREE.ShaderMaterial({
@@ -143,7 +167,15 @@
 						fragmentShader: fs
 					});
 
-				var materialFront = shaderMaterial;
+				var shaderMaterialL = new THREE.ShaderMaterial({
+					uniforms:     	uniformsL,			// pass the "uniforms" vars
+					shading:        THREE.FlatShading,
+					side:           THREE.DoubleSide,	// want the texture on both sides?
+					vertexShader:   vs,					// pointers to the shaders
+					fragmentShader: fsL
+				});
+
+				var materialFront = shaderMaterialL;
 				var materialSide  = shaderMaterial;
 				var materialArray = [ materialFront, materialSide ];
 

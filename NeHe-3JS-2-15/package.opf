@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-id" version="3.0" 
+      prefix="rendition: http://www.idpf.org/vocab/rendition/#">
+ <metadata xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:dcterms="http://purl.org/dc/terms/"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:opf="http://www.idpf.org/2007/opf">
+   	<dc:title>NeHe-3JS-2-15</dc:title> 
+   	<dc:creator>Ric Wright</dc:creator> 
+   	<dc:date>2014-11-25</dc:date>
+   	<dc:subject>WebGL, Three.js, NeHe</dc:subject>
+   	<dc:language>en</dc:language> 
+   	<dc:coverage>The Ether</dc:coverage> 
+   	<dc:rights>Public Domain</dc:rights> 
+   	<dc:publisher>Readium</dc:publisher> 
+   	<dc:identifier id="pub-id">urn:uuid:da8c6cfe-280d-4619-95b0-34d1968191fa</dc:identifier>
+   	<meta property="dcterms:modified">2014-11-25T00:00:00Z</meta>
+   	<!--  layout metadata  -->
+	<meta property="rendition:layout">pre-paginated</meta>
+	<meta property="rendition:orientation">portrait</meta>
+	<meta property="rendition:spread">auto</meta> 
+	<!-- cover -->
+   	<meta name="cover" content="cover-image" />  	
+</metadata>
+ <manifest>
+ 	<!--  images  -->
+  	<item id="readium_logo" href="images/readium_logo.png" media-type="image/png"/>
+  	<item id="epub_logo" href="images/epub_logo.jpeg" media-type="image/jpeg" />
+  	<item id="webgl_logo" href="images/webgl.jpg" media-type="image/jpeg" properties="cover-image"/>
+  	<!-- frontmatter -->
+  	<item id="nav" href="front/nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+  	<item id="titlepage" href="front/titlepage.xhtml" media-type="application/xhtml+xml"/>
+   	<!--  CSS -->
+  	<item id="fixed-css" href="css/fixed.css" media-type="text/css"/>
+ 	<item id="base-css" href="css/base.css" media-type="text/css"/>
+ 	<item id="NeHe" href="css/NEHE.css" media-type="text/css"/>
+ 	<!-- scripts -->
+ 	<item id="detector" href="js/Detector.js" media-type="text/javascript"/>
+ 	<item id="threejs" href="js/three.js" media-type="text/javascript"/>
+ 	<!--  SVG --> 
+	<!-- fonts -->
+  	<!--  Introduction XHTML --> 
+  	<item id="intro-001" href="intro/intro-001.xhtml" media-type="application/xhtml+xml"/>
+ 	<!--  Tutorial 02 -->
+   	<item id="lesson02-001" href="lesson02/lesson02-001.xhtml" media-type="application/xhtml+xml"/>
+   	<item id="lesson02-002" href="lesson02/lesson02-002.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
+
+ </manifest>
+ <spine>
+  	<itemref idref="nav" linear="yes"/>
+  	<itemref idref="titlepage"/>
+  	<itemref idref="intro-001" properties="page-spread-left"/>
+  	<itemref idref="lesson02-001" properties="page-spread-left"/>
+  	<itemref idref="lesson02-002" />
+ </spine>
+</package>

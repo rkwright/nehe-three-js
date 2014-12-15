@@ -21,23 +21,21 @@ body {
 	font-size: small;
 	font-family: "Lucida Console", "Courier New", Courier, Monaco, monospace;
 	background-color: #FFFFCC;
-	padding: 10 px;
-	border: solid 1px #000;
+	margin: 2em;
+	padding: 1em;
+	border: solid 1px #AAA;
 	border-collapse: collapse;
 	border-spacing: 10 px;
-	padding: 1em;
-	margin-left: 2em;
 }
 
 .warning    
 {
-	font-size: 0.75em;
+	font-size: small;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	background-color: #FFEEFF;
-	margin: 4 em;
-	padding: 10 px;
-	border: solid 1px #000;
+	margin: 2em;
+	padding: 1em;
+	border: solid 1px #AAA;
 	border-collapse: collapse;
 	border-spacing: 10 px;
-	padding: 1em;
 }

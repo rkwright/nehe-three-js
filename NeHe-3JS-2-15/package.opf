@@ -37,11 +37,19 @@
  	<!-- scripts -->
  	<item id="detector" href="js/Detector.js" media-type="text/javascript"/>
  	<item id="threejs" href="js/three.js" media-type="text/javascript"/>
+ 	<item id="jquery" href="js/jquery-1.9.1.js" media-type="text/javascript"/>
+ 	<item id="NEHE" href="js/NEHE.js" media-type="text/javascript"/>
+  	<item id="OrbitControls" href="js/OrbitControls-Touch.js" media-type="text/javascript"/>
+ 	<item id="Scene" href="js/Scene.js" media-type="text/javascript"/>
+ 	<item id="Stats" href="js/Stats.js" media-type="text/javascript"/>
  	<!--  SVG --> 
 	<!-- fonts -->
   	<!--  Introduction XHTML --> 
   	<item id="intro-001" href="intro/intro-001.xhtml" media-type="application/xhtml+xml"/>
- 	<!--  Tutorial 02 -->
+ 	<!--  Lesson 01 -->
+   	<item id="lesson01-001" href="lesson01/lesson01-001.xhtml" media-type="application/xhtml+xml"/>
+   	<item id="lesson01-002" href="lesson01/lesson01-002.xhtml" media-type="application/xhtml+xml"/>
+ 	<!--  Lesson 02 -->
    	<item id="lesson02-001" href="lesson02/lesson02-001.xhtml" media-type="application/xhtml+xml"/>
    	<item id="lesson02-002" href="lesson02/lesson02-002.xhtml" media-type="application/xhtml+xml" properties="scripted"/>
 
@@ -50,6 +58,7 @@
   	<itemref idref="nav" linear="yes"/>
   	<itemref idref="titlepage"/>
   	<itemref idref="intro-001" properties="page-spread-left"/>
+  	<itemref idref="lesson01-001" properties="page-spread-left"/>
   	<itemref idref="lesson02-001" properties="page-spread-left"/>
   	<itemref idref="lesson02-002" />
  </spine>

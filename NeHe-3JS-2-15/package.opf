@@ -45,7 +45,9 @@
  	<!--  SVG --> 
 	<!-- fonts -->
   	<!--  Introduction XHTML --> 
+  	<item id="preface-001" href="intro/preface-001.xhtml" media-type="application/xhtml+xml"/>
   	<item id="intro-001" href="intro/intro-001.xhtml" media-type="application/xhtml+xml"/>
+  	<item id="intro-002" href="intro/intro-002.xhtml" media-type="application/xhtml+xml"/>
  	<!--  Lesson 01 -->
    	<item id="lesson01-001" href="lesson01/lesson01-001.xhtml" media-type="application/xhtml+xml"/>
    	<item id="lesson01-002" href="lesson01/lesson01-002.xhtml" media-type="application/xhtml+xml"/>
@@ -57,8 +59,11 @@
  <spine>
   	<itemref idref="nav" linear="yes"/>
   	<itemref idref="titlepage"/>
+  	<itemref idref="preface-001" properties="page-spread-left"/>
   	<itemref idref="intro-001" properties="page-spread-left"/>
+  	<itemref idref="intro-002" />
   	<itemref idref="lesson01-001" properties="page-spread-left"/>
+  	<itemref idref="lesson01-002" />
   	<itemref idref="lesson02-001" properties="page-spread-left"/>
   	<itemref idref="lesson02-002" />
  </spine>

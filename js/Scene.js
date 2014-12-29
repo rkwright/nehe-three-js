@@ -19,6 +19,14 @@ Scene = function ( parameters ) {
 	this.directionalLight;
 
 	this.axisHeight = 0;
+	
+	this.floorRepeat = 0;
+	
+	this.fogLinear = false;
+	this.fogDensity = 0;
+	this.fogColor = 0xffffff;
+	this.fogNear = 0.015;
+	this.fogFar = 100;
 
 	this.setParameters( parameters );
 };
@@ -63,7 +71,14 @@ Scene.prototype = {
 	
 		// Create the scene, in which all objects are stored (e. g. camera, lights, geometries, ...)
 		this.scene = new THREE.Scene();
-	
+
+		if ( this.fogDensity > 0 || this.fogLinear == true )
+			this.addFog( this.fogDensity, this.fogColor, this.fogNear, this.fogFar );
+		
+		//this.scene.fog = new THREE.Fog( 0xffffff,  0.015, 100 );
+		//this.scene.fog = this.scene.fog = new THREE.FogExp2( 0xffffff, 0.15 );
+			 
+
 		// Get the size of the inner window (content area)
 		var canvasWidth = window.innerWidth;
 		var canvasHeight = window.innerHeight;
@@ -101,7 +116,7 @@ Scene.prototype = {
 	
 		// Get the DIV element from the HTML document by its ID and append the renderer's DOM object
 		container.appendChild(this.renderer.domElement);
-		
+				
 		// Ambient light has no direction, it illuminates every object with the same
 		// intensity. If only ambient light is used, no shading effects will occur.
 		this.ambientLight = new THREE.AmbientLight(0x404040);
@@ -120,6 +135,9 @@ Scene.prototype = {
 		
 		if ( this.axisHeight != 0 )
 			this.drawAxes(this.axisHeight);
+		
+		if (this.floorRepeat != 0)
+			this.addFloor(this.floorRepeat);
 		
 		//------ STATS --------------------	
 		// displays current and past frames per second attained by scene
@@ -152,6 +170,29 @@ Scene.prototype = {
 
 },
 
+	addFog: function( fogDensity, fogColor, fogNear, fogFar ) {
+		
+		if (fogDensity > 0)
+			this.scene.fog = this.scene.fog = new THREE.FogExp2(fogColor, fogDensity );
+		else
+			this.scene.fog = new THREE.Fog( fogColor, fogNear, fogFar );
+	},
+	
+	addFloor: function( floorRepeat ) {
+		// note: 4x4 checker-board pattern scaled so that each square is 25 by 25 pixels.
+		var floorTexture = new THREE.ImageUtils.loadTexture( '../images/checkerboard.jpg' );
+		floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+		floorTexture.repeat.set( floorRepeat, floorRepeat );
+		
+		// DoubleSide: render texture on both sides of mesh
+		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+		var floorGeometry = new THREE.PlaneGeometry(50, 50, 1, 1);
+		var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+		floor.position.y = 0.0;
+		floor.rotation.x = Math.PI / 2;
+		this.scene.add(floor);
+	},
+	
 // draw some axes
 	drawAxis: function( axis, axisColor, axisHeight ) {
 		var		AXIS_RADIUS   =	axisHeight/200.0;

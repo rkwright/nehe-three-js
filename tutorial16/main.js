@@ -2,13 +2,15 @@ var crateTexture;
 var	yTranslation = 1.05;
 var	zTranslation = 0.0;
 var	xPos, yPos;
+var fogDensity = 0.05;
 
 // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 var nScene = new Scene( { axisHeight:10, 
 						  controls:true, 
 						  displayStats:true,
 						  floorRepeat:10,
-						  fogDensity : 0.05,
+						  fogType:'linear',
+						  fogDensity : fogDensity,
 						  fogColor: 0xffffff });
 
 // set up the THREE.js scene via our Scene object
@@ -48,8 +50,43 @@ function initializeDemo() {
 		nScene.addToScene(boxMesh);
 	}
 	
+	document.addEventListener("keypress", onDocumentKeyPress, false);
 };
 
+function onDocumentKeyPress(event) {
+	// Get the key code of the pressed key
+	var keyChar = String.fromCharCode(event.which);
+
+	if (keyChar == '+') {  
+		if (fogDensity < 0.225 )
+			fogDensity += 0.025;
+		else 
+			fogDensity = 0.25;
+		nScene.addFog( { fogDensity: fogDensity } );
+	}
+	else if (keyChar == '-') {  
+		if (fogDensity > 0.025)
+			fogDensity -= 0.025;
+		else
+			fogDensity = 0;
+		nScene.addFog( { fogDensity: fogDensity } );
+	}
+	else if (keyChar == 'r') {
+		nScene.addFog( { fogColor: 0xff0000 } );
+	}
+	else if (keyChar == 'g') {
+		nScene.addFog( { fogColor: 0x00ff00 } );
+	}	
+	else if (keyChar == 'b') {
+		nScene.addFog( { fogColor: 0x0000ff } );
+	}
+	else if (keyChar == 'k') {
+		nScene.addFog( { fogColor: 0x000000 } );
+	}	
+	else if (keyChar == 'w') {
+		nScene.addFog( { fogColor: 0xffffff } );
+	}
+}
 /**
  * Animate the scene and call rendering.
  */

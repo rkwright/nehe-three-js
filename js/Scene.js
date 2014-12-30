@@ -22,7 +22,7 @@ Scene = function ( parameters ) {
 	
 	this.floorRepeat = 0;
 	
-	this.fogLinear = false;
+	this.fogType = 'none';	// else 'linear' or 'exponential' 
 	this.fogDensity = 0;
 	this.fogColor = 0xffffff;
 	this.fogNear = 0.015;
@@ -72,8 +72,7 @@ Scene.prototype = {
 		// Create the scene, in which all objects are stored (e. g. camera, lights, geometries, ...)
 		this.scene = new THREE.Scene();
 
-		if ( this.fogDensity > 0 || this.fogLinear == true )
-			this.addFog( this.fogDensity, this.fogColor, this.fogNear, this.fogFar );
+		this.addFog();
 		
 		//this.scene.fog = new THREE.Fog( 0xffffff,  0.015, 100 );
 		//this.scene.fog = this.scene.fog = new THREE.FogExp2( 0xffffff, 0.15 );
@@ -159,6 +158,17 @@ Scene.prototype = {
  */
 	renderScene: function() {
 		
+		//this.scene.fog = new THREE.FogExp2( Math.random() * 0xfffff, 0.1, 0.01, 100);
+		/*
+		 * if (this.fogType == 'exponential')
+			
+			this.scene.fog = new THREE.FogExp2(this.fogColor, this.fogDensity, this.fogNear, this.fogFar );
+		else if (this.fogType == 'linear')
+			this.scene.fog = new THREE.Fog( this.fogColor, this.fogNear, this.fogFar );
+		else
+			this.scene.fog = null;
+			*/
+		
 		this.renderer.render(this.scene, this.camera);
 
 		// the orbit controls, if used, have to be updated as well
@@ -170,15 +180,44 @@ Scene.prototype = {
 
 },
 
-	addFog: function( fogDensity, fogColor, fogNear, fogFar ) {
+	addFog: function( values ) {
 		
-		if (fogDensity > 0)
-			this.scene.fog = this.scene.fog = new THREE.FogExp2(fogColor, fogDensity );
+		if ( values != undefined ) {
+
+			for ( var key in values ) {
+				
+				var newValue = values[ key ];
+		
+				if ( newValue === undefined ) {
+					console.warn( "Fog parameter '" + key + "' parameter is undefined." );
+					continue;
+				}
+		
+				if ( key == 'fogType' ) 
+					this.fogType = newValue;
+				else if ( key == 'fogDensity' ) 
+					this.fogDensity = newValue;
+				else if ( key == 'fogColor' ) 
+					this.fogColor = newValue;
+				else if ( key == 'fogLinear' ) 
+					this.fogLinear = newValue;
+				else if ( key == 'fogNear' ) 
+					this.fogNear = newValue;
+				else if ( key == 'fogFar' ) 
+					this.fogFar = newValue;
+			}
+		}
+				
+		if (this.fogType == 'exponential')
+			this.scene.fog = new THREE.FogExp2(this.fogColor, this.fogDensity, this.fogNear, this.fogFar );
+		else if (this.fogType == 'linear')
+			this.scene.fog = new THREE.Fog( this.fogColor, this.fogNear, this.fogFar );
 		else
-			this.scene.fog = new THREE.Fog( fogColor, fogNear, fogFar );
+			this.scene.fog = null;
 	},
 	
 	addFloor: function( floorRepeat ) {
+		
 		// note: 4x4 checker-board pattern scaled so that each square is 25 by 25 pixels.
 		var floorTexture = new THREE.ImageUtils.loadTexture( '../images/checkerboard.jpg' );
 		floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 

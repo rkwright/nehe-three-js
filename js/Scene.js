@@ -123,10 +123,14 @@ Scene.prototype = {
 	
 		// Directional light has a source and shines in all directions, like the sun.
 		// This behaviour creates shading effects.
-		this.directionalLight = new THREE.PointLight(0xffffff);
-		this.directionalLight.position.set(250,250,250); 
+		this.directionalLight = new THREE.DirectionalLight(0xffffff);
+		this.directionalLight.position.set(5, 20, 12);
 		this.scene.add(this.directionalLight);
-		
+
+		this.pointLight = new THREE.PointLight(0xffffff, 0.25);
+		this.pointLight.position.set(15, -20, -12);
+		this.scene.add(this.pointLight);
+
 		// request the orbitControls be created and enabled
 		// add the controls
 		if (this.controls == true)
@@ -151,6 +155,10 @@ Scene.prototype = {
 
 	addToScene: function ( obj ) {
 		this.scene.add(obj);
+	},
+
+	remove: function ( obj ) {
+		this.scene.remove(obj);
 	},
 
 /**
@@ -232,7 +240,6 @@ Scene.prototype = {
 		this.scene.add(floor);
 	},
 	
-// draw some axes
 	drawAxis: function( axis, axisColor, axisHeight ) {
 		var		AXIS_RADIUS   =	axisHeight/200.0;
 		var		AXIS_HEIGHT   =	axisHeight;
@@ -259,7 +266,7 @@ Scene.prototype = {
 			//console.log(i + " pos: " + pos + " color: " + curColor);
 			
 			var geometry = new THREE.CylinderGeometry( AXIS_RADIUS, AXIS_RADIUS, AXIS_STEP, AXIS_SEGMENTS ); 
-			var material = new THREE.MeshLambertMaterial( {color: curColor} ); 
+			var material = new THREE.MeshLambertMaterial( { color: curColor } ); 
 			var cylinder = new THREE.Mesh( geometry, material ); 
 			
 			pos += AXIS_STEP/2.0;

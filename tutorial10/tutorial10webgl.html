@@ -8,7 +8,7 @@
   
   			@author: rkwright@geofx.com
 		-------------------------------------- -->
-		<title>Three.js/NEHE Tutorial #16</title>
+		<title>Three.js/NEHE Tutorial #10</title>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
 		<!-- The following meta line optimizes the site for mobile devices. It sets the viewport size
@@ -19,19 +19,22 @@
 		<!-- Include libraries from THREE.js: Core and the Detector for WebGL -->
 		<script src="../js/three.min.js" type="text/javascript"></script>
 		<script src="../js/Detector.js" type="text/javascript"></script>
+		<script src="../js/Stats.js" type="text/javascript"></script>
 		<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
-		<script src="../Scene.js" type="text/javascript"></script>
+		<script src="../js/Detector.js" type="text/javascript"></script>
+		<script src="../js/Scene.js" type="text/javascript"></script>
+		<script src="Data/World.js" type="text/javascript"></script>
 	</head>
 	<body>	
 		<!-- This JavaScript block encloses the Three.js commands -->
 		<script>			
 	
-			// set up the THREE.js scene
-			initializeScene();
-
-			// request the orbitControls be created and enabled
-			orbitControls();
-			
+			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+			var nScene = new Scene( { axisHeight:10, controls:true, displayStats:true });
+		
+			// set up the THREE.js scene via our Scene object
+			nScene.initialize();
+		
 			// then initialize our demo's stuff
 			initializeDemo();
 
@@ -42,10 +45,7 @@
 			 * Initialize the scene.
 			 */
 			function initializeDemo() {
-				
-				// draw some 3D axes to orient the user
-				drawAxes(10);
-		
+					
 				// then read the data and create the objects
 				createWorld();
 			}
@@ -103,7 +103,7 @@
 					var mesh = new THREE.Mesh( triGeom, material);
 					
 					// and add it to the scene
-					scene.add(mesh);
+					nScene.addToScene(mesh);
 				}
 			}
 			
@@ -114,13 +114,9 @@
 
 				// Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
-
-				// Map the 3D scene down to the 2D screen (render the frame)
-				renderer.render(scene, camera);
 				
-				// the orbit controls, if used, have to be updated as well
-				if (controls != null && typeof controls != 'undefined') 
-					controls.update();
+				// Map the 3D scene down to the 2D screen (render the frame)
+				nScene.renderScene();
 			}
 		</script>
 	</body>

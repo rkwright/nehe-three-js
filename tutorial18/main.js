@@ -70,7 +70,7 @@ function makeQuad( qType ) {
 			quadGeometry = new THREE.IcosahedronGeometry(2.0);
 		break;
 		case '5': 
-			quadGeometry = new THREE.CylinderGeometry(0.0, 2.0, 5, 32);	
+			quadGeometry = new THREE.CylinderGeometry(0.0, 2.0, 5, 64);	
 		break;
 		case '6':
 			quadGeometry = new THREE.OctahedronGeometry(2.0, 2.0, 2.0);

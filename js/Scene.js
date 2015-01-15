@@ -1,4 +1,4 @@
-	//some constants
+//some constants
 	var    	X_AXIS = 0;
 	var    	Y_AXIS = 1;
 	var    	Z_AXIS = 2;

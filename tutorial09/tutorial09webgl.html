@@ -20,7 +20,7 @@
 		<!-- Include two libraries
 		1. Three.js (core library)
 		2. Detector.js (checks the browsers WebGL capabilities) -->
-		<script src="../js/Three.r51.js"></script>
+		<script src="../js/three.js"></script>
 		<script src="../js/Detector.js"></script>
 	</head>
 	<body>
@@ -76,7 +76,7 @@
 				}
 
 				// Set the background color of the renderer to black, with full opacity
-				renderer.setClearColorHex(0x000000, 1);
+				renderer.setClearColor(0x000000, 1);
 
 				// Get the size of the inner window (content area)
 				// Reduce the canvas size a little bit to prevent scrolling the whole window
@@ -128,14 +128,19 @@
 					squareGeometry.vertices.push(new THREE.Vector3( 1, -1, 0));
 					squareGeometry.vertices.push(new THREE.Vector3( 1,  1, 0));
 					squareGeometry.vertices.push(new THREE.Vector3(-1,  1, 0));
-					squareGeometry.faces.push(new THREE.Face4(0, 1, 2, 3));
+					squareGeometry.faces.push(new THREE.Face3(0, 1, 2));
+					squareGeometry.faces.push(new THREE.Face3(0, 2, 3));
 					squareGeometry.faceVertexUvs[0].push([
-						new THREE.UV(0.0, 0.0),
-						new THREE.UV(1.0, 0.0),
-						new THREE.UV(1.0, 1.0),
-						new THREE.UV(0.0, 1.0)
+						new THREE.Vector2(0.0, 0.0),
+						new THREE.Vector2(1.0, 0.0),
+						new THREE.Vector2(1.0, 1.0)
 					]);
-
+					squareGeometry.faceVertexUvs[0].push([
+					    new THREE.Vector2(0.0, 0.0),
+					    new THREE.Vector2(1.0, 1.0),
+					    new THREE.Vector2(0.0, 1.0)
+					]); 
+					
 					// Create a material, which contains the texture We use AdditiveBlending and
 					// transparency:true so that the black areas of the star.jpg become transparent
 					// We also set the combine property to mix so the color we specify gets combined 
@@ -183,6 +188,7 @@
 					spin          += Math.PI * 2 / num;
 					if (spin > (Math.PI*2))
 							spin = 0;
+									
 					star[i].angle += i / num;
 					star[i].dist  -= 0.01;
 					if(star[i].dist < 0.0) {

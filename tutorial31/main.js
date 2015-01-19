@@ -25,6 +25,7 @@ animateScene();
  * Initialize the Demo.  
  */
 
+/*
 function initializeDemo() {
 
 	document.addEventListener("keypress", onDocumentKeyPress, false);
@@ -33,14 +34,14 @@ function initializeDemo() {
 		var orange = new THREE.MeshLambertMaterial( { color: 0x995500, opacity: 1.0, transparent: false } );     
 		var mesh	= new THREE.Mesh( geometry, orange );     
 		mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.025;
-		mesh.position.y += 0.90;
+		mesh.position.y += 0.94;
 		nScene.addToScene( mesh ); 
 		
 		car = mesh; 
 	}); 
 }
+*/
 
-/*
 function initializeDemo() {
 
 	document.addEventListener("keypress", onDocumentKeyPress, false);
@@ -55,7 +56,7 @@ function addModelToScene( geometry, materials ) {
 	car.position.y += 0.90;
 	nScene.addToScene( car );
 }
-*/
+
 
 function onDocumentKeyPress(event) {
 	// Get the key code of the pressed key

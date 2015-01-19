@@ -24,7 +24,7 @@
 		<!-- Include two libraries
 		1. Three.js (core library)
 		2. Detector.js (checks the browsers WebGL capabilities) -->
-		<script src="../js/three.r59.js"></script>
+		<script src="../js/three.js"></script>
 		<script src="../js/Detector.js"></script>
 	</head>
 	<body>
@@ -157,7 +157,7 @@
 				scene.add(camera);
 
 				// Create the cube
-				var cubeGeometry = new THREE.CubeGeometry(2.0, 2.0, 2.0);
+				var cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
 
 				// When the CanvasRenderer is used, you will see, that the texture has some distortions.
 				// To get rid of this, you only have to increase the number of cube segments. The

@@ -20,7 +20,7 @@
 		<!-- Include two libraries
 		1. Three.js (core library)
 		2. Detector.js (checks the browsers WebGL capabilities) -->
-		<script src="../js/three.r59.js"></script>
+		<script src="../js/three.js"></script>
 		<script src="../js/Detector.js"></script>
 	</head>
 	<body>
@@ -176,7 +176,7 @@
 				// Parameter 1: Width
 				// Parameter 2: Height
 				// Parameter 3: Depth
-				var cubeGeometry = new THREE.CubeGeometry(1.5, 1.5, 1.5);
+				var cubeGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
 
 				// Applying different materials to the faces is a more difficult than applying one
 				// material to the whole geometry. We start with creating an array of

@@ -20,7 +20,7 @@
 		<!-- Include two libraries
 		1. Three.js (core library)
 		2. Detector.js (checks the browsers WebGL capabilities) -->
-		<script src="../js/three.r59.js"></script>
+		<script src="../js/three.js"></script>
 		<script src="../js/Detector.js"></script>
 	</head>
 	<body>
@@ -147,7 +147,8 @@
 				squareGeometry.vertices.push(new THREE.Vector3( 1.0,  1.0, 0.0));
 				squareGeometry.vertices.push(new THREE.Vector3( 1.0, -1.0, 0.0));
 				squareGeometry.vertices.push(new THREE.Vector3(-1.0, -1.0, 0.0));
-				squareGeometry.faces.push(new THREE.Face4(0, 1, 2, 3));
+				squareGeometry.faces.push(new THREE.Face3(0, 1, 2));
+				squareGeometry.faces.push(new THREE.Face3(0, 2, 3));
 
 				// Create a white basic material and activate the 'doubleSided' attribute.
 				var squareMaterial = new THREE.MeshBasicMaterial({

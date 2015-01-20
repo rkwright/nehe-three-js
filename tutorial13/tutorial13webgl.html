@@ -10,7 +10,7 @@
 
 		@author: rkwright@geofx.com
 	--------------------------------------------------------------------------- -->
-	<title>Sprite Text Labels</title>
+	<title>NEHE Tutorial 13</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link rel=stylesheet href="../css/NEHE.css"/>
@@ -19,7 +19,7 @@
 	<script src="../js/Detector.js"></script>
 	<script src="../js/Stats.js"></script>
 	<script src="../js/OrbitControls-Touch.js"></script>
-	<script src="../js/Scene.js"></script>
+	<script src="../js/gfx-scene.js"></script>
 </head>
 <body>
 
@@ -32,10 +32,10 @@ var canvas1, context1, texture1;
 var DESCENDER_ADJUST = 1.28;
 
 // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
-var nScene = new Scene( { axisHeight:10, controls:true, displayStats:true });
+var gfxScene = new GFX.Scene( { axisHeight:10, controls:true, displayStats:true });
 
 // set up the THREE.js scene via our Scene object
-nScene.initialize();
+gfxScene.initialize();
 
 // then initialize our demo's stuff
 initializeDemo();
@@ -54,43 +54,43 @@ function initializeDemo()
 	cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
 	cube.position.set(0,0,0);
 	cube.name = "Cube";
-	nScene.addToScene(cube);
+	gfxScene.add(cube);
  
 	var txSprite = makeTextSprite( "Bottom-Right", -1, 1, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
 		borderThickness:4, fillColor: {r:255, g:255, b:255, a:1.0}, radius:0, vAlign:"bottom", hAlign:"right" } );
-	nScene.addToScene( txSprite );
+	gfxScene.add( txSprite );
 
 	var txSprite = makeTextSprite( "Center-Rightt", -1, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
 		borderThickness:6, fillColor: {r:255, g:255, b:255, a:1.0}, radius:12, vAlign:"center", hAlign:"right" } );
-	nScene.addToScene( txSprite );
+	gfxScene.add( txSprite );
 
 	var txSprite = makeTextSprite( "Top-Right", -1, -1, 0.25, { fontsize: 72, fontface: "Georgia", 
 		borderColor: {r:0, g:0, b:255, a:1.0}, borderThickness:8, fillColor: {r:255, g:255, b:255, a:1.0}, radius:8, vAlign:"top", hAlign:"right" } );
-	nScene.addToScene( txSprite );
+	gfxScene.add( txSprite );
 		
 	var txSprite = makeTextSprite( "Bottom-Center", 0, 1, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
 		borderThickness:4, radius:2, fillColor: {r:255, g:255, b:255, a:1.0}, vAlign:"bottom", hAlign:"center" } );
-	nScene.addToScene( txSprite );
+	gfxScene.add( txSprite );
 
 	var txSprite = makeTextSprite( "Center-Center", 0, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
 		borderThickness:10, radius:10, fillColor: {r:255, g:255, b:255, a:1.0}, vAlign:"center", hAlign:"center" } );
-	nScene.addToScene( txSprite );
+	gfxScene.add( txSprite );
 
 	var txSprite = makeTextSprite( "Top-Center", 0, -1, 0.25, { fontsize: 72, fontface: "Georgia",  borderColor: {r:0, g:0, b:255, a:1.0},
 		borderThickness:20, fillColor: {r:255, g:255, b:255, a:1.0}, radius:10, vAlign:"top", hAlign:"center" } );
-	nScene.addToScene( txSprite );
+	gfxScene.add( txSprite );
 	
 	var txSprite = makeTextSprite( "Bottom-Left-NoFill", 1, 1, 0.25, { fontsize: 72, fontface: "Georgia", radius:8, 
 		textColor: {r:0, g:255, b:0, a:1.0}, vAlign:"bottom", hAlign:"left" } );
-	nScene.addToScene( txSprite );
+	gfxScene.add( txSprite );
 
 	var txSprite = makeTextSprite( "Center-Left", 1, 0, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
 		borderThickness:8, fillColor: {r:255, g:255, b:255, a:1.0}, radius:0, vAlign:"center", hAlign:"left" } );
-	nScene.addToScene( txSprite );
+	gfxScene.add( txSprite );
 
 	var txSprite = makeTextSprite( "Top-Left", 1, -1, 0.25, { fontsize: 72, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0}, 
 		borderThickness:0, radius:8, fillColor: {r:255, g:255, b:255, a:1.0}, vAlign:"top", hAlign:"left" } );
-	nScene.addToScene( txSprite );
+	gfxScene.add( txSprite );
 
 }
 
@@ -269,7 +269,7 @@ function addSphere( x, y, z, size ) {
 	
 	var sphere = new THREE.Mesh( new THREE.SphereGeometry(size, 32, 32), new THREE.MeshNormalMaterial());
 	sphere.position.set(x, y, z);
-	nScene.addToScene(sphere);
+	gfxScene.add(sphere);
 }
 
 /**
@@ -342,7 +342,7 @@ function animateScene() {
 	requestAnimationFrame(animateScene);
 	
 	// Map the 3D scene down to the 2D screen (render the frame)
-	nScene.renderScene();
+	gfxScene.renderScene();
 }
 
 </script>

@@ -101,8 +101,8 @@ GFX.Scene.prototype = {
 		}
 	
 		// set up the camera
-		this.camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 0.1, 1000);
-		this.camera.position.set(0, 6, 6);
+		this.camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 0.1, 5000);
+		this.camera.position.set(0, 200, 400);
 		this.camera.lookAt(this.scene.position);
 		this.scene.add(this.camera);
 	

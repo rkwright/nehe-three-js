@@ -11,18 +11,21 @@ var GFX = { revision: '01' };
 	
 GFX.Scene = function ( parameters ) {
 	
-	this.scene;
-	this.renderer;
-	this.camera;
+	this.scene = null;
+	this.renderer = null;
+	this.camera = null;
+    this.containerID = null;
+
+	this.cameraPos = [0,20,40];
 
 	this.controls = false;
-	this.orbitControls;
+	this.orbitControls = null;
 
 	this.displayStats = false;
-	this.stats;
+	this.stats = null;
 
-	this.ambientLight;
-	this.directionalLight;
+	this.ambientLight = null;
+	this.directionalLight = null;
 
 	this.axisHeight = 0;
 	
@@ -86,9 +89,8 @@ GFX.Scene.prototype = {
 	
 		// if the caller supplied the container elm ID try to find it
 		var container;
-		var containerID;
-		if (containerID != null && typeof containerID != 'undefined')
-			container = document.getElementById(containerID);
+		if (this.containerID != null && typeof this.containerID != 'undefined')
+			container = document.getElementById(this.containerID);
 		
 		// couldn't find it, so create it ourselves
 		if (container == null || typeof container == 'undefined') {
@@ -102,7 +104,11 @@ GFX.Scene.prototype = {
 	
 		// set up the camera
 		this.camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 0.1, 5000);
-		this.camera.position.set(0, 10, 20);
+		if (this.cameraPos == undefined)
+			this.camera.position.set(0, 10, 20);
+		else
+			this.camera.position.set(this.cameraPos[0], this.cameraPos[1], this.cameraPos[2]);
+
 		this.camera.lookAt(this.scene.position);
 		this.scene.add(this.camera);
 	
@@ -278,7 +284,7 @@ GFX.Scene.prototype = {
 			}
 			
 			this.scene.add( cylinder );
-		};
+		}
 	},
 
 	drawAxes: function( height ) {
@@ -287,4 +293,4 @@ GFX.Scene.prototype = {
 		this.drawAxis(Y_AXIS, 0x00ff00, height);
 		this.drawAxis(Z_AXIS, 0x0000ff, height);
 	}
-}
+};

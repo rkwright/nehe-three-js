@@ -35,9 +35,10 @@
     //var geometry;
 
 	// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
-	var gfxScene = new GFX.Scene( { axisHeight:10, 
+	var gfxScene = new GFX.Scene( { axisHeight:100,
 						            controls:true, 
-						            displayStats:true });
+						            displayStats:true,
+                                    cameraPos: [0,200,400]});
  
 	// set up the THREE.js scene via our Scene object
 	gfxScene.initialize();
@@ -59,7 +60,8 @@
     function createPE() {
 
         this.engine = new ParticleEngine();
-        engine.setValues( Examples.fountain );engine.initialize( gfxScene );
+        this.engine.setValues( Examples.fountain );
+        this.engine.initialize( gfxScene );
     }
 
 	/**
@@ -74,7 +76,7 @@
 		gfxScene.renderScene();
 
         var dt = clock.getDelta();
-        engine.update( dt * 0.5 );
+        this.engine.update( dt * 0.5 );
     }
 
 </script>	

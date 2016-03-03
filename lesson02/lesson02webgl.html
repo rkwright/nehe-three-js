@@ -123,7 +123,7 @@
 				// rendering of both sides of each face (front and back). This prevents the so called
 				// 'backface culling'. Usually, only the side is rendered, whose normal vector points
 				// towards the camera. The other side is not rendered (backface culling). But this
-				// performance optimization sometimes leads to wholes in the surface. When this happens
+				// performance optimization sometimes leads to holes in the surface. When this happens
 				// in your surface, simply set 'doubleSided' to 'true'.
 				var triangleMaterial = new THREE.MeshBasicMaterial({
 					color:0xFFFFFF,
@@ -136,9 +136,15 @@
 				triangleMesh.position.set(-1.5, 0.0, 4.0);
 				scene.add(triangleMesh);
 
-				// The creation of the square is done in the same way as the triangle, except of the
-				// face definition. Instead of using THREE.Face3, we define a face with four vertices:
-				// THREE.Face4.
+				// The creation of the square is done in the same way as the triangle, exceptThe creation of the square
+				// is done in the same way as the triangle, except  in how we define the square.  There
+				// is no Face4 in three.js (for performance reasons).  Instead, we have to define two triangles.
+				// Moreover, the triangles	have to have the correct winding or one or the other will effectively be
+				// facing "away" (though since we define the mesh as double-sided that wouldn't show). Still, it is not
+				// good practice, so one has to ensure that they are have the correct winding direction. So we define
+				// the four vertices as ( -1, 1, 0), (1, 1, 0),	(1, -1, 0), (-1, -1, 0). Then connect them as (0, 1, 2)
+				// as one triangle and (0, 2, 3) as the second triangle.
+				//
 				// 1. Instantiate the geometry object
 				// 2. Add the vertices
 				// 3. Define the faces by setting the vertices indices

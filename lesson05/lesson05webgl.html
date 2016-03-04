@@ -2,7 +2,7 @@
 <!-- The previous line tells the browser that the page uses the HTML5 standard. -->
 <html>
 	<head>
-		<title>Three.js tutorial - Lesson 05</title>
+		<title>Three.js lesson - Lesson 05</title>
 		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
 		<!-- The following meta line optimizes the site for mobile devices. It sets the viewport size
@@ -122,33 +122,14 @@
 				//                          face, we set it to 'false'.
 				var pyramidGeometry = new THREE.CylinderGeometry(0, 1.5, 1.5, 4, false);
 
-				// Coloring the faces with vertex colors is a bit tricky, but allows us to see how to
-				// loop through the faces and check whether they have three or four vertices.
-				// With a simple 'for'-loop we run through all faces, which are accessed by their index.
-				// The 'instanceof' operator gives the possibility to check, whether the current face is
-				// a THREE.Face4 or THREE.Face3. Depending on its object type, we set three or four
-				// vertex colors. For THREE.Face4 we switch the colors of vertex 1 and 2 for every
-				// second face because we want the lower vertices having the same colors as the
-				// neighbour face. Vertex 0 and 3 are the upper vertices, which are always red.
-				// If WebGL isn't supported and the canvas renderer is used, it ignores the vertex
-				// colors. They are only supported by the WebGL renderer (current release of
-				// Three.js: 49).
+				// The pyramid geometry used to optionally use a Face4, but Face4 was removed in r62C
+				// We just loops through all the faces and set the the three vertex colors.
 				for(i = 0; i < pyramidGeometry.faces.length; i++){
-					if(pyramidGeometry.faces[i] instanceof THREE.Face4){
-						pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF0000);
-						if((i % 2) == 0){
-							pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x00FF00);
-							pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x0000FF);
-						} else {
-							pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x0000FF);
-							pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x00FF00);
-						}
-						pyramidGeometry.faces[i].vertexColors[3] = new THREE.Color(0xFF0000);
-					} else {
-						pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF0000);
-						pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x00FF00);
-						pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x0000FF);
-					}
+
+					pyramidGeometry.faces[i].vertexColors[0] = new THREE.Color(0xFF0000);
+					pyramidGeometry.faces[i].vertexColors[1] = new THREE.Color(0x00FF00);
+					pyramidGeometry.faces[i].vertexColors[2] = new THREE.Color(0x0000FF);
+
 				}
 
 				// To activate the vertex color, we have to set 'vertexColors' attribute to
@@ -213,7 +194,7 @@
 				// Decrease the rotation of the cube
 				cubeMesh.rotateOnAxis(new THREE.Vector3(1, 1, 1).normalize(), 0.075);
 
-				// Define the function, which is called by the browser supported timer loop. If the
+				// Define the function which is called by the browser supported timer loop. If the
 				// browser tab is not visible, the animation is paused. So 'animateScene()' is called
 				// in a browser controlled loop.
 				requestAnimationFrame(animateScene);

@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d45fab26-2091-4b16-bdd6-0d6346b2e5d2" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/tutorial04/tutorial04webgl.html" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tutorial05/tutorial05webgl.html" afterPath="$PROJECT_DIR$/lesson05/lesson05webgl.html" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tutorial06/NeHe.jpg" afterPath="$PROJECT_DIR$/lesson06/NeHe.jpg" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tutorial06/tutorial06webgl.html" afterPath="$PROJECT_DIR$/lesson06/lesson06webgl.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lesson03/lesson03webgl.html" afterPath="$PROJECT_DIR$/lesson03/lesson03webgl.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lesson05/lesson05webgl.html" afterPath="$PROJECT_DIR$/lesson05/lesson05webgl.html" />
     </list>
     <ignored path="Sandbox_NeHe2.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -36,10 +36,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="lesson04webgl.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="lesson04webgl.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lesson04/lesson04webgl.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
+            <state vertical-scroll-proportion="79.565216">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
@@ -59,8 +59,18 @@
       <file leaf-file-name="lesson05webgl.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lesson05/lesson05webgl.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.6086957">
-              <caret line="4" column="30" selection-start-line="4" selection-start-column="30" selection-end-line="4" selection-end-column="30" />
+            <state vertical-scroll-proportion="-26.086956">
+              <caret line="126" column="67" selection-start-line="126" selection-start-column="67" selection-end-line="126" selection-end-column="67" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="lesson06webgl.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/lesson06/lesson06webgl.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-1.5683646">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -91,8 +101,8 @@
         <option value="$PROJECT_DIR$/tutorial19/js/ParticleEngine.js" />
         <option value="$PROJECT_DIR$/js/gfx-scene.js" />
         <option value="$PROJECT_DIR$/tutorial02/tutorial02webgl.html" />
-        <option value="$PROJECT_DIR$/lesson05/lesson05webgl.html" />
         <option value="$PROJECT_DIR$/lesson03/lesson03webgl.html" />
+        <option value="$PROJECT_DIR$/lesson05/lesson05webgl.html" />
       </list>
     </option>
   </component>
@@ -366,7 +376,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="tutorial06" />
+              <option name="myItemId" value="lesson06" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -940,14 +950,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lesson05/lesson05webgl.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.6086957">
-          <caret line="4" column="30" selection-start-line="4" selection-start-column="30" selection-end-line="4" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tutorial15/tutorial15webgl.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.20107238">
@@ -966,7 +968,23 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lesson04/lesson04webgl.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
+        <state vertical-scroll-proportion="79.565216">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lesson05/lesson05webgl.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-26.086956">
+          <caret line="126" column="67" selection-start-line="126" selection-start-column="67" selection-end-line="126" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lesson06/lesson06webgl.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.5683646">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>

@@ -36,7 +36,8 @@
 			Cursor left / right: Control y rotation speed<br/>
 			Cursor up / down: Control x rotation speed<br/>
 			Page up / down: Move along z axis<br/>
-			Renderer: 
+			Renderer:
+			<p id="filterType">Filter: </p>
 		</div>
 
 		<!-- This is the DIV element which will contain the WebGL canvas. To be identifiable later on,
@@ -78,8 +79,11 @@
 
 			// Flag for toggling light
 			var lightIsOn = true;
+            var ambientLight;
+            var directionalLight;
+            var pointLight;
 
-			// Global mesh object of the cube
+            // Global mesh object of the cube
 			var cubeMesh;
 
 			// Initialize the scene
@@ -159,10 +163,6 @@
 				// Create the cube
 				var cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
 
-				// When the CanvasRenderer is used, you will see, that the texture has some distortions.
-				// To get rid of this, you only have to increase the number of cube segments. The
-				// WebGLRenderer doesn't needs this workaround.
-				//var cubeGeometry = new THREE.CubeGeometry(2.0, 2.0, 2.0, 4, 4, 4);
 
 				// Load an image as texture
 				crateTexture = new THREE.ImageUtils.loadTexture("Crate.jpg");
@@ -182,6 +182,9 @@
 					map:crateTexture,
 					side:THREE.DoubleSide
 				});
+
+				cubeMaterial = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('crate.jpg') } );
+
 				if(!webGLAvailable){
 					cubeMaterial = new THREE.MeshBasicMaterial({
 						map:crateTexture,
@@ -198,15 +201,15 @@
 
 				// Ambient light has no direction, it illuminates every object with the same
 				// intensity. If only ambient light is used, no shading effects will occur.
-				var ambientLight = new THREE.AmbientLight(0x101010, 1.0);
+				ambientLight = new THREE.AmbientLight(0x000000, 1);
 				scene.add(ambientLight);
 
 				// Directional light has a source and shines in all directions, like the sun.
 				// This behaviour creates shading effects.
-				var directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-				directionalLight.position = camera.position;
-				scene.add(directionalLight);
-
+				directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+                directionalLight.position.set( 0, 0, 6 ).normalize();
+                scene.add(directionalLight);
+                
 				// Add a listener for 'keydown' events. By this listener, all key events will be
 				// passed to the function 'onDocumentKeyDown'. There's another event type 'keypress'.
 				// It will report only the visible characters like 'a', but not the function keys
@@ -220,6 +223,7 @@
 			function onDocumentKeyDown(event){
 				// Get the key code of the pressed key
 				var keyCode = event.which;
+				var filterType;
 
 				// 'F' - Toggle through the texture filters
 				if(keyCode == 70){
@@ -229,63 +233,60 @@
 							crateTexture.minFilter = THREE.NearestFilter;
 							crateTexture.magFilter = THREE.NearestFilter;
 							textureFilter = 1;
+							filterType = "Nearest Neighbor";
 							break;
 						case 1:
 							crateTexture.minFilter = THREE.LinearFilter;
 							crateTexture.magFilter = THREE.LinearFilter;
 							textureFilter = 2;
+							filterType = "Linear";
 							break;
 						case 2:
-							crateTexture.minFilter = THREE.LinearFilter;
-							crateTexture.magFilter = THREE.LinearMipMapNearestFilter;
+							crateTexture.minFilter = THREE.LinearMipMapNearestFilter;
+							crateTexture.magFilter = THREE.LinearFilter;
 							textureFilter = 0;
+							filterType = "MipMap";
 							break;
 					};
 					crateTexture.needsUpdate = true;
+					document.getElementById("filterType").innerHTML = "Filter: " + filterType;
 
 				// 'L' - Toggle light
 				} else if(keyCode == 76){
-					// If we would just remove the lights from the scene, or set the lights to
-					// invisible, we would get a black cube due to the MeshLambertMaterial (it needs
-					// light). So we just switch the material to toggle the light
-					if(lightIsOn){
-						cubeMesh.material = new THREE.MeshBasicMaterial({
-							map:crateTexture,
-							side:THREE.DoubleSide
-						});
-						lightIsOn = false;
+                    // If we would just remove the lights from the scene, or set the lights to
+                    // invisible, we would get a black cube due to the MeshLambertMaterial (it needs
+                    // light). So we just switch the material to toggle the light
+                    if(lightIsOn){
+                        cubeMesh.material = new THREE.MeshBasicMaterial({
+                            map:crateTexture,
+                            side:THREE.DoubleSide
+                        });
+                        lightIsOn = false;
+                    } else {
+                            cubeMesh.material = new THREE.MeshLambertMaterial({
+                                map:crateTexture,
+                                side:THREE.DoubleSide
+                            });
 
-					} else {
-						if(webGLAvailable){
-							cubeMesh.material = new THREE.MeshLambertMaterial({
-								map:crateTexture,
-								side:THREE.DoubleSide
-							});
-						} else {
-							cubeMesh.material = new THREE.MeshBasicMaterial({
-								map:crateTexture,
-								side:THREE.DoubleSide
-							});
-						}
-						lightIsOn = true;
-					}
-					cubeMesh.material.needsUpdate = true;
+                        lightIsOn = true;
+                    }
+                    cubeMesh.material.needsUpdate = true;
 
 				// Cursor up
 				} else if(keyCode == 38){
-					xSpeed -= 0.01;
+					xSpeed -= 0.005;
 
 				// Cursor down
 				} else if(keyCode == 40){
-					xSpeed += 0.01;
+					xSpeed += 0.005;
 
 				// Cursor left
 				} else if(keyCode == 37){
-					ySpeed -= 0.01;
+					ySpeed -= 0.005;
 
 				// Cursor right
 				} else if(keyCode == 39){
-					ySpeed += 0.01;
+					ySpeed += 0.005;
 
 				// Page up
 				} else if(keyCode == 33){

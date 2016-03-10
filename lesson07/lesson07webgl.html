@@ -37,7 +37,8 @@
 			Cursor up / down: Control x rotation speed<br/>
 			Page up / down: Move along z axis<br/>
 			Renderer:
-			<p id="filterType">Filter: </p>
+			<p id="filterType">Filter: Linear</p>
+            <p id="textureSize">Texture Size: 256</p>
 		</div>
 
 		<!-- This is the DIV element which will contain the WebGL canvas. To be identifiable later on,
@@ -67,24 +68,26 @@
 			// The x and y speed is controlled by the cursor keys.
 			// The translation on the z axis by 'Page up / down'.
 			// 'crateTexture' is the texture object. We set it global, to modify it's attributes
-			// lateron.
+			// later on.
 			// 'textureFilter' will have three states (0, 1 or 2), controlling the current texture
 			// filtering (nearest, linear or mipmapped).
-			// The next two objects hold two different kinds of light: Ambient and directional light.
-			// 'enableLights' is the flag, which is switched by the key 'f'.
 
 			// Texture and flag for current texture filter
 			var crateTexture;
+            var crateSize = 256;
 			var textureFilter = 0;
 
-			// Flag for toggling light
-			var lightIsOn = true;
+			// intensity of the light so we can turn it on and off
+			var intensity = 1;
+            
+            // The next two objects hold two different kinds of light: Ambient and directional light.
+            // 'enableLights' is the flag, which is switched by the key 'f'.
             var ambientLight;
             var directionalLight;
-            var pointLight;
 
             // Global mesh object of the cube
 			var cubeMesh;
+            var cubeGeometry;
 
 			// Initialize the scene
 			initializeScene();
@@ -161,11 +164,11 @@
 				scene.add(camera);
 
 				// Create the cube
-				var cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
+				cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
 
 
 				// Load an image as texture
-				crateTexture = new THREE.ImageUtils.loadTexture("Crate.jpg");
+				crateTexture = new THREE.ImageUtils.loadTexture("Crate_"+crateSize+".jpg");
 
 				// Create a material, which contains the texture.
 				// Unfortunately, the CanvasRenderer doesn't support MeshLambertMaterial in combination
@@ -178,12 +181,7 @@
 				// side is not rendered (backface culling). But this performance optimization sometimes
 				// leads to wholes in the surface. When this happens in your surface, simply set
 				// 'doubleSided' to 'true'.
-				var cubeMaterial = new THREE.MeshLambertMaterial({
-					map:crateTexture,
-					side:THREE.DoubleSide
-				});
-
-				cubeMaterial = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('crate.jpg') } );
+				var cubeMaterial = new THREE.MeshPhongMaterial({ map:crateTexture, side:THREE.DoubleSide });
 
 				if(!webGLAvailable){
 					cubeMaterial = new THREE.MeshBasicMaterial({
@@ -201,15 +199,15 @@
 
 				// Ambient light has no direction, it illuminates every object with the same
 				// intensity. If only ambient light is used, no shading effects will occur.
-				ambientLight = new THREE.AmbientLight(0x000000, 1);
+				ambientLight = new THREE.AmbientLight(0x010101, intensity);
 				scene.add(ambientLight);
 
 				// Directional light has a source and shines in all directions, like the sun.
 				// This behaviour creates shading effects.
-				directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+				directionalLight = new THREE.DirectionalLight(0xffffff, intensity);
                 directionalLight.position.set( 0, 0, 6 ).normalize();
                 scene.add(directionalLight);
-                
+
 				// Add a listener for 'keydown' events. By this listener, all key events will be
 				// passed to the function 'onDocumentKeyDown'. There's another event type 'keypress'.
 				// It will report only the visible characters like 'a', but not the function keys
@@ -220,83 +218,83 @@
 			/**
 			 * This function is called, when a key is oushed down.
 			 */
-			function onDocumentKeyDown(event){
-				// Get the key code of the pressed key
-				var keyCode = event.which;
-				var filterType;
+			function onDocumentKeyDown(event) {
+                // Get the key code of the pressed key
+                var keyCode = event.which;
 
-				// 'F' - Toggle through the texture filters
-				if(keyCode == 70){
-					// The CanvasRenderer doesn't support texture filters.
-					switch(textureFilter){
-						case 0:
-							crateTexture.minFilter = THREE.NearestFilter;
-							crateTexture.magFilter = THREE.NearestFilter;
-							textureFilter = 1;
-							filterType = "Nearest Neighbor";
-							break;
-						case 1:
-							crateTexture.minFilter = THREE.LinearFilter;
-							crateTexture.magFilter = THREE.LinearFilter;
-							textureFilter = 2;
-							filterType = "Linear";
-							break;
-						case 2:
-							crateTexture.minFilter = THREE.LinearMipMapNearestFilter;
-							crateTexture.magFilter = THREE.LinearFilter;
-							textureFilter = 0;
-							filterType = "MipMap";
-							break;
-					};
-					crateTexture.needsUpdate = true;
-					document.getElementById("filterType").innerHTML = "Filter: " + filterType;
+                // 'F' - Toggle through the texture filters
+                if (keyCode == 70) {
+                    updateFilter();
 
-				// 'L' - Toggle light
-				} else if(keyCode == 76){
-                    // If we would just remove the lights from the scene, or set the lights to
-                    // invisible, we would get a black cube due to the MeshLambertMaterial (it needs
-                    // light). So we just switch the material to toggle the light
-                    if(lightIsOn){
-                        cubeMesh.material = new THREE.MeshBasicMaterial({
-                            map:crateTexture,
-                            side:THREE.DoubleSide
-                        });
-                        lightIsOn = false;
-                    } else {
-                            cubeMesh.material = new THREE.MeshLambertMaterial({
-                                map:crateTexture,
-                                side:THREE.DoubleSide
-                            });
+                    // 'L' - Toggle light
+                } else if (keyCode == 76) {
+                    // Just toggle the intensity to turn lights on and off
+                    intensity = intensity > 0 ? 0 : 1;
+                    directionalLight.intensity = ambientLight.intensity = intensity;
 
-                        lightIsOn = true;
-                    }
+                    // Cursor up
+                } else if (keyCode == 38) {
+                    xSpeed -= 0.005;
+
+                    // Cursor down
+                } else if (keyCode == 40) {
+                    xSpeed += 0.005;
+
+                    // Cursor left
+                } else if (keyCode == 37) {
+                    ySpeed -= 0.005;
+
+                    // Cursor right
+                } else if (keyCode == 39) {
+                    ySpeed += 0.005;
+
+                    // Page up
+                } else if (keyCode == 33) {
+                    zTranslation -= 0.2;
+
+                    // Page down
+                } else if (keyCode == 34) {
+                    zTranslation += 0.2;
+                }
+                else if (keyCode == 84) {   // 'T' switch textures
+                    crateSize = crateSize == 256 ? 128 : crateSize == 128 ? 64 : 256;
+
+                    cubeMesh.material.map = new THREE.ImageUtils.loadTexture("Crate_"+crateSize+".jpg");
+                    updateFilter();
                     cubeMesh.material.needsUpdate = true;
 
-				// Cursor up
-				} else if(keyCode == 38){
-					xSpeed -= 0.005;
+                    document.getElementById("textureSize").innerHTML = "Texture Size: " + crateSize;
 
-				// Cursor down
-				} else if(keyCode == 40){
-					xSpeed += 0.005;
+                }
+            }
 
-				// Cursor left
-				} else if(keyCode == 37){
-					ySpeed -= 0.005;
+            /**
+             *  Just update the filters
+             */
+            function updateFilter() {
+                var filterType;
+                switch (textureFilter) {
+                    case 0:
+                        cubeMesh.material.map.minFilter = THREE.NearestFilter;
+                        cubeMesh.material.map.magFilter = THREE.NearestFilter;
+                        filterType = "Nearest Neighbor";
+                        break;
+                    case 1:
+                        cubeMesh.material.map.minFilter = THREE.LinearFilter;
+                        cubeMesh.material.map.magFilter = THREE.LinearFilter;
+                        filterType = "Linear";
+                        break;
+                    case 2:
+                        cubeMesh.material.map.minFilter = THREE.LinearMipMapNearestFilter;
+                        cubeMesh.material.map.magFilter = THREE.LinearFilter;
+                        filterType = "MipMap";
+                        break;
+                }
 
-				// Cursor right
-				} else if(keyCode == 39){
-					ySpeed += 0.005;
-
-				// Page up
-				} else if(keyCode == 33){
-					zTranslation -= 0.2;
-
-				// Page down
-				} else if(keyCode == 34){
-					zTranslation += 0.2;
-				}
-			}
+                textureFilter = ++textureFilter % 3;
+                cubeMesh.material.map.needsUpdate = true;
+                document.getElementById("filterType").innerHTML = "Filter: " + filterType;
+            }
 
 			/**
 			 * Animate the scene and call rendering.

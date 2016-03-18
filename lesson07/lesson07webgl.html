@@ -7,7 +7,7 @@
 
 	<!-- The following meta line optimizes the site for mobile devices. It sets the viewport size
     to the screen size, so it will be displayed maximized, but unscaled. -->
-	<meta name="viewport" content="width=768, height=1024"/>
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
 	<style type="text/css">
 		body {
 			/* Set the background color of the HTML page to black */
@@ -126,8 +126,8 @@ function initializeScene(){
 	// Get the size of the inner window (content area)
 	// Reduce the canvas size a little bit to prevent scrolling the whole window
 	// content in Firefox while rotating the cube with the keys.
-	canvasWidth = 768;
-	canvasHeight = 1024;
+    canvasWidth = window.innerWidth;
+    canvasHeight = window.innerHeight;
 
 	// Set the renderers size to the content area's size
 	renderer.setSize(canvasWidth, canvasHeight);

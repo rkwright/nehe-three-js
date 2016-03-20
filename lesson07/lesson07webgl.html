@@ -228,9 +228,8 @@ function onDocumentKeyDown(event) {
 	}
     else if (keyCode == 76) {       // 'L' - Toggle light
 		// Just toggle the intensity to turn lights on and off
-		intensity = intensity > 0 ? 0 : 1;
-		directionalLight.intensity = ambientLight.intensity = intensity;
-
+        ambientLight.intensity = ambientLight.intensity > 0 ? 0 : 1;
+        directionalLight.intensity = directionalLight.intensity > 0 ? 0 : 1;
 	}
     else if (keyCode == 38) {       // Cursor up
 		xSpeed -= 0.005;

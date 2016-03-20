@@ -169,13 +169,8 @@
 				// Create the cube
 				var cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
 
-				// When the CanvasRenderer is used, you will see, that the texture has some distortions.
-				// To get rid of this, you only have to increase the number of cube segments. The
-				// WebGLRenderer doesn't needs this workaround.
-				//var cubeGeometry = new THREE.CubeGeometry(2.0, 2.0, 2.0, 4, 4, 4);
-
 				// Load an image as texture
-				glassTexture = new THREE.ImageUtils.loadTexture("Glass.jpg");
+				glassTexture = THREE.ImageUtils.loadTexture("Glass.jpg");
 
 				// Create a material, which contains the texture
 				// Unfortunately, the CanvasRenderer doesn't support MeshLambertMaterial in combination
@@ -201,13 +196,13 @@
 
 				// Ambient light has no direction, it illuminates every object with the same
 				// intensity. If only ambient light is used, no shading effects will occur.
-				ambientLight = new THREE.AmbientLight(0x101010, 1.0);
+				ambientLight = new THREE.AmbientLight(0xF0F0F0, 1.0);
 				scene.add(ambientLight);
 
 				// Directional light has a source and shines in all directions, like the sun.
 				// This behaviour creates shading effects.
 				directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-				directionalLight.position = camera.position;
+				directionalLight.position.set( 0, 0, 6 ).normalize();
 				scene.add(directionalLight);
 
 				// Add a listener for 'keydown' events. By this listener, all key events will be
@@ -230,7 +225,6 @@
 				}
                 else if (keyCode == 76) {        // 'L' - Toggle light
                     // Just toggle the intensity to turn lights on and off
-                    cubeMesh.material = new THREE.MeshLambertMaterial({map:glassTexture});
                     ambientLight.intensity = ambientLight.intensity > 0 ? 0 : 1;
                     directionalLight.intensity = directionalLight.intensity > 0 ? 0 : 1;
 				}

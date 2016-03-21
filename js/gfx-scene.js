@@ -2,7 +2,7 @@
  *  @author rkwright   /  http://www.geofx.com
  */
 
-var GFX = { revision: '01' };
+var GFX = { revision: '02' };
 
 //some constants
 	var    	X_AXIS = 0;
@@ -76,10 +76,11 @@ GFX.Scene.prototype = {
 					this[ key ] = Number( newValue );
 				}
                 else if (currentValue instanceof Array) {
-                        this[ key ] = newValue.slice();
-				} else {
-                this[ key ] = newValue;
-            }
+                    this[ key ] = newValue.slice();
+				}
+                else {
+                    this[ key ] = newValue;
+                }
 			}
 		}
 	},

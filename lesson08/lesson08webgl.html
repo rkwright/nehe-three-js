@@ -99,7 +99,7 @@
 				cubeMesh.position.set(0.0, 0.0, zTranslation);
 				gfxScene.add(cubeMesh);
 
-                // Add a listener for 'keydown' events. There's another event type 'keypress',
+                // Add a listener for 'keydown' events. There's another event type: 'keypress',
                 // but it will report only the visible characters like 'a', but not the function keys
                 // like 'cursor up'.
                 document.addEventListener("keydown", onDocumentKeyDown, false);
@@ -109,14 +109,14 @@
 			 * This function is called, when a key is pushed down.
 			 */
 			function onDocumentKeyDown(event){
-				// Get the key code of the pressed key
-				var keyCode = event.which;
 
-				if (keyCode == 70) {             // 'F' - Toggle through the texture filters
+				var keyCode = event.which;      // Get the key code of the pressed key
+
+				if (keyCode == 70) {            // 'F' - Toggle through the texture filters
                     updateFilter();
 
 				}
-                else if (keyCode == 76) {        // 'L' - Toggle light
+                else if (keyCode == 76) {       // 'L' - Toggle light
                     // Just toggle the intensity to turn lights on and off
                     ambientLight.intensity = ambientLight.intensity > 0 ? 0 : 1;
                     directionalLight.intensity = directionalLight.intensity > 0 ? 0 : 1;

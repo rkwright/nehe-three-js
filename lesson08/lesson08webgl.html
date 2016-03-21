@@ -8,24 +8,12 @@
 		<!-- The following meta line optimizes the site for mobile devices. It sets the viewport size
 		to the screen size, so it will be displayed maximized, but unscaled. -->
 		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
-		<style type="text/css">
-			body {
-				/* Set the background color of the HTML page to black */
-				background-color: #000000;
+        <link rel="stylesheet" type="text/css" href="../css/NEHE.css" />
 
-				/* Hide oversized content. This prevents the scroll bars. */
-				overflow: hidden;
-
-				/* Define the font and the color for the usage, which is an ordinary HTML overlay. */
-				font-family: Monospace;
-				color: white;
-			}
-		</style>
-		<!-- Include two libraries
-		1. Three.js (core library)
-		2. Detector.js (checks the browsers WebGL capabilities) -->
+		<!-- Include the necessary libs -->
 		<script src="../js/Three.js"></script>
 		<script src="../js/Detector.js"></script>
+        <script src="../js/gfx-scene.js" type="text/javascript"></script>
 	</head>
 	<body>
 		<!-- Create a DIV element, which will be shown over the WebGL canvas. The last line
@@ -42,17 +30,11 @@
 			Renderer:
 		</div>
 
-		<!-- This is the DIV element which will contain the WebGL canvas. To be identifiable later on,
-		the id 'WebGLCanvas' is applied to it. -->
-		<div id="WebGLCanvas">
 
 		<!-- This JavaScript block encloses the Three.js commands -->
 		<script>
-			// Global scene object
-			var scene;
-
-			// Global camera object
-			var camera;
+            // allocate the Scene object, and set the camera position
+            var gfxScene = new GFX.Scene( { cameraPos:[0,0,6] });
 
 			// x and y rotation
 			var xRotation = 0.0;
@@ -64,15 +46,6 @@
 
 			// Translation along the z axis
 			var zTranslation = 0.0;
-
-			// The x and y speed is controlled by the cursor keys.
-			// The translation on the z axis by 'Page up / down'.
-			// 'glassTexture' is the texture object. We set it global, to modify it's attributes
-			// lateron.
-			// 'textureFilter' will have three states (0, 1 or 2), controlling the current texture
-			// filtering (nearest, linear or mipmapped).
-			// The next two objects hold two different kinds of light: Ambient and directional light.
-			// 'enableLights' is the flag, which is switched by the key 'f'.
 
 			// Texture and flag for current texture filter
 			var glassTexture;
@@ -90,82 +63,19 @@
                 "NearestMipMapNearest",
                 "LinearMipMapLinear" ];
 
-            // The next two objects hold two different kinds of light: Ambient and directional light.
-            // 'enableLights' is the flag, which is switched by the key 'f'.
-            var ambientLight;
-            var directionalLight;
-
 			// Global mesh object of the cube
 			var cubeMesh;
 
-			// Initialize the scene
-			initializeScene();
+			// Initialize the demo
+			initializeDemo();
 
 			// Animate the scene
 			animateScene();
 
 			/**
-			 * Initialze the scene.
+			 *  Initialize the demo's local aspects, i.e not the scene.
 			 */
-			function initializeScene(){
-				// Check whether the browser supports WebGL. If so, instantiate the hardware accelerated
-				// WebGL renderer. For antialiasing, we have to enable it. The canvas renderer uses
-				// antialiasing by default.
-				// The approach of multiplse renderers is quite nice, because your scene can also be
-				// viewed in browsers, which don't support WebGL. The limitations of the canvas renderer
-				// in contrast to the WebGL renderer will be explained in the tutorials, when there is a
-				// difference.
-				webGLAvailable = false;
-				if (Detector.webgl){
-					renderer = new THREE.WebGLRenderer({antialias:true});
-					webGLAvailable = true;
-					document.getElementById("overlaytext").innerHTML += "WebGL Renderer";
-				}
-
-				// Set the background color of the renderer to black, with full opacity
-				renderer.setClearColor(0x000000, 1);
-
-				// Get the size of the inner window (content area)
-				// Reduce the canvas size a little bit to prevent scrolling the whole window
-				// content in Firefox while rotating the cube with the keys.
-				canvasWidth = window.innerWidth - 10;
-				canvasHeight = window.innerHeight - 20;
-
-				// Set the renderers size to the content areas size
-				renderer.setSize(canvasWidth, canvasHeight);
-
-				// Get the DIV element from the HTML document by its ID and append the renderers DOM
-				// object to it
-				document.getElementById("WebGLCanvas").appendChild(renderer.domElement);
-
-				// Create the scene, in which all objects are stored (e. g. camera, lights,
-				// geometries, ...)
-				scene = new THREE.Scene();
-
-				// Now that we have a scene, we want to look into it. Therefore we need a camera.
-				// Three.js offers three camera types:
-				//  - PerspectiveCamera (perspective projection)
-				//  - OrthographicCamera (parallel projection)
-				//  - CombinedCamera (allows to switch between perspective / parallel projection
-				//    during runtime)
-				// In this example we create a perspective camera. Parameters for the perspective
-				// camera are ...
-				// ... field of view (FOV),
-				// ... aspect ratio (usually set to the quotient of canvas width to canvas height)
-				// ... near and
-				// ... far.
-				// Near and far define the cliping planes of the view frustum. Three.js provides an
-				// example (http://mrdoob.github.com/three.js/examples/
-				// -> canvas_camera_orthographic2.html), which allows to play around with these
-				// parameters.
-				// The camera is moved 10 units towards the z axis to allow looking to the center of
-				// the scene.
-				// After definition, the camera has to be added to the scene.
-				camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 100);
-				camera.position.set(0, 0, 6);
-				camera.lookAt(scene.position);
-				scene.add(camera);
-
+			function initializeDemo() {
 				// Create the cube
 				var cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
 
@@ -173,47 +83,30 @@
 				glassTexture = THREE.ImageUtils.loadTexture("Glass.jpg");
 
 				// Create a material, which contains the texture
-				// Unfortunately, the CanvasRenderer doesn't support MeshLambertMaterial in combination
-				// with Textures. Otherwise, the MeshBasicMaterial doesn't support lighting. As
-				// compromise, the CanvasRenderer will show the texture without lighting via
-				// MeshBasicMaterial.
 				var cubeMaterial = new THREE.MeshLambertMaterial({
 					map:glassTexture,
 					depthWrite: false,
 					transparent: true,
-					opacity: 0.5,
+					opacity: 0.75,
 					side:THREE.DoubleSide,
 					combine: THREE.MixOperation
 				});
-
 
 				// Create a mesh and insert the geometry and the material. Translate the
 				// whole mesh by 'zTranslation' units on the z axis. Finally add the mesh
 				// to the scene.
 				cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
 				cubeMesh.position.set(0.0, 0.0, zTranslation);
-				scene.add(cubeMesh);
+				gfxScene.add(cubeMesh);
 
-				// Ambient light has no direction, it illuminates every object with the same
-				// intensity. If only ambient light is used, no shading effects will occur.
-				ambientLight = new THREE.AmbientLight(0xF0F0F0, 1.0);
-				scene.add(ambientLight);
-
-				// Directional light has a source and shines in all directions, like the sun.
-				// This behaviour creates shading effects.
-				directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-				directionalLight.position.set( 0, 0, 6 ).normalize();
-				scene.add(directionalLight);
-
-				// Add a listener for 'keydown' events. By this listener, all key events will be
-				// passed to the function 'onDocumentKeyDown'. There's another event type 'keypress'.
-				// It will report only the visible characters like 'a', but not the function keys
-				// like 'cursor up'.
-				document.addEventListener("keydown", onDocumentKeyDown, false);
+                // Add a listener for 'keydown' events. There's another event type 'keypress',
+                // but it will report only the visible characters like 'a', but not the function keys
+                // like 'cursor up'.
+                document.addEventListener("keydown", onDocumentKeyDown, false);
 			}
 
 			/**
-			 * This function is called, when a key is oushed down.
+			 * This function is called, when a key is pushed down.
 			 */
 			function onDocumentKeyDown(event){
 				// Get the key code of the pressed key
@@ -242,27 +135,21 @@
 					}
                     updateFilter();
 					cubeMesh.material.needsUpdate = true;
-
 				}
                 else if(keyCode == 38) {        // Cursor up
 					xSpeed -= 0.01;
-
 				}
                 else if(keyCode == 40) {        // Cursor down
 					xSpeed += 0.01;
-
 				}
                 else if(keyCode == 37) {        // Cursor left
 					ySpeed -= 0.01;
-
 				}
                 else if(keyCode == 39) {        // Cursor right
 					ySpeed += 0.01;
-
 				}
                 else if(keyCode == 33) {        // Page up
 					zTranslation -= 0.2;
-
 				}
                 else if(keyCode == 34) {        // Page down
 					zTranslation += 0.2;
@@ -270,7 +157,7 @@
 			}
 
 			/**
-			 *  Just update the filters
+			 *  Just update the filters and the labels
 			 */
 			function updateFilter() {
 				textureFilter = ++textureFilter % 4;
@@ -295,21 +182,13 @@
 				// Apply the the translation along the z axis
 				cubeMesh.position.z = zTranslation;
 
-				// Define the function, which is called by the browser supported timer loop. If the
-				// browser tab is not visible, the animation is paused. So 'animateScene()' is called
-				// in a browser controlled loop.
+				// Tell the browser to call this function back
 				requestAnimationFrame(animateScene);
 
-				// Map the 3D scene down to the 2D screen (render the frame)
-				renderScene();
+                // Map the 3D scene down to the 2D screen (render the frame)
+                gfxScene.renderScene();
 			}
 
-			/**
-			 * Render the scene. Map the 3D world to the 2D screen.
-			 */
-			function renderScene(){
-				renderer.render(scene, camera);
-			}
 		</script>
 	</body>
 </html>

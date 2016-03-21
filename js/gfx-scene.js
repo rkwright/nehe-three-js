@@ -16,6 +16,9 @@ GFX.Scene = function ( parameters ) {
 	this.camera = null;
     this.containerID = null;
 
+	this.canvasWidth = 0;
+	this.canvasHeight = 0;
+
 	this.cameraPos = [0,20,40];
 
 	this.controls = false;
@@ -38,6 +41,8 @@ GFX.Scene = function ( parameters ) {
 	this.fogFar = 100;
 
 	this.setParameters( parameters );
+
+    this.initialize();
 };
 
 // the scene's parameters from the values JSON object
@@ -62,14 +67,19 @@ GFX.Scene.prototype = {
 	
 				if ( currentValue instanceof THREE.Color ) {
 					currentValue.set( newValue );
-				} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
+				}
+                else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
 					currentValue.copy( newValue );
-				} else if ( key == 'overdraw' ) {
+				}
+                else if ( key == 'overdraw' ) {
 					// ensure overdraw is backwards-compatible with legacy boolean type
 					this[ key ] = Number( newValue );
-				} else {
-					this[ key ] = newValue;
 				}
+                else if (currentValue instanceof Array) {
+                        this[ key ] = newValue.slice();
+				} else {
+                this[ key ] = newValue;
+            }
 			}
 		}
 	},
@@ -84,8 +94,10 @@ GFX.Scene.prototype = {
 		this.addFog();
 		
 		// Get the size of the inner window (content area)
-		var canvasWidth = window.innerWidth;
-		var canvasHeight = window.innerHeight;
+		if (this.canvasHeight == 0) {
+			this.canvasWidth = window.innerWidth;
+			this.canvasHeight = window.innerHeight;
+		}
 	
 		// if the caller supplied the container elm ID try to find it
 		var container;
@@ -98,12 +110,12 @@ GFX.Scene.prototype = {
 			document.body.appendChild( container );
 		}
 		else {
-			canvasWidth = container.clientWidth;
-			canvasHeight = container.clientHeight;
+			this.canvasWidth = container.clientWidth;
+			this.canvasHeight = container.clientHeight;
 		}
 	
 		// set up the camera
-		this.camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 0.1, 5000);
+		this.camera = new THREE.PerspectiveCamera(45, this.canvasWidth / this.canvasHeight, 0.1, 5000);
 		if (this.cameraPos == undefined)
 			this.camera.position.set(0, 10, 20);
 		else
@@ -119,7 +131,7 @@ GFX.Scene.prototype = {
 		this.renderer.setClearColor(0x000000, 1);
 	
 		// Set the renderers size to the content areas size
-		this.renderer.setSize(canvasWidth, canvasHeight);
+		this.renderer.setSize(this.canvasWidth, this.canvasHeight);
 	
 		// Get the DIV element from the HTML document by its ID and append the renderer's DOM object
 		container.appendChild(this.renderer.domElement);

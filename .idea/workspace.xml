@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d45fab26-2091-4b16-bdd6-0d6346b2e5d2" name="Default" comment="" />
+    <list default="true" id="d45fab26-2091-4b16-bdd6-0d6346b2e5d2" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/gfx-scene.js" afterPath="$PROJECT_DIR$/js/gfx-scene.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tutorial10/tutorial10webgl.html" afterPath="$PROJECT_DIR$/tutorial10/tutorial10webgl.html" />
+    </list>
     <ignored path="Sandbox_NeHe2.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -21,32 +24,40 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="lesson07webgl.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lesson07/lesson07webgl.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.782609">
-              <caret line="207" column="30" selection-start-line="207" selection-start-column="21" selection-end-line="207" selection-end-column="30" />
-              <folding>
-                <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="lesson06webgl.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lesson06/lesson06webgl.html">
+      <file leaf-file-name="gfx-scene.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/js/gfx-scene.js">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="80" column="0" selection-start-line="78" selection-start-column="0" selection-end-line="80" selection-end-column="0" />
+              <caret line="123" column="4" selection-start-line="123" selection-start-column="4" selection-end-line="123" selection-end-column="4" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="lesson08webgl.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="tutorial10webgl.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tutorial10/tutorial10webgl.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-10.782609">
+              <caret line="17" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NEHE.css" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/css/NEHE.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-0.0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="lesson08webgl.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lesson08/lesson08webgl.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="1.7099749">
+            <state vertical-scroll-proportion="33.217392">
               <caret line="136" column="4" selection-start-line="136" selection-start-column="4" selection-end-line="136" selection-end-column="4" />
               <folding />
             </state>
@@ -56,18 +67,18 @@
       <file leaf-file-name="tutorial09webgl.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tutorial09/tutorial09webgl.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.65217394">
-              <caret line="135" column="51" selection-start-line="135" selection-start-column="51" selection-end-line="135" selection-end-column="51" />
+            <state vertical-scroll-proportion="-23.608696">
+              <caret line="126" column="67" selection-start-line="126" selection-start-column="49" selection-end-line="126" selection-end-column="67" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="tutorial10webgl.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tutorial10/tutorial10webgl.html">
+      <file leaf-file-name="lesson08webgl-gfx.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/lesson08/lesson08webgl-gfx.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="90" column="21" selection-start-line="90" selection-start-column="21" selection-end-line="90" selection-end-column="21" />
+            <state vertical-scroll-proportion="0.4379562">
+              <caret line="102" column="24" selection-start-line="102" selection-start-column="24" selection-end-line="102" selection-end-column="24" />
               <folding />
             </state>
           </provider>
@@ -89,11 +100,13 @@
         <option value="$PROJECT_DIR$/tutorial02/tutorial02webgl.html" />
         <option value="$PROJECT_DIR$/lesson03/lesson03webgl.html" />
         <option value="$PROJECT_DIR$/lesson05/lesson05webgl.html" />
-        <option value="$PROJECT_DIR$/js/gfx-scene.js" />
         <option value="$PROJECT_DIR$/tut/tut.html" />
         <option value="$PROJECT_DIR$/lesson07/lesson07webgl.html" />
         <option value="$PROJECT_DIR$/lesson08/tutorial08webgl.html" />
         <option value="$PROJECT_DIR$/lesson08/lesson08webgl.html" />
+        <option value="$PROJECT_DIR$/tutorial10/tutorial10webgl.html" />
+        <option value="$PROJECT_DIR$/js/gfx-scene.js" />
+        <option value="$PROJECT_DIR$/lesson08/lesson08webgl-gfx.html" />
       </list>
     </option>
   </component>
@@ -445,6 +458,34 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Sandbox_NeHe2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Sandbox-NeHe" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="js" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Sandbox_NeHe2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Sandbox-NeHe" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="css" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -460,13 +501,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lesson08" />
       <recent name="$PROJECT_DIR$/tut" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration default="false" name="lesson07webgl.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/Sandbox_NeHe2/lesson07/lesson07webgl.html">
-      <method />
-    </configuration>
+  <component name="RunManager" selected="JavaScript Debug.lesson08webgl-gfx.html">
     <configuration default="false" name="lesson08webgl.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/Sandbox_NeHe2/lesson08/lesson08webgl.html">
       <method />
     </configuration>
@@ -477,6 +516,9 @@
       <method />
     </configuration>
     <configuration default="false" name="tutorial08webgl.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/Sandbox_NeHe2/lesson08/tutorial08webgl.html">
+      <method />
+    </configuration>
+    <configuration default="false" name="lesson08webgl-gfx.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/Sandbox_NeHe2/lesson08/lesson08webgl-gfx.html">
       <method />
     </configuration>
     <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
@@ -529,19 +571,19 @@
       <method />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="JavaScript Debug.lesson07webgl.html" />
-      <item index="1" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl.html" />
-      <item index="2" class="java.lang.String" itemvalue="JavaScript Debug.tutorial10webgl.html" />
-      <item index="3" class="java.lang.String" itemvalue="JavaScript Debug.tutorial09webgl.html" />
-      <item index="4" class="java.lang.String" itemvalue="JavaScript Debug.tutorial08webgl.html" />
+      <item index="0" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl.html" />
+      <item index="1" class="java.lang.String" itemvalue="JavaScript Debug.tutorial10webgl.html" />
+      <item index="2" class="java.lang.String" itemvalue="JavaScript Debug.tutorial09webgl.html" />
+      <item index="3" class="java.lang.String" itemvalue="JavaScript Debug.tutorial08webgl.html" />
+      <item index="4" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl-gfx.html" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl.html" />
-        <item index="1" class="java.lang.String" itemvalue="JavaScript Debug.tutorial08webgl.html" />
-        <item index="2" class="java.lang.String" itemvalue="JavaScript Debug.tutorial09webgl.html" />
-        <item index="3" class="java.lang.String" itemvalue="JavaScript Debug.tutorial10webgl.html" />
-        <item index="4" class="java.lang.String" itemvalue="JavaScript Debug.lesson07webgl.html" />
+        <item index="0" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl-gfx.html" />
+        <item index="1" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl.html" />
+        <item index="2" class="java.lang.String" itemvalue="JavaScript Debug.tutorial08webgl.html" />
+        <item index="3" class="java.lang.String" itemvalue="JavaScript Debug.tutorial09webgl.html" />
+        <item index="4" class="java.lang.String" itemvalue="JavaScript Debug.tutorial10webgl.html" />
       </list>
     </recent_temporary>
   </component>
@@ -597,7 +639,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="47" y="23" width="2266" height="1313" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17475729" sideWeight="0.48801368" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -607,7 +649,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298109" sideWeight="0.5119863" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40875372" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.40836012" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3299595" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -644,7 +686,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/js/gfx-scene.js</url>
-          <line>106</line>
+          <line>118</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -652,11 +694,16 @@
           <line>257</line>
           <option name="timeStamp" value="27" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/js/gfx-scene.js</url>
+          <line>57</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="30" />
+      <option name="time" value="31" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="JavascriptDebugType">
@@ -667,13 +714,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/js/three.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="7762" column="4" selection-start-line="7762" selection-start-column="4" selection-end-line="7762" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lesson08/lesson08webgl.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -963,14 +1003,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/gfx-scene.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.011511896">
-          <caret line="116" column="4" selection-start-line="116" selection-start-column="4" selection-end-line="116" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tutorial16/tutorial16webgl.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -982,13 +1014,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.011511896">
           <caret line="7762" column="4" selection-start-line="7762" selection-start-column="4" selection-end-line="7762" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lesson06/lesson06webgl.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="80" column="0" selection-start-line="78" selection-start-column="0" selection-end-line="80" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1000,25 +1025,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tutorial10/tutorial10webgl.html">
+    <entry file="file://$PROJECT_DIR$/lesson06/lesson06webgl.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="90" column="21" selection-start-line="90" selection-start-column="21" selection-end-line="90" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tutorial09/tutorial09webgl.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.65217394">
-          <caret line="135" column="51" selection-start-line="135" selection-start-column="51" selection-end-line="135" selection-end-column="51" />
+        <state vertical-scroll-proportion="0.012573345">
+          <caret line="80" column="0" selection-start-line="78" selection-start-column="0" selection-end-line="80" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/lesson07/lesson07webgl.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.782609">
+        <state vertical-scroll-proportion="0.18860017">
           <caret line="207" column="30" selection-start-line="207" selection-start-column="21" selection-end-line="207" selection-end-column="30" />
           <folding>
             <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -1028,8 +1045,48 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lesson08/lesson08webgl.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.7099749">
+        <state vertical-scroll-proportion="33.217392">
           <caret line="136" column="4" selection-start-line="136" selection-start-column="4" selection-end-line="136" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tutorial09/tutorial09webgl.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-23.608696">
+          <caret line="126" column="67" selection-start-line="126" selection-start-column="49" selection-end-line="126" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/gfx-scene.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="123" column="4" selection-start-line="123" selection-start-column="4" selection-end-line="123" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/css/NEHE.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tutorial10/tutorial10webgl.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.782609">
+          <caret line="17" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lesson08/lesson08webgl-gfx.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4379562">
+          <caret line="102" column="24" selection-start-line="102" selection-start-column="24" selection-end-line="102" selection-end-column="24" />
           <folding />
         </state>
       </provider>

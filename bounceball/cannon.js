@@ -11,6 +11,7 @@ var RADIUS     = 0.5;
 CANNON.Cannon = function ( parameters ) {
 	
 	this.deltaT   = 0.0;
+    this.lastT    = 0.0;
     this.mesh     = null;
     this.magazine = new Array();
     this.active   = new Array();
@@ -79,6 +80,11 @@ CANNON.Cannon.prototype = {
      * fetch an existing one from the magazine
      */
 	launch: function() {
+        var now = performance.now();
+        if ((now - this.lastT) < this.deltaT)
+            return;
+        this.lastT = now;
+
         var newBall;
         if (this.magazine.length > 0) {
             newBall = this.magazine.pop();

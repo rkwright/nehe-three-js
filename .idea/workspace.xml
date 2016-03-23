@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d45fab26-2091-4b16-bdd6-0d6346b2e5d2" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bounceball/bounceball-webgl.html" afterPath="$PROJECT_DIR$/bounceball/bounceball-webgl.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/three.js" afterPath="$PROJECT_DIR$/js/three.js" />
     </list>
     <ignored path="Sandbox_NeHe2.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -27,17 +29,72 @@
         <entry file="file://$PROJECT_DIR$/js/gfx-scene.js">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="119" column="0" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
+              <caret line="249" column="30" selection-start-line="249" selection-start-column="30" selection-end-line="249" selection-end-column="30" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="bounceball-webgl.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="beachball.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/bounceball/beachball.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.8335015">
+              <caret line="103" column="34" selection-start-line="103" selection-start-column="34" selection-end-line="103" selection-end-column="34" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="jquery-1.7.1.min.js" pinned="false" current-in-tab="false">
+        <entry file="mock://chrome-extension://okoipgjoibbceoobaoebhpacnejdbipe/lib/jquery-1.7.1.min.js">
+          <provider selected="true" editor-type-id="vmFileEditor">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="jquery-1.7.1.min.js" pinned="false" current-in-tab="false">
+        <entry file="mock://chrome-extension://okoipgjoibbceoobaoebhpacnejdbipe/lib/jquery-1.7.1.min.js">
+          <provider selected="true" editor-type-id="vmFileEditor">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="jquery-1.7.1.min.js" pinned="false" current-in-tab="false">
+        <entry file="mock://chrome-extension://okoipgjoibbceoobaoebhpacnejdbipe/lib/jquery-1.7.1.min.js">
+          <provider selected="true" editor-type-id="vmFileEditor">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="jquery-1.7.1.min.js" pinned="false" current-in-tab="false">
+        <entry file="mock://chrome-extension://okoipgjoibbceoobaoebhpacnejdbipe/lib/jquery-1.7.1.min.js">
+          <provider selected="true" editor-type-id="vmFileEditor">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="jquery-1.7.1.min.js" pinned="false" current-in-tab="false">
+        <entry file="mock://chrome-extension://okoipgjoibbceoobaoebhpacnejdbipe/lib/jquery-1.7.1.min.js">
+          <provider selected="true" editor-type-id="vmFileEditor">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="bounceball-webgl.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bounceball/bounceball-webgl.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.34306568">
-              <caret line="27" column="52" selection-start-line="27" selection-start-column="52" selection-end-line="27" selection-end-column="52" />
+            <state vertical-scroll-proportion="-13.695652">
+              <caret line="24" column="64" selection-start-line="24" selection-start-column="64" selection-end-line="24" selection-end-column="64" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tutorial09webgl.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tutorial09/tutorial09webgl.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="212" column="88" selection-start-line="198" selection-start-column="0" selection-end-line="212" selection-end-column="88" />
               <folding />
             </state>
           </provider>
@@ -66,7 +123,10 @@
         <option value="$PROJECT_DIR$/lesson08/lesson08webgl-gfx.html" />
         <option value="$PROJECT_DIR$/js/gfx-scene.js" />
         <option value="$PROJECT_DIR$/lesson08/lesson08webgl.html" />
+        <option value="$PROJECT_DIR$/bounceball/bounceBall.js" />
+        <option value="chrome-extension://okoipgjoibbceoobaoebhpacnejdbipe/lib/jquery-1.7.1.min.js" />
         <option value="$PROJECT_DIR$/bounceball/bounceball-webgl.html" />
+        <option value="$PROJECT_DIR$/bounceball/beachball.js" />
       </list>
     </option>
   </component>
@@ -106,7 +166,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -462,6 +521,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -475,15 +535,13 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/bounceball" />
       <recent name="$PROJECT_DIR$/lesson08" />
       <recent name="$PROJECT_DIR$/tut" />
     </key>
   </component>
   <component name="RunManager" selected="JavaScript Debug.bounceball-webgl.html">
     <configuration default="false" name="lesson08webgl.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/Sandbox_NeHe2/lesson08/lesson08webgl.html">
-      <method />
-    </configuration>
-    <configuration default="false" name="tutorial08webgl.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/Sandbox_NeHe2/lesson08/tutorial08webgl.html">
       <method />
     </configuration>
     <configuration default="false" name="lesson08webgl-gfx.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/Sandbox_NeHe2/lesson08/lesson08webgl-gfx.html">
@@ -493,6 +551,9 @@
       <method />
     </configuration>
     <configuration default="false" name="tutorial10webgl.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/Sandbox_NeHe2/tutorial10/tutorial10webgl.html">
+      <method />
+    </configuration>
+    <configuration default="false" name="tutorial19webgl.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/Sandbox_NeHe2/tutorial19/tutorial19webgl.html">
       <method />
     </configuration>
     <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
@@ -546,18 +607,18 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl.html" />
-      <item index="1" class="java.lang.String" itemvalue="JavaScript Debug.tutorial08webgl.html" />
-      <item index="2" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl-gfx.html" />
-      <item index="3" class="java.lang.String" itemvalue="JavaScript Debug.bounceball-webgl.html" />
-      <item index="4" class="java.lang.String" itemvalue="JavaScript Debug.tutorial10webgl.html" />
+      <item index="1" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl-gfx.html" />
+      <item index="2" class="java.lang.String" itemvalue="JavaScript Debug.bounceball-webgl.html" />
+      <item index="3" class="java.lang.String" itemvalue="JavaScript Debug.tutorial10webgl.html" />
+      <item index="4" class="java.lang.String" itemvalue="JavaScript Debug.tutorial19webgl.html" />
     </list>
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="JavaScript Debug.bounceball-webgl.html" />
-        <item index="1" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl.html" />
-        <item index="2" class="java.lang.String" itemvalue="JavaScript Debug.tutorial10webgl.html" />
-        <item index="3" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl-gfx.html" />
-        <item index="4" class="java.lang.String" itemvalue="JavaScript Debug.tutorial08webgl.html" />
+        <item index="1" class="java.lang.String" itemvalue="JavaScript Debug.tutorial19webgl.html" />
+        <item index="2" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl.html" />
+        <item index="3" class="java.lang.String" itemvalue="JavaScript Debug.tutorial10webgl.html" />
+        <item index="4" class="java.lang.String" itemvalue="JavaScript Debug.lesson08webgl-gfx.html" />
       </list>
     </recent_temporary>
   </component>
@@ -623,7 +684,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3298109" sideWeight="0.5119863" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.40836012" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18086816" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3299595" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -664,35 +725,24 @@
           <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/bounceball/bounceball-webgl.html</url>
-          <line>53</line>
-          <option name="timeStamp" value="33" />
+          <url>file://$PROJECT_DIR$/bounceball/beachball.js</url>
+          <line>71</line>
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/bounceball/beachball.js</url>
+          <line>102</line>
+          <option name="timeStamp" value="44" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="34" />
+      <option name="time" value="46" />
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="JavascriptDebugType">
-        <watch expression="this.particleGeometry.vertices[i]" language="JavaScript" />
-        <watch expression="this.particleArray[i].position" language="JavaScript" />
-        <watch expression="this.particleArray[i]" language="JavaScript" />
-      </configuration>
-    </watches-manager>
+    <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/lesson08/lesson08webgl.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="170" column="77" selection-start-line="170" selection-start-column="77" selection-end-line="170" selection-end-column="77" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/gfx-scene.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -756,9 +806,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -920,27 +967,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tutorial19/js/ParticleEngine.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="409" column="76" selection-start-line="409" selection-start-column="76" selection-end-line="409" selection-end-column="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tutorial19/tutorial19webgl.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.869565">
-          <caret line="9" column="10" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tutorial19/js/ParticleEngineExamples.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="288" column="64" selection-start-line="288" selection-start-column="64" selection-end-line="288" selection-end-column="64" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lesson03/lesson03webgl.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-2.6086957">
@@ -1004,7 +1030,7 @@
         <state vertical-scroll-proportion="0.18860017">
           <caret line="207" column="30" selection-start-line="207" selection-start-column="21" selection-end-line="207" selection-end-column="30" />
           <folding>
-            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1013,7 +1039,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1021,15 +1046,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-10.782609">
           <caret line="17" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tutorial09/tutorial09webgl.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.7153285">
-          <caret line="124" column="42" selection-start-line="124" selection-start-column="42" selection-end-line="124" selection-end-column="42" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1037,7 +1053,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-10.434783">
           <caret line="20" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1045,24 +1060,58 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.13138686">
           <caret line="13" column="62" selection-start-line="13" selection-start-column="62" selection-end-line="13" selection-end-column="62" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/js/gfx-scene.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="119" column="0" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
+          <caret line="249" column="30" selection-start-line="249" selection-start-column="30" selection-end-line="249" selection-end-column="30" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tutorial09/tutorial09webgl.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="212" column="88" selection-start-line="198" selection-start-column="0" selection-end-line="212" selection-end-column="88" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tutorial19/tutorial19webgl.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="13.695652">
+          <caret line="9" column="10" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tutorial19/js/ParticleEngine.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="139" column="27" selection-start-line="139" selection-start-column="27" selection-end-line="139" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tutorial19/js/ParticleEngineExamples.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="35" column="32" selection-start-line="35" selection-start-column="32" selection-end-line="35" selection-end-column="32" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/bounceball/bounceball-webgl.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.34306568">
-          <caret line="27" column="52" selection-start-line="27" selection-start-column="52" selection-end-line="27" selection-end-column="52" />
+        <state vertical-scroll-proportion="-13.695652">
+          <caret line="24" column="64" selection-start-line="24" selection-start-column="64" selection-end-line="24" selection-end-column="64" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bounceball/beachball.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.8335015">
+          <caret line="103" column="34" selection-start-line="103" selection-start-column="34" selection-end-line="103" selection-end-column="34" />
           <folding />
         </state>
       </provider>

@@ -66,7 +66,7 @@ CANNON.Cannon.prototype = {
 	init: function () {
         this.radius = BASE_RADIUS;  // + DELTA_RADIUS * Math.random();
 
-        var geometry = new THREE.CylinderGeometry( this.radius, this.radius * 1.5, this.radius * 5, 32, 32, true);
+        var geometry = new THREE.CylinderGeometry( this.radius * 2.0, this.radius * 3.0, this.radius * 10, 32, 1, true);
 
         var material = new THREE.MeshPhongMaterial( { color : 0xdddddd, specular: 0x009900, shininess: 30 });
 
@@ -82,6 +82,7 @@ CANNON.Cannon.prototype = {
         var newBall;
         if (this.magazine.length > 0) {
             newBall = this.magazine.pop();
+            newBall.init();
         }
         else {
             newBall = new BALL.BeachBall( { xLimit : this.xLimit,
@@ -112,7 +113,7 @@ CANNON.Cannon.prototype = {
 
             ball.update();
 
-            if ( Math.abs(ball.mesh.position.x) > this.xLimit || Math.abs(ball.mesh.position.z) > this.zLimit ) {
+            if ( (Math.abs(ball.loc.x) > this.xLimit || Math.abs(ball.loc.z) > this.zLimit) && ball.loc.y < 0) {
                 ball.mesh.material.opacity -= 0.05;
             }
         }

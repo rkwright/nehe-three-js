@@ -13,6 +13,7 @@
 		<script src="../js/three.js" type="text/javascript"></script>
 		<script src="../js/Detector.js" type="text/javascript"></script>
         <script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
+        <script src="../js/Stats.js" type="text/javascript"></script>
         <script src="../js/gfx-scene.js" type="text/javascript"></script>
         <script src="beachball.js" type="text/javascript"></script>
         <script src="cannon.js" type="text/javascript"></script>
@@ -25,7 +26,8 @@
             // allocate the Scene object, and set the camera position
             var gfxScene = new GFX.Scene( { cameraPos : [5,7.5,20],
                                             controls : true,
-                                            floorRepeat : FLOOR_REPEAT });
+                                            floorRepeat : FLOOR_REPEAT,
+                                            displayStats:true});
             // globals
             var cannon    = null;
             var beachBall = null;
@@ -41,10 +43,11 @@
 			 */
 			function initializeDemo() {
 
-               // beachBall = new BALL.BeachBall( { xLimit : FLOOR_REPEAT,
-               //                                   zLimit : FLOOR_REPEAT } );
-
-               // gfxScene.add( beachBall.mesh );
+                var cubeGeometry = new THREE.BoxGeometry( 10, 10, 10 );
+                var cubeMaterial = new THREE.MeshBasicMaterial( { wireframe:true, color : 0xff0000 } );
+                cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+                cube.position.set(0,0,0);
+                gfxScene.add(cube);
 
 				cannon = new CANNON.Cannon( { scene : gfxScene,
                                               deltaT : 500,

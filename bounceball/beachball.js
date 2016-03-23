@@ -6,8 +6,8 @@ var BALL = { revision: '01' };
 
 //some constants
 var RESTITUTION     = 0.75;
-var SEGMENTS        = 6;
-var BASE_VELOCITY_V = 0.05;
+var SEGMENTS        = 8;
+var BASE_VELOCITY_V = 0.1;
 var BASE_VELOCITY_H = 0.025;
 var MIN_RHO         = 60.0 * Math.PI / 180.0;
 var DELTA_RHO       = 30.0 * Math.PI / 180.0;
@@ -16,7 +16,7 @@ var DELTA_RADIUS    = 0.01;
 
 BALL.BeachBall = function ( parameters ) {
 	
-	this.gravity  = new THREE.Vector3(0, -0.001, 0);
+	this.gravity  = new THREE.Vector3(0, -0.002, 0);
 	this.vel      = new THREE.Vector3(0,0,0);
 	this.loc      = new THREE.Vector3(0,0,0);
     this.radius   = 0;
@@ -100,11 +100,14 @@ BALL.BeachBall.prototype = {
         this.vel.add( this.gravity );
         this.mesh.position.set(this.loc.x, this.loc.y, this.loc.z);
 
-        console.log(" veloc: " + this.vel.x.toFixed(3) + ", " + this.vel.y.toFixed(3) + ", " + this.vel.z.toFixed(3) + ", loc: " + this.loc.x.toFixed(3) + ", " + this.loc.y.toFixed(3) + ", "+ this.loc.z.toFixed(3));
 
-    if (this.loc.y < 0.0) {
-            this.vel.y = -this.vel.y * RESTITUTION;
-            this.loc.y = this.radius;
+        if (this.loc.y < 0.0 ) {
+            console.log(" veloc: " + this.vel.x.toFixed(3) + ", " + this.vel.y.toFixed(3) + ", " + this.vel.z.toFixed(3) + ", loc: " + this.loc.x.toFixed(3) + ", " + this.loc.y.toFixed(3) + ", "+ this.loc.z.toFixed(3));
+
+            if (Math.abs(this.loc.x) <= this.xLimit && Math.abs(this.loc.z) <= this.zLimit) {
+                this.vel.y = -this.vel.y * RESTITUTION;
+                this.loc.y = this.radius;
+            }
         }
 	}
 };

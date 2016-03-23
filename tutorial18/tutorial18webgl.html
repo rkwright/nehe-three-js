@@ -31,9 +31,10 @@
 			var	quadType = 'b';
 	
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
-			var gfxScene = new GFX.Scene( { axisHeight:10, 
-									  controls:true, 
-									  displayStats:true });
+			var gfxScene = new GFX.Scene( { cameraPos : [0, 20, 40],
+				                                        axisHeight:10,
+									                    controls:true,
+									                    displayStats:true });
 	
 			// set up the THREE.js scene via our Scene object
 			gfxScene.initialize();

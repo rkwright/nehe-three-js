@@ -5,12 +5,14 @@
 var BALL = { revision: '01' };
 
 //some constants
-var RESTITUTION   = 0.75;
-var SEGMENTS      = 6;
-var BASE_VELOCITY = 0.1;
-var MIN_RHO       = 60.0 * Math.PI / 180.0;
-var DELTA_RHO     = 30.0 * Math.PI / 180.0;
-var BASE_RADIUS   = 0.1;
+var RESTITUTION     = 0.75;
+var SEGMENTS        = 6;
+var BASE_VELOCITY_V = 0.05;
+var BASE_VELOCITY_H = 0.025;
+var MIN_RHO         = 60.0 * Math.PI / 180.0;
+var DELTA_RHO       = 30.0 * Math.PI / 180.0;
+var BASE_RADIUS     = 0.1;
+var DELTA_RADIUS    = 0.01;
 
 BALL.BeachBall = function ( parameters ) {
 	
@@ -75,11 +77,11 @@ BALL.BeachBall.prototype = {
         material.color.setRGB(Math.random(), Math.random(), Math.random());
 
         var theta = Math.PI * 2.0 * Math.random();
-        var velX = Math.sin(theta) * BASE_VELOCITY;
-        var velZ = Math.cos(theta) * BASE_VELOCITY;
+        var velX = Math.sin(theta) * BASE_VELOCITY_H;
+        var velZ = Math.cos(theta) * BASE_VELOCITY_H;
 
         var rho = MIN_RHO + DELTA_RHO * Math.random();
-        var velY = Math.sin(rho) * BASE_VELOCITY;
+        var velY = Math.sin(rho) * BASE_VELOCITY_V;
 
         this.vel.set( velX, velY, velZ);
         this.loc.set(0, this.radius, 0);

@@ -102,7 +102,7 @@ BALL.BeachBall.prototype = {
 
 
         if (this.loc.y < 0.0 ) {
-            console.log(" veloc: " + this.vel.x.toFixed(3) + ", " + this.vel.y.toFixed(3) + ", " + this.vel.z.toFixed(3) + ", loc: " + this.loc.x.toFixed(3) + ", " + this.loc.y.toFixed(3) + ", "+ this.loc.z.toFixed(3));
+            //console.log(" veloc: " + this.vel.x.toFixed(3) + ", " + this.vel.y.toFixed(3) + ", " + this.vel.z.toFixed(3) + ", loc: " + this.loc.x.toFixed(3) + ", " + this.loc.y.toFixed(3) + ", "+ this.loc.z.toFixed(3));
 
             if (Math.abs(this.loc.x) <= this.xLimit && Math.abs(this.loc.z) <= this.zLimit) {
                 this.vel.y = -this.vel.y * RESTITUTION;

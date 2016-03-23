@@ -19,6 +19,7 @@ CANNON.Cannon = function ( parameters ) {
     this.zLimit   = 0;
     this.radius   = RADIUS;
     this.scene    = null;
+    this.ballCount = 0;
 
     this.setParameters( parameters );
 
@@ -93,6 +94,8 @@ CANNON.Cannon.prototype = {
         else {
             newBall = new BALL.BeachBall( { xLimit : this.xLimit,
                                             zLimit : this.zLimit } );
+            this.ballCount++;
+            console.log("ballcount = " + this.ballCount);
         }
 
         this.active.push( newBall );

@@ -9,33 +9,19 @@
 		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="../css/NEHE.css" />
 
-		<!-- Include two libraries
-		1. Three.js (core library)
-		2. Detector.js (checks the browsers WebGL capabilities) -->
+		<!-- Include the needed libs -->
 		<script src="../js/three.js"></script>
 		<script src="../js/Detector.js"></script>
 		<script src="../js/gfx-scene.js" type="text/javascript"></script>
 	</head>
 	<body>
-		<!-- This is the DIV element which will contain the WebGL canvas. To be identifiable later on,
-		the id 'WebGLCanvas' is applied to it. -->
-		<div id="WebGLCanvas">
-		</div>
-
 		<!-- This JavaScript block encloses the Three.js commands -->
 		<script>
 			// allocate the Scene object, and set the camera position
 			var gfxScene = new GFX.Scene( { cameraPos:[0,0,15] });
 
-			// Texture
-			var starTexture;
-
-			// Global mesh object of the cube
-			var cubeMesh;
-
 			var num = 32;
 			var star = new Array(num);
-			var spin = 0;
 
 			// Initialize the scene
 			initializeDemo();
@@ -49,7 +35,7 @@
 			function initializeDemo() {
 
 				// Load an image as texture
-				starTexture = new THREE.ImageUtils.loadTexture("Star.jpg");
+				var starTexture = new THREE.ImageUtils.loadTexture("images/Star.jpg");
 
 				for (i = 0; i < num; i++){
 					var squareGeometry = new THREE.Geometry();
@@ -107,14 +93,13 @@
 			 */
 			function animateScene()
 			{
-				// Define the function, which is called by the browser supported timer loop. If the
-				// browser tab is not visible, the animation is paused. So 'animateScene()' is called
-				// in a browser controlled loop.
+				// Tell the browser to call this routine at the next opportunity
 				requestAnimationFrame(animateScene);
 
 				// Now loop through the stars and update their positions, spin and color
-				for ( var i = 0; i < num; i++) {
-					spin          += Math.PI * 2 / num;
+				var spin = 0;
+				for ( var i = 0; i < num; i++ ) {
+					spin += Math.PI * 2 / num;
 					if (spin > (Math.PI*2))
 							spin = 0;
 									
@@ -145,7 +130,6 @@
 				// Map the 3D scene down to the 2D screen (render the frame)
 				gfxScene.renderScene();
 			}
-
 		</script>
 	</body>
 </html>

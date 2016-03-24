@@ -32,7 +32,10 @@ GFX.Scene = function ( parameters ) {
 
 	this.axisHeight = 0;
 	
-	this.floorRepeat = 0;
+	this.floorRepeat = 1;
+	this.floorX      = 0;
+	this.floorZ      = 0;
+    this.floorImage  = null;
 	
 	this.fogType = 'none';	// else 'linear' or 'exponential' 
 	this.fogDensity = 0;
@@ -237,13 +240,17 @@ GFX.Scene.prototype = {
 	addFloor: function( floorRepeat ) {
 		
 		// note: 4x4 checker-board pattern scaled so that each square is 25 by 25 pixels.
-		var floorTexture = new THREE.ImageUtils.loadTexture( '../images/checkerboard.jpg' );
-		floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
-		floorTexture.repeat.set( floorRepeat, floorRepeat );
+        var image = this.floorImage == null ? '../images/checkerboard.jpg' : this.floorImage;
+		var texture = new THREE.ImageUtils.loadTexture( image );
+		texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+		texture.repeat.set( this.floorRepeat, this.floorRepeat );
 		
 		// DoubleSide: render texture on both sides of mesh
-		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-		var floorGeometry = new THREE.PlaneGeometry(10, 10, 1, 1);
+		var floorMaterial = new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } );
+        var width = this.floorX == 0 ? 10 : this.floorX;
+        var height = this.floorZ == 0 ? 10 : this.floorZ;
+
+        var floorGeometry = new THREE.PlaneGeometry(width, height, 1, 1);
 		var floor = new THREE.Mesh(floorGeometry, floorMaterial);
 		floor.position.y = 0.0;
 		floor.rotation.x = Math.PI / 2;

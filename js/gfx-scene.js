@@ -97,10 +97,22 @@ GFX.Scene.prototype = {
 
 		this.addFog();
 		
-		// Get the size of the inner window (content area)
+		// If the user didn't supply a fixed size for the window,
+		// get the size of the inner window (content area)
 		if (this.canvasHeight == 0) {
 			this.canvasWidth = window.innerWidth;
 			this.canvasHeight = window.innerHeight;
+
+            var _self = this;
+
+			// add an event listener to handle changing the size of the window
+			window.addEventListener('resize', function() {
+                _self.canvasWidth  = window.innerWidth;
+                _self.canvasHeight = window.innerHeight;
+                _self.renderer.setSize( _self.canvasWidth, _self.canvasHeight );
+                _self.camera.aspect = _self.canvasWidth / _self.canvasHeight;
+                _self.camera.updateProjectionMatrix();
+            });
 		}
 	
 		// if the caller supplied the container elm ID try to find it
@@ -199,7 +211,7 @@ GFX.Scene.prototype = {
 		if (this.stats != null && typeof this.stats != 'undefined') 
 			this.stats.update();
 
-},
+	},
 
 	addFog: function( values ) {
 		

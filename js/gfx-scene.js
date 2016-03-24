@@ -30,9 +30,9 @@ GFX.Scene = function ( parameters ) {
 	this.ambientLight = null;
 	this.directionalLight = null;
 
-	this.axisHeight = 0;
+	this.axesHeight = 0;
 	
-	this.floorRepeat = 1;
+	this.floorRepeat = 0;
 	this.floorX      = 0;
 	this.floorZ      = 0;
     this.floorImage  = null;
@@ -172,8 +172,8 @@ GFX.Scene.prototype = {
 		if (this.controls == true)
 			this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
 		
-		if ( this.axisHeight != 0 )
-			this.drawAxes(this.axisHeight);
+		if ( this.axesHeight != 0 )
+			this.drawAxes(this.axesHeight);
 		
 		if (this.floorRepeat != 0)
 			this.addFloor(this.floorRepeat);

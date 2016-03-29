@@ -21,7 +21,15 @@
 	<body>
 
 		<script type="text/javascript">
+            var ELEV         = 25;
+            var DISTRIBX     = 20;
+            var DISTRIBZ     = 20;
+            var DELTA_ELEV   = 10;
             var FLOOR_REPEAT = 5;
+            var clock;
+            var deltaTime;
+
+            var particleSystem;
 
             // allocate the Scene object, and set the camera position
             var gfxScene = new GFX.Scene( { cameraPos : [5,7.5,20],
@@ -43,6 +51,8 @@
 			 */
 			function initializeDemo() {
 
+                clock = new THREE.Clock(true);
+
                 var cubeGeometry = new THREE.BoxGeometry( 10, 10, 10 );
                 var cubeMaterial = new THREE.MeshBasicMaterial( { wireframe:true, color : 0xff0000 } );
                 cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
@@ -55,6 +65,48 @@
                                               zLimit : FLOOR_REPEAT});
 
 				gfxScene.add( cannon.mesh );
+
+				particleSystem = createParticleSystem();
+				gfxScene.add(particleSystem);
+			}
+
+			function createParticleSystem() {
+
+				// The number of particles in a particle system is not easily changed.
+				var particleCount = 250;
+
+				// Particles are just individual vertices in a geometry
+				// Create the geometry that will hold all of the vertices
+				var particles = new THREE.Geometry();
+
+				// Create the vertices and add them to the particles geometry
+				for (var p = 0; p < particleCount; p++) {
+
+					// This will create all the vertices in a range of -200 to 200 in all directions
+					var x = Math.random() * ELEV - DELTA_ELEV;
+					var y = Math.random() * DISTRIBX - DELTA_ELEV;
+					var z = Math.random() * DISTRIBZ - DELTA_ELEV;
+
+					// Create the vertex
+					var particle = new THREE.Vector3(x, y, z);
+
+					// Add the vertex to the geometry
+					particles.vertices.push(particle);
+				}
+
+				// Create the material that will be used to render each vertex of the geometry
+				var particleMaterial = new THREE.PointsMaterial(
+						{ color: 0xffffff,
+							size: 0.4,
+							map: THREE.ImageUtils.loadTexture("images/snowflake.png"),
+							blending: THREE.AdditiveBlending,
+							transparent: true,
+						});
+
+				// Create the particle system
+				particleSystem = new THREE.Points(particles, particleMaterial);
+
+				return particleSystem;
 			}
 
 			/**
@@ -62,11 +114,11 @@
 			 */
 			function animateScene() {
 
-                //beachBall.update();
-
                 cannon.launch();
 
                 cannon.update();
+
+                animateParticles();
 
                 //console.log(" veloc: " + veloc.x.toFixed(3) + ", " + veloc.y.toFixed(3) + ", " + veloc.z.toFixed(3) + ", loc: " + loc.x.toFixed(3) + ", " + loc.y.toFixed(3) + ", "+ loc.z.toFixed(3));
 
@@ -75,6 +127,23 @@
 
                 // Map the 3D scene down to the 2D screen (render the frame)
                 gfxScene.renderScene();
+			}
+
+			function animateParticles() {
+                deltaTime = clock.getDelta();
+
+                var verts = particleSystem.geometry.vertices;
+				for(var i = 0; i < verts.length; i++) {
+					var vert = verts[i];
+					if (vert.y < -10) {
+						vert.y = Math.random() * ELEV - DELTA_ELEV;
+					}
+					vert.y = vert.y - (1.0 * deltaTime);
+                    vert.x = vert.x + (Math.random() - 0.5) * DISTRIBX * 0.001;
+				}
+				particleSystem.geometry.verticesNeedUpdate = true;
+
+				//particleSystem.rotation.y -= .1 * deltaTime;
 			}
 
 		</script>

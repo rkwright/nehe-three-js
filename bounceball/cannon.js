@@ -68,9 +68,15 @@ CANNON.Cannon.prototype = {
 	init: function () {
         this.radius = BASE_RADIUS;  // + DELTA_RADIUS * Math.random();
 
-        var geometry = new THREE.CylinderGeometry( this.radius * 2.0, this.radius * 3.0, this.radius * 10, 32, 1, true);
+        var geometry = new THREE.CylinderGeometry( this.radius * 2.0,
+                                                   this.radius * 3.0,
+                                                   this.radius * 10,
+                                                   32, 1, true);
 
-        var material = new THREE.MeshPhongMaterial( { color : 0xdddddd, specular: 0x009900, shininess: 30 });
+        var material = new THREE.MeshPhongMaterial( { color : 0xdddddd,
+                                                      specular: 0x009900,
+                                                      shininess: 30,
+                                                      side:THREE.DoubleSide});
 
         this.mesh = new THREE.Mesh( geometry, material );
     },

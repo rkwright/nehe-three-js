@@ -43,7 +43,7 @@ GFX.Scene = function ( parameters ) {
 	this.fogNear = 0.015;
 	this.fogFar = 100;
 
-	this.setParameters( parameters );
+    this.setParameters( parameters );
 
     this.initialize();
 };

@@ -19,7 +19,7 @@
 		<link rel="stylesheet" type="text/css" href="../css/NEHE.css" /> 
 
 		<!-- Include several libraries from THREE.js and the Scene class  -->
-		<script src="../js/three.js" type="text/javascript"></script>
+		<script src="../js/three-71.js" type="text/javascript"></script>
 		<script src="../js/Detector.js" type="text/javascript"></script>
 		<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
 		<script src="../js/Stats.js" type="text/javascript"></script>
@@ -28,7 +28,7 @@
 		<!-- the shaders -->
 		<script id="vertexShader" type="x-shader/x-fragment">
 			// create two shared variable for the VS and FS containing the normal and the uv coords
-			varying vec3     	vNormal;
+			//varying vec3     	vNormal;
 			varying vec2 		vUv;
 			attribute float  	displacement;
 			uniform float    	amplitude;
@@ -37,7 +37,7 @@
 
 				// set the variables passed (behind the scenes) by three.js to our
 				// "varying" variables, which makes them available to the other shader
-				vNormal = normal;
+				//vNormal = normal;
 				vUv = uv;
 
 				// find the position of the vertex as a function of its current position
@@ -50,7 +50,7 @@
 			
 		<script id="fragmentShader" type="x-shader/x-vertex">
 			// create the shared variables. which are set in the vertex shader
-			varying vec3 		vNormal;
+			// varying vec3 		vNormal;
 			varying vec2 		vUv;
 			uniform sampler2D 	texImage;
 	

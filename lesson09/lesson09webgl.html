@@ -38,6 +38,9 @@
 				var starTexture = new THREE.ImageUtils.loadTexture("images/Star.jpg");
 
 				for (i = 0; i < num; i++){
+					// Create a square mesh to hold the image. As in the first lesson,
+                    // we have to use two triangles and ensure the winding directions
+                    // are correct
 					var squareGeometry = new THREE.Geometry();
 					squareGeometry.vertices.push(new THREE.Vector3(-1, -1, 0));
 					squareGeometry.vertices.push(new THREE.Vector3( 1, -1, 0));
@@ -102,7 +105,8 @@
 					spin += Math.PI * 2 / num;
 					if (spin > (Math.PI*2))
 							spin = 0;
-									
+
+                    // make the stars spiral inward as they spin
 					star[i].angle += i / num;
 					star[i].dist  -= 0.01;
 					if(star[i].dist < 0.0) {

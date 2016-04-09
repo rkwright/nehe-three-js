@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>PlaneGeometry Example using WebGL through the help of three.js</title>
+ 
+<style>
+body
+{
+background-color: #000000;
+margin: 0px;
+}
+</style>
+ 
+<script src="../js/three.js"></script>
+</head>
+<body>
+<canvas id='canvas1'>
+</canvas>
+ 
+<script>
+
+var camera, scene, renderer, geometry, material, mesh;
+var text3d ;
+
+var canvas1 = document.getElementById('canvas1') ;
+
+init();
+animate();
+
+function init()
+{
+// Step 1 : Add Scene
+scene = new THREE.Scene();
+
+// Step 2 : Add Camera
+camera = new THREE.PerspectiveCamera(25, window.innerWidth / window.innerHeight, 1, 10000 );
+camera.position.z = 250; // The less the value the bigger the objects will look
+scene.add( camera );
+
+// Step 3 : Add Object
+// Parameter 1 : width
+// Parameter 2 : height
+geometry = new THREE.PlaneGeometry(40, 40, 4,4) ;
+
+material = new THREE.MeshBasicMaterial( { wireframe:true, overdraw: true } )
+
+mesh = new THREE.Mesh( geometry, material ) ;
+
+scene.add( mesh );
+
+// Step 4 : Add Renderer
+//renderer = new THREE.CanvasRenderer();
+renderer = new THREE.WebGLRenderer(canvas1);
+renderer.setSize( window.innerWidth, window.innerHeight );
+
+document.body.appendChild( renderer.domElement );
+}
+
+function animate()
+{
+// note: three.js includes requestAnimationFrame shim
+requestAnimationFrame( animate );
+render();
+}
+
+function render()
+{
+mesh.rotation.x += 0.01;
+
+renderer.render( scene, camera );
+}
+
+</script>
+</body>
+</html>

@@ -74,8 +74,10 @@
 	
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( { cameraPos:[0,0,6], axesHeight:10, controls:true, displayStats:true });
-            
-			// Animate the scene
+
+            initializeDemo();
+
+            // Animate the scene
 			animateScene();
 
 			/**
@@ -93,7 +95,7 @@
 				texture = new THREE.ImageUtils.loadTexture("data/Tim.bmp");
 				
 				// all we need is a simple planar mesh. 9 by 9 units with 45x45 verticies
-				var bufferGeometry = new THREE.BufferGeometry(9,9,45,45);
+				var bufferGeometry = new THREE.BufferGeometry();
 				var vertexPositions = [];
 
 				// add a uniform for the amplitude and the texture.  These are read-only 
@@ -116,14 +118,21 @@
 				//var verts  = planeGeometry.vertices;
 				//var values = attributes.displacement.value;
 
+                var gridSize = 46;
                 var nV = 0;
-				for ( var y=0; y<46; y++ ) {
-					for ( var x=0; x<46; x++ ) {
+				for ( var y=0; y<gridSize; y++ ) {
+					for ( var x=0; x<gridSize; x++ ) {
 						var sVal = Math.sin((((x/5.0)*40.0)/360.0)*Math.PI*2.0);
 						//var index = x + 46 * y;
 						//values[index] =  sVal;
-                        vertexPositions[nV++] = [x,y,sVal];
-					}
+                        vertexPositions[nV++] = [ x,y,0 ];
+                        vertexPositions[nV++] = [ x+1,y,0 ];
+                        vertexPositions[nV++] = [ x+1,y+1,0 ];
+
+                        vertexPositions[nV++] = [ x+1,y+1,0 ];
+                        vertexPositions[nV++] = [ x,y+1,0 ];
+                        vertexPositions[nV++] = [ x,y,0 ];
+                    }
 				}
 
                 var vertices = new Float32Array( vertexPositions.length * 3 ); // three components per vertex
@@ -136,22 +145,23 @@
 
                 // itemSize = 3 because there are 3 values (components) per vertex
                 bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+                var bufferMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
                 // find the shaders
-				var vs = document.getElementById("vertexShader").textContent;
-				var fs = document.getElementById("fragmentShader").textContent;
+				//var vs = document.getElementById("vertexShader").textContent;
+				//var fs = document.getElementById("fragmentShader").textContent;
 
 				// and create our shader material...
-				var shaderMaterial = new THREE.ShaderMaterial({
-						uniforms:     	uniforms,	// pass the "uniforms" vars
-						//attributes:     attributes,	// and the attributes
-						side:THREE.DoubleSide,		// want the texture on both sides of the wave
-						vertexShader:   vs,			// pointers to the shaders
-						fragmentShader: fs
-					});
+				//var shaderMaterial = new THREE.ShaderMaterial({
+				//		uniforms:     	uniforms,	// pass the "uniforms" vars
+				//		//attributes:     attributes,	// and the attributes
+				//		side:THREE.DoubleSide,		// want the texture on both sides of the wave
+				//		vertexShader:   vs,			// pointers to the shaders
+				//		fragmentShader: fs
+				//	});
 				
 				// finally create the mesh and add it to the scene
-				var mesh = new THREE.Mesh( bufferGeometry, shaderMaterial);
+				var mesh = new THREE.Mesh( bufferGeometry, bufferMaterial);  // shaderMaterial);
 				gfxScene.add(mesh);
 			}
 			
@@ -166,7 +176,7 @@
 				// update the amplitude based on the frame value. Taking the sine merely
 				// causes the value to vary from -1..1.  When multiplied by the displacement
 				// this causes the the wave to be slowly inverted back and forth
-				uniforms.amplitude.value = Math.sin(frameCounter);
+				//uniforms.amplitude.value = Math.sin(frameCounter);
 				
 				// bump the frame counter
 				frameCounter += 0.1;

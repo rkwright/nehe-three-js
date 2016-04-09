@@ -19,56 +19,87 @@ margin: 0px;
  
 <script>
 
-var camera, scene, renderer, geometry, material, mesh;
-var text3d ;
+    var camera, scene, renderer, geometry, material, mesh;
+    var text3d ;
 
-var canvas1 = document.getElementById('canvas1') ;
+    var canvas1 = document.getElementById('canvas1') ;
 
-init();
-animate();
+    init();
+    animate();
 
-function init()
-{
-// Step 1 : Add Scene
-scene = new THREE.Scene();
+    function init()
+    {
+        // Step 1 : Add Scene
+        scene = new THREE.Scene();
 
-// Step 2 : Add Camera
-camera = new THREE.PerspectiveCamera(25, window.innerWidth / window.innerHeight, 1, 10000 );
-camera.position.z = 250; // The less the value the bigger the objects will look
-scene.add( camera );
+        // Step 2 : Add Camera
+        camera = new THREE.PerspectiveCamera(25, window.innerWidth / window.innerHeight, 1, 10000 );
+        camera.position.z = 250; // The less the value the bigger the objects will look
+        scene.add( camera );
 
-// Step 3 : Add Object
-// Parameter 1 : width
-// Parameter 2 : height
-geometry = new THREE.PlaneGeometry(40, 40, 4,4) ;
+        // Step 3 : Add Object
+        // Parameter 1 : width
+        // Parameter 2 : height
+        geometry = new THREE.PlaneGeometry(40, 40, 4,4) ;
 
-material = new THREE.MeshBasicMaterial( { wireframe:true, overdraw: true } )
+        material = new THREE.MeshBasicMaterial( { wireframe:true, overdraw: true } )
 
-mesh = new THREE.Mesh( geometry, material ) ;
+        mesh = new THREE.Mesh( geometry, material ) ;
 
-scene.add( mesh );
+        scene.add( mesh );
 
-// Step 4 : Add Renderer
-//renderer = new THREE.CanvasRenderer();
-renderer = new THREE.WebGLRenderer(canvas1);
-renderer.setSize( window.innerWidth, window.innerHeight );
+        var bufferGeometry = new THREE.BufferGeometry();
 
-document.body.appendChild( renderer.domElement );
-}
+        // create a simple square shape. We duplicate the top left and bottom right
+        // vertices because each vertex needs to appear once per triangle.
+        var vertexPositions = [
+            [-1.0, -1.0,  1.0],
+            [ 1.0, -1.0,  1.0],
+            [ 1.0,  1.0,  1.0],
 
-function animate()
-{
-// note: three.js includes requestAnimationFrame shim
-requestAnimationFrame( animate );
-render();
-}
+            [ 1.0,  1.0,  1.0],
+            [-1.0,  1.0,  1.0],
+            [-1.0, -1.0,  1.0]
+        ];
 
-function render()
-{
-mesh.rotation.x += 0.01;
+        var vertices = new Float32Array( vertexPositions.length * 3 ); // three components per vertex
 
-renderer.render( scene, camera );
-}
+        // components of the position vector for each vertex are stored
+        // contiguously in the buffer.
+        for ( var i = 0; i < vertexPositions.length; i++ )
+        {
+            vertices[ i*3 + 0 ] = vertexPositions[i][0];
+            vertices[ i*3 + 1 ] = vertexPositions[i][1];
+            vertices[ i*3 + 2 ] = vertexPositions[i][2];
+        }
+
+        // itemSize = 3 because there are 3 values (components) per vertex
+        bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+        var bufferMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+        var bufferMesh = new THREE.Mesh( bufferGeometry, bufferMaterial );
+
+        scene.add( bufferMesh );
+
+        // Step 4 : Add Renderer
+        renderer = new THREE.WebGLRenderer(canvas1);
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        document.body.appendChild( renderer.domElement );
+    }
+
+    function animate()
+    {
+        // note: three.js includes requestAnimationFrame shim
+        requestAnimationFrame( animate );
+        render();
+    }
+
+    function render()
+    {
+        mesh.rotation.x += 0.01;
+
+        renderer.render( scene, camera );
+    }
 
 </script>
 </body>

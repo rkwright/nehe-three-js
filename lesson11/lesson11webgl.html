@@ -145,23 +145,23 @@
 
                 // itemSize = 3 because there are 3 values (components) per vertex
                 bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-                var bufferMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+                //var bufferMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 
                 // find the shaders
-				//var vs = document.getElementById("vertexShader").textContent;
-				//var fs = document.getElementById("fragmentShader").textContent;
+				var vs = document.getElementById("vertexShader").textContent;
+				var fs = document.getElementById("fragmentShader").textContent;
 
 				// and create our shader material...
-				//var shaderMaterial = new THREE.ShaderMaterial({
-				//		uniforms:     	uniforms,	// pass the "uniforms" vars
-				//		//attributes:     attributes,	// and the attributes
-				//		side:THREE.DoubleSide,		// want the texture on both sides of the wave
-				//		vertexShader:   vs,			// pointers to the shaders
-				//		fragmentShader: fs
-				//	});
+				var shaderMaterial = new THREE.ShaderMaterial({
+						uniforms:     	uniforms,	// pass the "uniforms" vars
+						//attributes:     attributes,	// and the attributes
+						side:THREE.DoubleSide,		// want the texture on both sides of the wave
+						vertexShader:   vs,			// pointers to the shaders
+						fragmentShader: fs
+					});
 				
 				// finally create the mesh and add it to the scene
-				var mesh = new THREE.Mesh( bufferGeometry, bufferMaterial);  // shaderMaterial);
+				var mesh = new THREE.Mesh( bufferGeometry, shaderMaterial);
 				gfxScene.add(mesh);
 			}
 			

@@ -2,38 +2,36 @@
 <!-- The previous line tells the browser that the page uses the HTML5 standard. -->
 
 <html>
-	<head>
-		<!-- --------------------------------------------------------------------------
-  			NeHe Tutorial 11
-  			Original:  http://http://nehe.gamedev.net/tutorial/flag_effect_(waving_texture)/16002/
-  
-  			@author: rkwright@geofx.com
- 		-------------------------------------------------------------------------- -->
-	
-		<title>NEHE Tutorial 11</title>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<head>
+	<!-- --------------------------------------------------------------------------
+          NeHe Tutorial 11
+          Original:  http://http://nehe.gamedev.net/tutorial/flag_effect_(waving_texture)/16002/
 
-		<!-- The following meta line optimizes the site for mobile devices. It sets the viewport size
-		to the screen size, so it will be displayed maximized, but unscaled. -->
-		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
-		<link rel="stylesheet" type="text/css" href="../css/NEHE.css" /> 
+          @author: rkwright@geofx.com
+     -------------------------------------------------------------------------- -->
 
-		<!-- Include several libraries from THREE.js and the Scene class  -->
-		<script src="../js/three.js" type="text/javascript"></script>
-		<script src="../js/Detector.js" type="text/javascript"></script>
-		<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
-		<script src="../js/Stats.js" type="text/javascript"></script>
-		<script src="../js/gfx-scene.js" type="text/javascript"></script>
-		
-		<!-- the shaders -->
-		<script id="vertexShader" type="x-shader/x-fragment">
+	<title>NEHE Tutorial 11</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+	<!-- The following meta line optimizes the site for mobile devices. It sets the viewport size
+    to the screen size, so it will be displayed maximized, but unscaled. -->
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+	<link rel="stylesheet" type="text/css" href="../css/NEHE.css" />
+
+	<!-- Include several libraries from THREE.js and the Scene class  -->
+	<script src="../js/three.js" type="text/javascript"></script>
+	<script src="../js/Detector.js" type="text/javascript"></script>
+	<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
+	<script src="../js/Stats.js" type="text/javascript"></script>
+	<script src="../js/gfx-scene.js" type="text/javascript"></script>
+
+	<!-- the shaders -->
+	<script id="vertexShader" type="x-shader/x-fragment">
 			// create two shared variable for the VS and FS containing the normal and the uv coords
 			//varying vec3     	vNormal;
 			varying vec2 		vUv;
 			attribute float  	displacement;
 			uniform float    	amplitude;
-			//attribute vec3      position;
-			//varying vec3        vPosition;
 
 			void main() {
 
@@ -41,7 +39,6 @@
 				// "varying" variables, which makes them available to the other shader
 				//vNormal = normal;
 				vUv = uv;
-				//vPosition = position;
 
 				// find the position of the vertex as a function of its current position
 				// and the displacement * amplitude - which makes it wave
@@ -50,140 +47,124 @@
 				gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
 			}
 		</script>
-			
-		<script id="fragmentShader" type="x-shader/x-vertex">
+
+	<script id="fragmentShader" type="x-shader/x-vertex">
 			// create the shared variables. which are set in the vertex shader
-			// varying vec3 		vNormal;
+			//varying vec3 		vNormal;
 			varying vec2 		vUv;
 			uniform sampler2D 	texImage;
-	
+
 			void main(void) {
-				
+
 				gl_FragColor = texture2D(texImage, vUv);
 			}
 		</script>
-	
+
 	<!-- --------------------------------------------------------------- -->
 
-	</head>
-	<body>	
-		<script>
-			var uniforms;
-			var texture;
-			var frameCounter = 0;
-	
-			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
-			var gfxScene = new GFX.Scene( { cameraPos:[0,0,6], axesHeight:10, controls:true, displayStats:true });
+</head>
+<body>
+<script>
+	var uniforms;
+	var texture;
+	var frameCounter = 0;
 
-            initializeDemo();
+	// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+	var gfxScene = new GFX.Scene( { axesHeight:10, controls:true, displayStats:true });
 
-            // Animate the scene
-			animateScene();
+	// set up the THREE.js scene via our Scene object
+	//gfxScene.initialize();
 
-			/**
-			 * Initialize the Demo.  This is NeHe #11: http://nehe.gamedev.net/tutorial/flag_effect_%28waving_texture%29/16002/
-			 * Create a image mapped texture which is then oscillated (in a sine wave)
-			 */
-			function initializeDemo() {
-				
-				// now go create the mesh
-				createMesh();
+	// then initialize our demo's stuff
+	initializeDemo();
+
+	// Animate the scene
+	animateScene();
+
+	/**
+	 * Initialize the Demo.  This is NeHe #11: http://nehe.gamedev.net/tutorial/flag_effect_%28waving_texture%29/16002/
+	 * Create a image mapped texture which is then oscillated (in a sine wave)
+	 */
+	function initializeDemo() {
+
+		// now go create the mesh
+		createMesh();
+	}
+
+	function createMesh() {
+		// load the image as a texture
+		texture = new THREE.ImageUtils.loadTexture("data/Tim.bmp");
+
+		// all we need is a simple planar mesh. 9 by 9 units with 45x45 verticies
+		var planeGeometry = new THREE.PlaneBufferGeometry(9,9,45,45);
+
+		// add a uniform for the amplitude and the texture.  These are read-only
+		// variables that get passed to our shaders
+		uniforms = {
+			amplitude:	{ type: 'f', value: 0 },
+			texImage:	{ type: 't', value: texture }
+		};
+
+		// these are variables with one per vertex
+		var attributes = {
+			displacement: {
+				type: 'f', // a float
+				value: []  // an empty array
 			}
-			
-			function createMesh() {
-				// load the image as a texture
-				texture = new THREE.ImageUtils.loadTexture("data/Tim.bmp");
-				
-				// all we need is a simple planar mesh. 9 by 9 units with 45x45 verticies
-				var bufferGeometry = new THREE.BufferGeometry();
-				var vertexPositions = [];
+		};
 
-				// add a uniform for the amplitude and the texture.  These are read-only 
-				// variables that get passed to our shaders
-				uniforms = {
-						amplitude:	{ type: 'f', value: 0 },
-						texImage:	{ type: 't', value: texture }
-				};
-				
-				// these are variables with one per vertex
-				var attributes = {
-						displacement: {
-							type: 'f', // a float
-							value: []  // an empty array
-						}
-				};
-				
-				// now populate the array of attributes.  This creates a simple parametric 
-				// surface with the shape of a sine wave
-				//var verts  = planeGeometry.vertices;
-				//var values = attributes.displacement.value;
+		// now populate the array of attributes.  This creates a simple parametric
+		// surface with the shape of a sine wave
+		//var verts  = planeGeometry.vertices;
+		var values = attributes.displacement.value;
 
-                var gridSize = 46;
-                var nV = 0;
-				for ( var y=0; y<gridSize; y++ ) {
-					for ( var x=0; x<gridSize; x++ ) {
-						var sVal = Math.sin((((x/5.0)*40.0)/360.0)*Math.PI*2.0);
-						//var index = x + 46 * y;
-						//values[index] =  sVal;
-                        vertexPositions[nV++] = [ x,y,0 ];
-                        vertexPositions[nV++] = [ x+1,y,0 ];
-                        vertexPositions[nV++] = [ x+1,y+1,0 ];
-
-                        vertexPositions[nV++] = [ x+1,y+1,0 ];
-                        vertexPositions[nV++] = [ x,y+1,0 ];
-                        vertexPositions[nV++] = [ x,y,0 ];
-                    }
-				}
-
-                var vertices = new Float32Array( vertexPositions.length * 3 ); // three components per vertex
-
-                for ( var i=0; i<nV; i++ ) {
-                    vertices[ i*3 + 0 ] = vertexPositions[i][0];
-                    vertices[ i*3 + 1 ] = vertexPositions[i][1];
-                    vertices[ i*3 + 2 ] = vertexPositions[i][2];
-                }
-
-                // itemSize = 3 because there are 3 values (components) per vertex
-                bufferGeometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-                //var bufferMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-
-                // find the shaders
-				var vs = document.getElementById("vertexShader").textContent;
-				var fs = document.getElementById("fragmentShader").textContent;
-
-				// and create our shader material...
-				var shaderMaterial = new THREE.ShaderMaterial({
-						uniforms:     	uniforms,	// pass the "uniforms" vars
-						//attributes:     attributes,	// and the attributes
-						side:THREE.DoubleSide,		// want the texture on both sides of the wave
-						vertexShader:   vs,			// pointers to the shaders
-						fragmentShader: fs
-					});
-				
-				// finally create the mesh and add it to the scene
-				var mesh = new THREE.Mesh( bufferGeometry, shaderMaterial);
-				gfxScene.add(mesh);
+		for ( var y=0; y<46; y++ ) {
+			for ( var x=0; x<46; x++ ) {
+				var sVal = Math.sin((((x/5.0)*40.0)/360.0)*Math.PI*2.0);
+				var index = x + 46 * y;
+				values[index] =  sVal;
 			}
-			
-			/**
-			 * Animate the scene and call rendering.
-			 */
-			function animateScene() {
+		}
 
-				// Tell the browser to call this function when page is visible
-				requestAnimationFrame(animateScene);
+		planeGeometry.addAttribute( 'displacement', new THREE.BufferAttribute( attributes.displacement, 3 ) );
 
-				// update the amplitude based on the frame value. Taking the sine merely
-				// causes the value to vary from -1..1.  When multiplied by the displacement
-				// this causes the the wave to be slowly inverted back and forth
-				//uniforms.amplitude.value = Math.sin(frameCounter);
-				
-				// bump the frame counter
-				frameCounter += 0.1;
-				
-				// Map the 3D scene down to the 2D screen (render the frame)
-				gfxScene.renderScene();
-			}
-		</script>
-	</body>
+		// find the shaders
+		var vs = document.getElementById("vertexShader").textContent;
+		var fs = document.getElementById("fragmentShader").textContent;
+
+		// and create our shader material...
+		var shaderMaterial = new THREE.ShaderMaterial({
+			uniforms:     	uniforms,	// pass the "uniforms" vars
+			//attributes:     attributes,	// and the attributes
+			side:THREE.DoubleSide,		// want the texture on both sides of the wave
+			vertexShader:   vs,			// pointers to the shaders
+			fragmentShader: fs
+		});
+
+		// finally create the mesh and add it to the scene
+		var mesh = new THREE.Mesh( planeGeometry, shaderMaterial);
+		gfxScene.add(mesh);
+	}
+
+	/**
+	 * Animate the scene and call rendering.
+	 */
+	function animateScene() {
+
+		// Tell the browser to call this function when page is visible
+		requestAnimationFrame(animateScene);
+
+		// update the amplitude based on the frame value. Taking the sine merely
+		// causes the value to vary from -1..1.  When multiplied by the displacement
+		// this causes the the wave to be slowly inverted back and forth
+		uniforms.amplitude.value = Math.sin(frameCounter);
+
+		// bump the frame counter
+		frameCounter += 0.1;
+
+		// Map the 3D scene down to the 2D screen (render the frame)
+		gfxScene.renderScene();
+	}
+</script>
+</body>
 </html>

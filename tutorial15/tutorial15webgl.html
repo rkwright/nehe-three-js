@@ -17,15 +17,15 @@
 		<link rel="stylesheet" type="text/css" href="../css/NEHE.css" /> 
 
 		<!-- Include several libraries from THREE.js and the Scene class  -->
-		<script src="../js/three-71.js" type="text/javascript"></script>
+		<script src="../js/three.js" type="text/javascript"></script>
 		<script src="../js/Detector.js" type="text/javascript"></script>
 		<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
 		<script src="../js/Stats.js" type="text/javascript"></script>
 		<script src="../js/gfx-scene.js" type="text/javascript"></script>
 
 		<!-- include the JSON format font files we will use -->
-		<script src="../fonts/gentilis_bold.typeface.js"></script>
-		<script src="../fonts/gentilis_regular.typeface.js"></script>
+		<!-- script src="../fonts/gentilis_bold.typeface.js"></script -->
+		<!-- script src="../fonts/gentilis_regular.typeface.js"></script -->
 		
 		<!-- the shaders -------------------------------------------------- -->
 		<script id="vertexShader" type="x-shader/x-vertex">
@@ -81,7 +81,7 @@
 			var 	size = 1;				// this is actually the HEIGHT of the text. in user-space
 			var 	height = 0.2;			// this is TOTALLY misnamed.  It is the thickness of the extruded text
 			var		curveSegments = 10;		// number of points on "the curve" - which curve?
-			var 	font = "gentilis";
+			var 	fontName = "../fonts/gentilis_bold.typeface.js";
 			var		weight = "bold";
 			var		style = "normal";
 
@@ -97,9 +97,6 @@
 			
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( { axesHeight:10, controls:true, displayStats:true });
-			
-			// set up the THREE.js scene via our Scene object
-			//gfxScene.initialize();
 			
 			// then initialize our demo's stuff
 			initializeDemo();
@@ -178,19 +175,44 @@
 				var materialFront = shaderMaterialL;
 				var materialSide  = shaderMaterial;
 				var materialArray = [ materialFront, materialSide ];
+                var loader = new THREE.FontLoader();
+				loader.load( fontName, function ( font ) {
+
+					/*
+					var textGeometry = new THREE.TextGeometry( "text", {
+
+						font: font,
+
+						size: 50,
+						height: 10,
+						curveSegments: 12,
+
+						bevelThickness: 1,
+						bevelSize: 1,
+						bevelEnabled: true
+
+					});
+					var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
+
+					var mesh = new THREE.Mesh( textGeometry, textMaterial );
+
+					gfxScene.add( mesh );
+
+				} );*/
+
 
 				textGeom = new THREE.TextGeometry( text , {
 					size: size,						// actually the height of the font, in user-space
 					height: height,					// THICKNESS of the extruded font, in user-space
 					curveSegments: curveSegments,
 					font: font,						// name of the font
-					weight: weight,					// bold or normal
-					style: style,					// regular, italic or bold
+					//weight: weight,					// bold or normal
+					//style: style,					// regular, italic or bold
 					bevelThickness: bevelThickness,
 					bevelSize: bevelSize,
 					bevelEnabled: bevelEnabled,
-					material: 0,					// index in the array of the face
-					extrudeMaterial: 1				// index in the array of the extruded sides
+					//material: 0,					// index in the array of the face
+					//extrudeMaterial: 1				// index in the array of the extruded sides
 				});
 				
 				var textMaterial = new THREE.MeshFaceMaterial(materialArray);
@@ -208,6 +230,8 @@
 				
 				textMesh.position.set(-0.5 * textWidth, 0, 0.5 );
 				gfxScene.add(textMesh);
+				} );
+
 			}
 
 			/**

@@ -82,8 +82,6 @@
 			var 	height = 0.2;			// this is TOTALLY misnamed.  It is the thickness of the extruded text
 			var		curveSegments = 10;		// number of points on "the curve" - which curve?
 			var 	fontName = "../fonts/gentilis_bold.typeface.js";
-			var		weight = "bold";
-			var		style = "normal";
 
 			var		bevelThickness = 0.05;
 			var		bevelSize = 0.05;
@@ -96,7 +94,7 @@
 			var     leather;
 			
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
-			var gfxScene = new GFX.Scene( { axesHeight:10, controls:true, displayStats:true });
+			var gfxScene = new GFX.Scene( { cameraPos:[2,2,10], axesHeight:10, controls:true, displayStats:true });
 			
 			// then initialize our demo's stuff
 			initializeDemo();
@@ -178,59 +176,34 @@
                 var loader = new THREE.FontLoader();
 				loader.load( fontName, function ( font ) {
 
-					/*
-					var textGeometry = new THREE.TextGeometry( "text", {
+                    textGeom = new THREE.TextGeometry( text , {
+                        size: size,						// actually the height of the font, in user-space
+                        height: height,					// THICKNESS of the extruded font, in user-space
+                        curveSegments: curveSegments,
+                        font: font,						// name of the font
+                        //weight: weight,					// bold or normal
+                        //style: style,					// regular, italic or bold
+                        bevelThickness: bevelThickness,
+                        bevelSize: bevelSize,
+                        bevelEnabled: bevelEnabled,
+                        //material: 0,					// index in the array of the face
+                        //extrudeMaterial: 1				// index in the array of the extruded sides
+                    });
 
-						font: font,
+                    var textMaterial = new THREE.MeshFaceMaterial(materialArray);
+                    var textMesh = new THREE.Mesh(textGeom, textMaterial );
 
-						size: 50,
-						height: 10,
-						curveSegments: 12,
+                    textGeom.computeBoundingBox();
+                    textGeom.computeVertexNormals();
 
-						bevelThickness: 1,
-						bevelSize: 1,
-						bevelEnabled: true
+                    // get the width of the string so we can center it on the origin
+                    textGeom.computeBoundingBox();
 
-					});
-					var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
+                    var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
 
-					var mesh = new THREE.Mesh( textGeometry, textMaterial );
-
-					gfxScene.add( mesh );
-
-				} );*/
-
-
-				textGeom = new THREE.TextGeometry( text , {
-					size: size,						// actually the height of the font, in user-space
-					height: height,					// THICKNESS of the extruded font, in user-space
-					curveSegments: curveSegments,
-					font: font,						// name of the font
-					//weight: weight,					// bold or normal
-					//style: style,					// regular, italic or bold
-					bevelThickness: bevelThickness,
-					bevelSize: bevelSize,
-					bevelEnabled: bevelEnabled,
-					//material: 0,					// index in the array of the face
-					//extrudeMaterial: 1				// index in the array of the extruded sides
+                    textMesh.position.set(-0.5 * textWidth, 0, 0.5 );
+                    gfxScene.add(textMesh);
 				});
-				
-				var textMaterial = new THREE.MeshFaceMaterial(materialArray);
-				var textMesh = new THREE.Mesh(textGeom, textMaterial );
-
-				textGeom.computeBoundingBox();
-				textGeom.computeVertexNormals();
-				
-				//gfxScene.add(textMesh);
-				
-				// get the width of the string so we can center it on the origin
-				textGeom.computeBoundingBox();
-				
-				var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
-				
-				textMesh.position.set(-0.5 * textWidth, 0, 0.5 );
-				gfxScene.add(textMesh);
-				} );
 
 			}
 

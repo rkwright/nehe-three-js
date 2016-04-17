@@ -23,23 +23,27 @@
 	</head>
 	<body>	
 		<script type="text/javascript">
+            var MAX_FOG = 0.5;
+            var MIN_FOG = 0.0;
+            var FOG_INCR = 0.025;
+
 			var crateTexture;
-			var	yTranslation = 1.05;
+			var	yTranslation = 0.1;
 			var	zTranslation = 0.0;
 			var	xPos, yPos;
-			var fogDensity = 0.20;
-	
+            var fogType = "exponential";
+			var fogDensity = 0.10
+
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
-			var gfxScene = new GFX.Scene( { axisHeight:10, 
-									  controls:true, 
-									  displayStats:true,
-									  floorRepeat:10,
-									  fogType:'linear',
-									  fogDensity : fogDensity,
-									  fogColor: 0xffffff });
-	
-			// set up the THREE.js scene via our Scene object
-			gfxScene.initialize();
+			var gfxScene = new GFX.Scene( {
+				cameraPos:[2,2,10],
+				axisHeight:10,
+				controls:true,
+				displayStats:true,
+				floorRepeat:10,
+                fogType : fogType,
+				fogDensity : fogDensity,
+				fogColor: 0xffffff });
 	
 			// then initialize our demo's stuff
 			initializeDemo();
@@ -53,7 +57,7 @@
 			function initializeDemo() {
 	
 				// Create the cubes
-				var boxGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
+				var boxGeometry = new THREE.BoxGeometry(0.25, 0.25, 0.25);
 	
 				// Load an image as texture
 				crateTexture = new THREE.ImageUtils.loadTexture("images/Crate.jpg");
@@ -63,13 +67,13 @@
 					side:THREE.DoubleSide
 				});
 	
-				for ( var x=-20; x<=20; x += 4 ) {
+				for ( var x=-5; x<=5; x += 1) {
 					boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
 					boxMesh.position.set(x, yTranslation, zTranslation);
 					gfxScene.add(boxMesh);
 				}
 				
-				for ( var z=-20; z<=20; z += 4 ) {
+				for ( var z=-5; z<=5; z += 1 ) {
 					boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
 					boxMesh.position.set(0.0, yTranslation, z);
 					gfxScene.add(boxMesh);
@@ -82,16 +86,16 @@
 				// Get the key code of the pressed key
 				var keyChar = String.fromCharCode(event.which);
 	
-				if (keyChar == '+') {  
-					if (fogDensity < 0.225 )
-						fogDensity += 0.025;
+				if (keyChar == '+') {
+					if (fogDensity < MAX_FOG )
+						fogDensity += FOG_INCR;
 					else 
-						fogDensity = 0.25;
+						fogDensity = MAX_FOG;
 					gfxScene.addFog( { fogDensity: fogDensity } );
 				}
 				else if (keyChar == '-') {  
-					if (fogDensity > 0.025)
-						fogDensity -= 0.025;
+					if (fogDensity > MIN_FOG)
+						fogDensity -= FOG_INCR;
 					else
 						fogDensity = 0;
 					gfxScene.addFog( { fogDensity: fogDensity } );
@@ -111,7 +115,7 @@
 				else if (keyChar == 'w') {
 					gfxScene.addFog( { fogColor: 0xffffff } );
 				}
-			}
+ 			}
 			/**
 			 * Animate the scene and call rendering.
 			 */
@@ -126,7 +130,7 @@
 		</script>
 
 		<!-- Create a DIV element, which will be shown over the WebGL canvas. -->
-		<div style="position: absolute; top: 10px; left: 10px;color:red">
+		<div style="position: absolute; top: 10px; left: 10px;color:white">
 			'r,g,b,w,k': Color of the fog<br/>
 			'+,-' intensity of the fog, if exponential 
 		</div>

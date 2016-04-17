@@ -232,9 +232,7 @@ GFX.Scene.prototype = {
 					this.fogDensity = newValue;
 				else if ( key == 'fogColor' ) 
 					this.fogColor = newValue;
-				else if ( key == 'fogLinear' ) 
-					this.fogLinear = newValue;
-				else if ( key == 'fogNear' ) 
+				else if ( key == 'fogNear' )
 					this.fogNear = newValue;
 				else if ( key == 'fogFar' ) 
 					this.fogFar = newValue;
@@ -242,7 +240,7 @@ GFX.Scene.prototype = {
 		}
 				
 		if (this.fogType == 'exponential')
-			this.scene.fog = new THREE.FogExp2(this.fogColor, this.fogDensity, this.fogNear, this.fogFar );
+			this.scene.fog = new THREE.FogExp2(this.fogColor, this.fogDensity );
 		else if (this.fogType == 'linear')
 			this.scene.fog = new THREE.Fog( this.fogColor, this.fogNear, this.fogFar );
 		else

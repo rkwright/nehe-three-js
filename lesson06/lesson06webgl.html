@@ -26,7 +26,7 @@
 	<body>
 		<!-- This is the DIV element which will contain the WebGL canvas. To be identifiable later on,
 		the id 'WebGLCanvas' is applied to it. -->
-		<div id="WebGLCanvas">
+		<div id="WebGLCanvas"/>
 
 		<!-- This JavaScript block encloses the Three.js commands -->
 		<script>
@@ -123,13 +123,7 @@
 				//var cubeGeometry = new THREE.CubeGeometry(2.0, 2.0, 2.0, 4, 4, 4);
 
 				// Load an image as texture
-				var neheTexture = new THREE.ImageUtils.loadTexture("NeHe.jpg");
-				//neheTexture.min_filter = THREE.LinearFilter;
-				//neheTexture.mag_filter = THREE.LinearFilter;
-				//neheTexture.wrapS = THREE.RepeatWrapping;
-				//neheTexture.wrapT = THREE.RepeatWrapping;
-				//neheTexture.repeat.x = 2;
-				//neheTexture.repeat.y = 2;
+                var neheTexture = new THREE.ImageUtils.loadTexture("images/NeHe.jpg");
 
 				// After creating a THREE.CubeGeometry, we load the texture by
 				// 'THREE.ImageUtils.loadTexture()'. On this object, we can configure the texture
@@ -147,15 +141,16 @@
 				// to holes in the surface. When this happens in your surface, simply set
 				// 'doubleSided' to 'true'.
 				var cubeMaterial = new THREE.MeshBasicMaterial({
-					map:neheTexture,
-					side:THREE.DoubleSide
-				});
+                    map: neheTexture,
+                    side: THREE.DoubleSide
+                });
 
 				// Create a mesh and insert the geometry and the material. Translate the whole mesh
 				// by 1.5 on the x axis and by 4 on the z axis and add the mesh to the scene.
 				cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
 				cubeMesh.position.set(0.0, 0.0, 4.0);
 				scene.add(cubeMesh);
+
 			}
 
 			/**

@@ -26,13 +26,14 @@
             var MAX_FOG = 0.5;
             var MIN_FOG = 0.0;
             var FOG_INCR = 0.025;
+            var CUBE_SIZE = 0.25;
 
 			var crateTexture;
-			var	yTranslation = 0.1;
+			var	yTranslation = CUBE_SIZE/2.0;
 			var	zTranslation = 0.0;
 			var	xPos, yPos;
             var fogType = "exponential";
-			var fogDensity = 0.10
+			var fogDensity = 0.10;
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
@@ -57,7 +58,7 @@
 			function initializeDemo() {
 	
 				// Create the cubes
-				var boxGeometry = new THREE.BoxGeometry(0.25, 0.25, 0.25);
+				var boxGeometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
 	
 				// Load an image as texture
 				crateTexture = new THREE.ImageUtils.loadTexture("images/Crate.jpg");
@@ -66,7 +67,8 @@
 					map:crateTexture,
 					side:THREE.DoubleSide
 				});
-	
+
+				var boxMesh;
 				for ( var x=-5; x<=5; x += 1) {
 					boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
 					boxMesh.position.set(x, yTranslation, zTranslation);
@@ -80,7 +82,7 @@
 				}
 				
 				document.addEventListener("keypress", onDocumentKeyPress, false);
-			};
+			}
 	
 			function onDocumentKeyPress(event) {
 				// Get the key code of the pressed key

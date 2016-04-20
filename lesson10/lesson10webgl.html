@@ -28,7 +28,7 @@
 		<!-- This JavaScript block encloses the Three.js commands -->
 		<script>			
 	
-			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+			// allocate the Scene object, request orbitControls,  3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( { cameraPos : [5, 2, 8],
                                             axesHeight:10,
 				                            controls:true,
@@ -49,6 +49,9 @@
 				createWorld();
 			}
 
+			/**
+			 * Read the world file, construct the structure
+			 */
 			function createWorld() {
 				
 				// Load an image as texture
@@ -59,7 +62,7 @@
 				var material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
 
 				// loop through all the triangles in our "world"
-				for ( i=0; i<nTriangles; i++ ) {
+				for ( var i=0; i<nTriangles; i++ ) {
 					// fetch three rows at a time, being the three vertices
 					var i1 = i * 3;
 					var i2 = i * 3 + 1;

@@ -69,7 +69,7 @@
 	var texture;
 	var frameCounter = 0;
 
-	// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+	// allocate the Scene object, request orbitControls, 3D axes 10 units high and the stats
 	var gfxScene = new GFX.Scene( { axesHeight:10, controls:true, displayStats:true });
 
 	// then initialize our demo's stuff
@@ -104,6 +104,7 @@
 
 		// now populate the array of attributes.  This creates a simple parametric
 		// surface with the shape of a sine wave
+		// Note that the array MUST be a Float32 because that is what three.js expects.
 		var displacement = new Float32Array( 2116 );
 
 		for ( var y=0; y<46; y++ ) {

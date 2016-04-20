@@ -94,7 +94,7 @@
 			var     leather;
 			
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
-			var gfxScene = new GFX.Scene( { cameraPos:[2,2,10], axesHeight:10, controls:true, displayStats:true });
+			var gfxScene = new GFX.Scene( { cameraPos:[4,2,10], axesHeight:10, controls:true, displayStats:true });
 			
 			// then initialize our demo's stuff
 			initializeDemo();
@@ -108,7 +108,7 @@
 			function initializeDemo() {
 
 				createText();
-			};
+			}
 				
 			/**
 			 * Here we actually create the text.  Not too much to it, actually.
@@ -154,7 +154,7 @@
 				var fsL = document.getElementById("fragmentShader-L").textContent;
 
 				// and create our shader material...
-				var shaderMaterial = new THREE.ShaderMaterial({
+				var shaderMaterialW = new THREE.ShaderMaterial({
 						uniforms:     	uniforms,			// pass the "uniforms" vars
 						shading:        THREE.FlatShading,
 						side:           THREE.DoubleSide,	// want the texture on both sides?
@@ -170,9 +170,7 @@
 					fragmentShader: fsL
 				});
 
-				var materialFront = shaderMaterialL;
-				var materialSide  = shaderMaterial;
-				var materialArray = [ materialFront, materialSide ];
+				var materialArray = [ shaderMaterialL, shaderMaterialW ];
                 var loader = new THREE.FontLoader();
 				loader.load( fontName, function ( font ) {
 
@@ -185,9 +183,7 @@
                         //style: style,					// regular, italic or bold
                         bevelThickness: bevelThickness,
                         bevelSize: bevelSize,
-                        bevelEnabled: bevelEnabled,
-                        //material: 0,					// index in the array of the face
-                        //extrudeMaterial: 1				// index in the array of the extruded sides
+                        bevelEnabled: bevelEnabled
                     });
 
                     var textMaterial = new THREE.MeshFaceMaterial(materialArray);

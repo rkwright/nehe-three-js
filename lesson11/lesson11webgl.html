@@ -70,7 +70,7 @@
 	var frameCounter = 0;
 
 	// allocate the Scene object, request orbitControls, 3D axes 10 units high and the stats
-	var gfxScene = new GFX.Scene( { axesHeight:10, controls:true, displayStats:true });
+	var gfxScene = new GFX.Scene( { cameraPos : [0, 2, 20], axesHeight:10, controls:true, displayStats:true });
 
 	// then initialize our demo's stuff
 	initializeDemo();

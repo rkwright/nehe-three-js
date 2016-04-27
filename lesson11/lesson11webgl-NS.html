@@ -30,7 +30,8 @@
 			var texture;
             var vertices;
             var ParaMesh;
-            var TriMesh;
+            var triGeom;
+            var triMesh;
 			// set up the THREE.js scene via our Scene object
 			//nScene.initialize();
 			
@@ -53,8 +54,8 @@
 				material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
 				
 				// now go create the mesh
-				//createMeshByTriangles();
-                createMeshParametric();
+				createMeshByTriangles();
+                //createMeshParametric();
 			}
 
 			function setupPoints() {
@@ -117,7 +118,7 @@
 			function addTriangle ( x1, y1, x2, y2, x3, y3, u1, v1, u2, v2, u3, v3, meshMat ) {
 				
 				// create a plain Geometry and push the vertices into it
-				var triGeom = new THREE.Geometry();
+				triGeom = new THREE.Geometry();
 				triGeom.vertices.push(new THREE.Vector3(points[x1][y1][0], points[x1][y1][1], points[x1][y1][2]));
 				triGeom.vertices.push(new THREE.Vector3(points[x2][y2][0], points[x2][y2][1], points[x2][y2][2]));
 				triGeom.vertices.push(new THREE.Vector3(points[x3][y3][0], points[x3][y3][1], points[x3][y3][2]));
@@ -141,9 +142,9 @@
 				triGeom.computeVertexNormals();
 
 				// and create the actual mesh
-				var mesh = new THREE.Mesh( triGeom, meshMat);
+				triMesh = new THREE.Mesh( triGeom, meshMat);
 				// and add it to the scene
-				nScene.add(mesh);
+				nScene.add(triMesh);
 			}
 			
 			// move the points over one step to "wiggle" the mesh
@@ -151,37 +152,31 @@
 				console.log("Wiggle count: " + wiggle_count);
 				if ( wiggle_count++ == 2 )
 				{
-					for ( y = 0; y < 45; y++ )
-					{
+					for ( y = 0; y < 45; y++ ) {
 						var temp = points[0][y][2];
-						for ( x = 0; x < 44; x++ )
-						{
+						for ( x = 0; x < 44; x++ ) {
 							points[x][y][2] = points[x+1][y][2];
 						}
 						points[44][y][2] = temp;
 					}
 					wiggle_count = 0;
-				}
+ 				}
 			}
 
             function wiggleThePara() {
                 console.log("Wiggle count: " + wiggle_count);
-                if ( wiggle_count++ == 2 )
-                {
-                    var len = vertices.length;
-                    var temp = vertices[0][2];
+                var len = vertices.length;
+                var temp = vertices[0].z;
 
-                    for ( var i = 1; i < len; i++ )
-                    {
-                        vertices[i-1][2] = vertices[i][2];
-                    }
-
-                    vertices[vertices.length-1][2] = temp;
-
-                    wiggle_count = 0;
-                    paraMesh.geometry.verticesNeedUpdate = true;
+                for ( var i = 1; i < len; i++ ) {
+                    vertices[i-1].z = vertices[i].z;
                 }
-            }
+
+                vertices[vertices.length-1].z = temp;
+
+                paraMesh.geometry.verticesNeedUpdate = true;
+             }
+
 			/**
 			 * Animate the scene and call rendering.
 			 */
@@ -192,17 +187,12 @@
 				// Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
 
-				// update the amplitude based on the frame value.
-				var amplitude = Math.sin(frame);
-				// bump the frame counter
-				frame += 0.1;
-
 				// re-create the mesh - this is an expensive operation.  How to avoid it?
 				//createMeshByTriangles();
 				
 				// then wiggle the mesh for next time
-				//wiggleTheMesh();
-                wiggleThePara();
+				wiggleTheMesh();
+                //wiggleThePara();
 				
 				// Map the 3D scene down to the 2D screen (render the frame)
 				nScene.renderScene();

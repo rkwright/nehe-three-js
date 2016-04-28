@@ -42,7 +42,7 @@
 
 				// find the position of the vertex as a function of its current position
 				// and the displacement * amplitude - which makes it wave
-				vec3 newPosition = position + normal * vec3(displacement * amplitude);
+				vec3 newPosition = position + normal * vec3(displacement); //  * amplitude);
 
 				gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
 			}
@@ -68,6 +68,8 @@
 	var uniforms;
 	var texture;
 	var frameCounter = 0;
+    var displacement;
+    var planeGeometry;
 
 	// allocate the Scene object, request orbitControls, 3D axes 10 units high and the stats
 	var gfxScene = new GFX.Scene( { cameraPos : [0, 2, 20], axesHeight:10, controls:true, displayStats:true });
@@ -93,7 +95,7 @@
 		texture = new THREE.ImageUtils.loadTexture("data/Tim.bmp");
 
 		// all we need is a simple planar mesh. 9 by 9 units with 45x45 verticies
-		var planeGeometry = new THREE.PlaneBufferGeometry(9,9,45,45);
+		planeGeometry = new THREE.PlaneBufferGeometry(9,9,45,45);
 
 		// add a uniform for the amplitude and the texture.  These are read-only
 		// variables that get passed to our shaders
@@ -105,7 +107,7 @@
 		// now populate the array of attributes.  This creates a simple parametric
 		// surface with the shape of a sine wave
 		// Note that the array MUST be a Float32 because that is what three.js expects.
-		var displacement = new Float32Array( 2116 );
+		displacement = new Float32Array( 2116 );
 
 		for ( var y=0; y<46; y++ ) {
 			for ( var x=0; x<46; x++ ) {
@@ -134,6 +136,15 @@
 		gfxScene.add(mesh);
 	}
 
+	function wiggleDisplacement() {
+        var temp = displacement[0];
+	    for ( var i=0; i< 2116; i++ ) {
+            displacement[i-1] = displacement[i];
+        }
+        displacement[2115] = temp;
+        planeGeometry.verticesNeedUpdate = true;
+	}
+
 	/**
 	 * Animate the scene and call rendering.
 	 */
@@ -145,10 +156,12 @@
 		// update the amplitude based on the frame value. Taking the sine merely
 		// causes the value to vary from -1..1.  When multiplied by the displacement
 		// this causes the the wave to be slowly inverted back and forth
-		uniforms.amplitude.value = Math.sin(frameCounter);
+		//uniforms.amplitude.value = Math.sin(frameCounter);
+
+        wiggleDisplacement();
 
 		// bump the frame counter
-		frameCounter += 0.1;
+		frameCounter += 0.15;
 
 		// Map the 3D scene down to the 2D screen (render the frame)
 		gfxScene.renderScene();

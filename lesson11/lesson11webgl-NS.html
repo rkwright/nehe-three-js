@@ -54,8 +54,8 @@
 				material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
 				
 				// now go create the mesh
-				createMeshByTriangles();
-                //createMeshParametric();
+				//createMeshByTriangles();
+                createMeshParametric();
 			}
 
 			function setupPoints() {
@@ -191,8 +191,8 @@
 				//createMeshByTriangles();
 				
 				// then wiggle the mesh for next time
-				wiggleTheMesh();
-                //wiggleThePara();
+				//wiggleTheMesh();
+                wiggleThePara();
 				
 				// Map the 3D scene down to the 2D screen (render the frame)
 				nScene.renderScene();

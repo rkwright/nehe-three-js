@@ -32,7 +32,7 @@
 	var DESCENDER_ADJUST = 1.28;
 
 	// allocate the Scene object, request orbitControls, 3D axes 10 units high and the stats
-	var gfxScene = new GFX.Scene( { cameraPos : [5, 2, 8], axisHeight:10, controls:true, displayStats:true });
+	var gfxScene = new GFX.Scene( { cameraPos : [5, 2, 8], axesHeight:10, controls:true, displayStats:true });
 
 	// set up the THREE.js scene via our Scene object
 	//gfxScene.initialize();
@@ -44,7 +44,7 @@
 	animateScene();
 
 	/**
-	 * Initialize the Demo.  This is roughly equivalent to NeHe #12:
+	 * Initialize the Demo.
 	 */
 
 	function initializeDemo()

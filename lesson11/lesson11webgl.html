@@ -26,15 +26,10 @@
 			var nScene = new GFX.Scene( { axesHeight:10, controls:true, displayStats:true });
 			
 			var wiggle_count = 0;		// Counter Used To Control How Fast Flag Waves
-			var points = [];
 			var texture;
-            var vertices;
+            var paraGeom;
             var ParaMesh;
-            var triGeom;
-            var triMesh;
-			// set up the THREE.js scene via our Scene object
-			//nScene.initialize();
-			
+
 			// then initialize our demo's stuff
 			initializeDemo();
 
@@ -47,29 +42,14 @@
 			 */
 			function initializeDemo() {
 				
-				setupPoints();
-
 				// load the image and create the mesh-material
 				texture = new THREE.ImageUtils.loadTexture("Data/Tim.bmp");
 				material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
 				
 				// now go create the mesh
-				//createMeshByTriangles();
                 createMeshParametric();
 			}
 
-			function setupPoints() {
-				for ( var x=0; x<45; x++ ) {
-					points[x] = [];
-					for( var y=0; y<45; y++ ) {
-						points[x][y] = [];
-						points[x][y][0] = ((x/5.0)-4.5);
-						points[x][y][1] = ((y/5.0)-4.5);
-						points[x][y][2] = (Math.sin((((x/5.0)*40.0)/360.0)*Math.PI*2.0));
-					}
-				}
-			}
-			
 			// this is the simple callback function we pass to the ParametricGeometry
 			// the ParametricGeometry will call this for each slice/stack so that u and v vary from 0..1
 			function sineWave ( u, v ) {
@@ -81,94 +61,18 @@
 			}
 			
 			// just create the Parametric geometry and add it to the Scene
-			// works, but performance is very slow
 			function createMeshParametric() {
-			    var paraGeom = new THREE.ParametricGeometry(sineWave, 45, 45);
+			    paraGeom = new THREE.ParametricGeometry(sineWave, 45, 45);
 				paraMesh = new THREE.Mesh( paraGeom, material);
 				nScene.add(paraMesh);
-				
-				vertices = paraGeom.vertices;
-				console.log("verts: " + vertices.length );
-
-			}
-			
-			// this is the orginal approach, much more akin to the original C++ implementation
-			// create a series of quads consisting of two triangles
-			// works fine but performance is absymal
-			function createMeshByTriangles() {
-				
-				for( var x = 0; x < 44; x++ )
-				{
-					for( var y = 0; y < 44; y++ )
-					{
-						var tx1 = (x)/44.0;
-						var ty1 = (y)/44.0;
-						var tx2 = (x+1)/44.0;
-						var ty2 = (y+1)/44.0;
-						
-						addTriangle(x, y,x+1, y, x, y+1, tx1, ty1,tx2, ty1, tx1, ty2, material);
-						
-						addTriangle(x+1, y, x+1, y+1, x, y+1, tx2,ty1, tx2, ty2, tx1, ty2, material);
-
-					}
-				}
-			}
-		
-			// add one half of each quad as a simple triangle
-			function addTriangle ( x1, y1, x2, y2, x3, y3, u1, v1, u2, v2, u3, v3, meshMat ) {
-				
-				// create a plain Geometry and push the vertices into it
-				triGeom = new THREE.Geometry();
-				triGeom.vertices.push(new THREE.Vector3(points[x1][y1][0], points[x1][y1][1], points[x1][y1][2]));
-				triGeom.vertices.push(new THREE.Vector3(points[x2][y2][0], points[x2][y2][1], points[x2][y2][2]));
-				triGeom.vertices.push(new THREE.Vector3(points[x3][y3][0], points[x3][y3][1], points[x3][y3][2]));
-
-				// now need to create the mapping between our texture and the two triangles that
-				// comprise the faces.  For a good intro into UV mapping, see
-				// http://solutiondesign.com/webgl-and-three-js-texture-mapping/
-				
-				var uvs = [];
-				uvs.push( new THREE.Vector2( u1,v1 ) );
-				uvs.push( new THREE.Vector2( u2,v2 ) );
-				uvs.push( new THREE.Vector2( u3,v3 ) );
-				
-				// create a new Face, whose indices point into the vertices we created above
-				triGeom.faces.push( new THREE.Face3( 0, 1, 2 ) );
-				// then set corresponding UV vertices
-				triGeom.faceVertexUvs[ 0 ].push( [ uvs[0], uvs[1], uvs[2] ] );
-				
-				// re-compute the normals for both the faces and vertexes
-				triGeom.computeFaceNormals();
-				triGeom.computeVertexNormals();
-
-				// and create the actual mesh
-				triMesh = new THREE.Mesh( triGeom, meshMat);
-				// and add it to the scene
-				nScene.add(triMesh);
-			}
-			
-			// move the points over one step to "wiggle" the mesh
-			function wiggleTheMesh() {
-				console.log("Wiggle count: " + wiggle_count);
-				if ( wiggle_count++ == 2 )
-				{
-					for ( y = 0; y < 45; y++ ) {
-						var temp = points[0][y][2];
-						for ( x = 0; x < 44; x++ ) {
-							points[x][y][2] = points[x+1][y][2];
-						}
-						points[44][y][2] = temp;
-					}
-					wiggle_count = 0;
- 				}
 			}
 
-            function wiggleThePara() {
-                console.log("Wiggle count: " + wiggle_count);
-                var len = vertices.length;
+            function wiggleTheSurface() {
+
+                vertices = paraGeom.vertices;
+
                 var temp = vertices[0].z;
-
-                for ( var i = 1; i < len; i++ ) {
+                for ( var i = 1; i < vertices.length; i++ ) {
                     vertices[i-1].z = vertices[i].z;
                 }
 
@@ -180,19 +84,13 @@
 			/**
 			 * Animate the scene and call rendering.
 			 */
-			var frame = 0;
-
 			function animateScene() {
 
 				// Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
 
-				// re-create the mesh - this is an expensive operation.  How to avoid it?
-				//createMeshByTriangles();
-				
-				// then wiggle the mesh for next time
-				//wiggleTheMesh();
-                wiggleThePara();
+				// then wiggle the mesh
+                wiggleTheSurface();
 				
 				// Map the 3D scene down to the 2D screen (render the frame)
 				nScene.renderScene();

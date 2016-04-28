@@ -1,171 +1,202 @@
 <!DOCTYPE html>
-<!-- The previous line tells the browser that the page uses the HTML5 standard. -->
-
 <html>
-<head>
-	<!-- --------------------------------------------------------------------------
-          NeHe Tutorial 11
-          Original:  http://http://nehe.gamedev.net/tutorial/flag_effect_(waving_texture)/16002/
+	<head>
+		<title>NEHE Tutorial #11</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
-          @author: rkwright@geofx.com
-     -------------------------------------------------------------------------- -->
+		<!-- The following meta line optimizes the site for mobile devices. It sets the viewport size
+		to the screen size, so it will be displayed maximized, but unscaled. -->
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+		<link rel="stylesheet" type="text/css" href="../css/NEHE.css" />
 
-	<title>NEHE Tutorial 11</title>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+		<!-- Include two libraries from THREE.js: Core and the Detector for WebGL -->
+		<script src="../js/three.js" type="text/javascript"></script>
+		<script src="../js/Detector.js" type="text/javascript"></script>
+		<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
+		<script src="../js/Stats.js" type="text/javascript"></script>
+		<script src="../js/gfx-scene.js" type="text/javascript"></script>
+		
 
-	<!-- The following meta line optimizes the site for mobile devices. It sets the viewport size
-    to the screen size, so it will be displayed maximized, but unscaled. -->
-	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
-	<link rel="stylesheet" type="text/css" href="../css/NEHE.css" />
 
-	<!-- Include several libraries from THREE.js and the Scene class  -->
-	<script src="../js/three.js" type="text/javascript"></script>
-	<script src="../js/Detector.js" type="text/javascript"></script>
-	<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
-	<script src="../js/Stats.js" type="text/javascript"></script>
-	<script src="../js/gfx-scene.js" type="text/javascript"></script>
+	</head>
+	<body>	
+		<!-- This JavaScript block encloses the Three.js commands -->
+		<script>
+			// allocate the Scene object, request orbitControls and an set of 3D axes 10 units high
+			var nScene = new GFX.Scene( { axesHeight:10, controls:true, displayStats:true });
+			
+			var wiggle_count = 0;		// Counter Used To Control How Fast Flag Waves
+			var points = [];
+			var texture;
+            var vertices;
+            var ParaMesh;
+            var triGeom;
+            var triMesh;
+			// set up the THREE.js scene via our Scene object
+			//nScene.initialize();
+			
+			// then initialize our demo's stuff
+			initializeDemo();
 
-	<!-- the shaders -->
-	<script id="vertexShader" type="x-shader/x-fragment">
-			// create two shared variable for the VS and FS containing the normal and the uv coords
-			//varying vec3     	vNormal;
-			varying vec2 		vUv;
-			attribute float  	displacement;
-			uniform float    	amplitude;
+			// Animate the scene
+			animateScene();
 
-			void main() {
+			/**
+			 * Initialize the Demo.  This is NeHe #11: http://nehe.gamedev.net/tutorial/flag_effect_%28waving_texture%29/16002/
+			 * Create a image mapped texture which is then oscillated (in a sine wave)
+			 */
+			function initializeDemo() {
+				
+				setupPoints();
 
-				// set the variables passed (behind the scenes) by three.js to our
-				// "varying" variables, which makes them available to the other shader
-				//vNormal = normal;
-				vUv = uv;
+				// load the image and create the mesh-material
+				texture = new THREE.ImageUtils.loadTexture("Data/Tim.bmp");
+				material = new THREE.MeshBasicMaterial( { map: texture, side:THREE.DoubleSide } );
+				
+				// now go create the mesh
+				//createMeshByTriangles();
+                createMeshParametric();
+			}
 
-				// find the position of the vertex as a function of its current position
-				// and the displacement * amplitude - which makes it wave
-				vec3 newPosition = position + normal * vec3(displacement); //  * amplitude);
+			function setupPoints() {
+				for ( var x=0; x<45; x++ ) {
+					points[x] = [];
+					for( var y=0; y<45; y++ ) {
+						points[x][y] = [];
+						points[x][y][0] = ((x/5.0)-4.5);
+						points[x][y][1] = ((y/5.0)-4.5);
+						points[x][y][2] = (Math.sin((((x/5.0)*40.0)/360.0)*Math.PI*2.0));
+					}
+				}
+			}
+			
+			// this is the simple callback function we pass to the ParametricGeometry
+			// the ParametricGeometry will call this for each slice/stack so that u and v vary from 0..1
+			function sineWave ( u, v ) {
+				x = u * 9 - 4.5;
+				y = v * 9 - 4.5;
+				z = Math.sin(u*Math.PI*2.0);
+				
+				return new THREE.Vector3(x, y, z);
+			}
+			
+			// just create the Parametric geometry and add it to the Scene
+			// works, but performance is very slow
+			function createMeshParametric() {
+			    var paraGeom = new THREE.ParametricGeometry(sineWave, 45, 45);
+				paraMesh = new THREE.Mesh( paraGeom, material);
+				nScene.add(paraMesh);
+				
+				vertices = paraGeom.vertices;
+				console.log("verts: " + vertices.length );
 
-				gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+			}
+			
+			// this is the orginal approach, much more akin to the original C++ implementation
+			// create a series of quads consisting of two triangles
+			// works fine but performance is absymal
+			function createMeshByTriangles() {
+				
+				for( var x = 0; x < 44; x++ )
+				{
+					for( var y = 0; y < 44; y++ )
+					{
+						var tx1 = (x)/44.0;
+						var ty1 = (y)/44.0;
+						var tx2 = (x+1)/44.0;
+						var ty2 = (y+1)/44.0;
+						
+						addTriangle(x, y,x+1, y, x, y+1, tx1, ty1,tx2, ty1, tx1, ty2, material);
+						
+						addTriangle(x+1, y, x+1, y+1, x, y+1, tx2,ty1, tx2, ty2, tx1, ty2, material);
+
+					}
+				}
+			}
+		
+			// add one half of each quad as a simple triangle
+			function addTriangle ( x1, y1, x2, y2, x3, y3, u1, v1, u2, v2, u3, v3, meshMat ) {
+				
+				// create a plain Geometry and push the vertices into it
+				triGeom = new THREE.Geometry();
+				triGeom.vertices.push(new THREE.Vector3(points[x1][y1][0], points[x1][y1][1], points[x1][y1][2]));
+				triGeom.vertices.push(new THREE.Vector3(points[x2][y2][0], points[x2][y2][1], points[x2][y2][2]));
+				triGeom.vertices.push(new THREE.Vector3(points[x3][y3][0], points[x3][y3][1], points[x3][y3][2]));
+
+				// now need to create the mapping between our texture and the two triangles that
+				// comprise the faces.  For a good intro into UV mapping, see
+				// http://solutiondesign.com/webgl-and-three-js-texture-mapping/
+				
+				var uvs = [];
+				uvs.push( new THREE.Vector2( u1,v1 ) );
+				uvs.push( new THREE.Vector2( u2,v2 ) );
+				uvs.push( new THREE.Vector2( u3,v3 ) );
+				
+				// create a new Face, whose indices point into the vertices we created above
+				triGeom.faces.push( new THREE.Face3( 0, 1, 2 ) );
+				// then set corresponding UV vertices
+				triGeom.faceVertexUvs[ 0 ].push( [ uvs[0], uvs[1], uvs[2] ] );
+				
+				// re-compute the normals for both the faces and vertexes
+				triGeom.computeFaceNormals();
+				triGeom.computeVertexNormals();
+
+				// and create the actual mesh
+				triMesh = new THREE.Mesh( triGeom, meshMat);
+				// and add it to the scene
+				nScene.add(triMesh);
+			}
+			
+			// move the points over one step to "wiggle" the mesh
+			function wiggleTheMesh() {
+				console.log("Wiggle count: " + wiggle_count);
+				if ( wiggle_count++ == 2 )
+				{
+					for ( y = 0; y < 45; y++ ) {
+						var temp = points[0][y][2];
+						for ( x = 0; x < 44; x++ ) {
+							points[x][y][2] = points[x+1][y][2];
+						}
+						points[44][y][2] = temp;
+					}
+					wiggle_count = 0;
+ 				}
+			}
+
+            function wiggleThePara() {
+                console.log("Wiggle count: " + wiggle_count);
+                var len = vertices.length;
+                var temp = vertices[0].z;
+
+                for ( var i = 1; i < len; i++ ) {
+                    vertices[i-1].z = vertices[i].z;
+                }
+
+                vertices[vertices.length-1].z = temp;
+
+                paraMesh.geometry.verticesNeedUpdate = true;
+             }
+
+			/**
+			 * Animate the scene and call rendering.
+			 */
+			var frame = 0;
+
+			function animateScene() {
+
+				// Tell the browser to call this function when page is visible
+				requestAnimationFrame(animateScene);
+
+				// re-create the mesh - this is an expensive operation.  How to avoid it?
+				//createMeshByTriangles();
+				
+				// then wiggle the mesh for next time
+				//wiggleTheMesh();
+                wiggleThePara();
+				
+				// Map the 3D scene down to the 2D screen (render the frame)
+				nScene.renderScene();
 			}
 		</script>
-
-	<script id="fragmentShader" type="x-shader/x-vertex">
-			// create the shared variables. which are set in the vertex shader
-			//varying vec3 		vNormal;
-			varying vec2 		vUv;
-			uniform sampler2D 	texImage;
-
-			void main(void) {
-
-				gl_FragColor = texture2D(texImage, vUv);
-			}
-		</script>
-
-	<!-- --------------------------------------------------------------- -->
-
-</head>
-<body>
-<script>
-	var uniforms;
-	var texture;
-	var frameCounter = 0;
-    var displacement;
-    var planeGeometry;
-
-	// allocate the Scene object, request orbitControls, 3D axes 10 units high and the stats
-	var gfxScene = new GFX.Scene( { cameraPos : [0, 2, 20], axesHeight:10, controls:true, displayStats:true });
-
-	// then initialize our demo's stuff
-	initializeDemo();
-
-	// Animate the scene
-	animateScene();
-
-	/**
-	 * Initialize the Demo.  This is NeHe #11: http://nehe.gamedev.net/tutorial/flag_effect_%28waving_texture%29/16002/
-	 * Create a image mapped texture which is then oscillated (in a sine wave)
-	 */
-	function initializeDemo() {
-
-		// now go create the mesh
-		createMesh();
-	}
-
-	function createMesh() {
-		// load the image as a texture
-		texture = new THREE.ImageUtils.loadTexture("data/Tim.bmp");
-
-		// all we need is a simple planar mesh. 9 by 9 units with 45x45 verticies
-		planeGeometry = new THREE.PlaneBufferGeometry(9,9,45,45);
-
-		// add a uniform for the amplitude and the texture.  These are read-only
-		// variables that get passed to our shaders
-		uniforms = {
-			amplitude:	{ type: 'f', value: 0 },
-			texImage:	{ type: 't', value: texture }
-		};
-
-		// now populate the array of attributes.  This creates a simple parametric
-		// surface with the shape of a sine wave
-		// Note that the array MUST be a Float32 because that is what three.js expects.
-		displacement = new Float32Array( 2116 );
-
-		for ( var y=0; y<46; y++ ) {
-			for ( var x=0; x<46; x++ ) {
-				var sVal = Math.sin((((x/5.0)*40.0)/360.0)*Math.PI*2.0);
-				var index = x + 46 * y;
-				displacement[index] =  sVal;
-			}
-		}
-
-		planeGeometry.addAttribute( 'displacement', new THREE.BufferAttribute( displacement, 1 ) );
-
-		// find the shaders
-		var vs = document.getElementById("vertexShader").textContent;
-		var fs = document.getElementById("fragmentShader").textContent;
-
-		// and create our shader material...
-		var shaderMaterial = new THREE.ShaderMaterial({
-			uniforms:     	uniforms,	// pass the "uniforms" vars
-			side:THREE.DoubleSide,		// want the texture on both sides of the wave
-			vertexShader:   vs,			// pointers to the shaders
-			fragmentShader: fs
-		});
-
-		// finally create the mesh and add it to the scene
-		var mesh = new THREE.Mesh( planeGeometry, shaderMaterial);
-		gfxScene.add(mesh);
-	}
-
-	function wiggleDisplacement() {
-        var temp = displacement[0];
-	    for ( var i=0; i< 2116; i++ ) {
-            displacement[i-1] = displacement[i];
-        }
-        displacement[2115] = temp;
-        planeGeometry.verticesNeedUpdate = true;
-	}
-
-	/**
-	 * Animate the scene and call rendering.
-	 */
-	function animateScene() {
-
-		// Tell the browser to call this function when page is visible
-		requestAnimationFrame(animateScene);
-
-		// update the amplitude based on the frame value. Taking the sine merely
-		// causes the value to vary from -1..1.  When multiplied by the displacement
-		// this causes the the wave to be slowly inverted back and forth
-		//uniforms.amplitude.value = Math.sin(frameCounter);
-
-        wiggleDisplacement();
-
-		// bump the frame counter
-		frameCounter += 0.15;
-
-		// Map the 3D scene down to the 2D screen (render the frame)
-		gfxScene.renderScene();
-	}
-</script>
-</body>
+	</body>
 </html>

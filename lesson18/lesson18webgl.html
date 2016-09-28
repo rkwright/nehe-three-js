@@ -7,7 +7,7 @@
   
   			@author: rkwright@geofx.com
 		-------------------------------------- -->
-		<title>NEHE Tutorial 18</title>
+		<title>NEHE Lesson 18</title>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
 		<!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
@@ -31,14 +31,11 @@
 			var	quadType = 'b';
 	
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
-			var gfxScene = new GFX.Scene( { cameraPos : [0, 20, 40],
-				                                        axisHeight:10,
+			var gfxScene = new GFX.Scene( { cameraPos : [0, 6, 12],
+				                                        axesHeight:10,
 									                    controls:true,
 									                    displayStats:true });
-	
-			// set up the THREE.js scene via our Scene object
-			gfxScene.initialize();
-	
+
 			// then initialize our demo's stuff
 			initializeDemo();
 	
@@ -58,7 +55,7 @@
 				quadric = makeQuad('0');
 				
 				document.addEventListener("keypress", onDocumentKeyPress, false);
-			};
+			}
 	
 			function makeMaterial ( matType ) {
 				
@@ -156,7 +153,7 @@
 		</script>
 
 		<!-- Create a DIV element, which will be shown over the WebGL canvas. -->
-		<div style="position: absolute; top: 10px; left: 10px;color:red">
+		<div style="position: absolute; top: 10px; left: 10px;color:white">
 		'0 .. 9': Type of object<br/>
 		't, p, w' : texture, paint or wireframe		</div>
 	</body>

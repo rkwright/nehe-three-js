@@ -100,7 +100,7 @@
 							size: 0.4,
 							map: THREE.ImageUtils.loadTexture("images/snowflake.png"),
 							blending: THREE.AdditiveBlending,
-							transparent: true,
+							transparent: true
 						});
 
 				// Create the particle system
@@ -139,7 +139,7 @@
 						vert.y = Math.random() * ELEV - DELTA_ELEV;
 					}
 					vert.y = vert.y - (1.0 * deltaTime);
-                    vert.x = vert.x + (Math.random() - 0.5) * DISTRIBX * 0.001;
+                    //vert.x = vert.x + (Math.random() - 0.5) * DISTRIBX * 0.001;
 				}
 				particleSystem.geometry.verticesNeedUpdate = true;
 

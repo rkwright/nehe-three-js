@@ -57,13 +57,11 @@
 	<body>
 
 		<script type="text/javascript">
-			var FLOOR_REPEAT = 5;
 
             // allocate the Scene object, and set the camera position
             var gfxScene = new GFX.Scene( { cameraPos : [5,7.5,20],
                                             controls : true,
 											axesHeight:10,
-                                            floorRepeat : FLOOR_REPEAT,
                                             displayStats:true});
 
 			// Initialize the demo
@@ -76,7 +74,23 @@
 			 *  Initialize the demo's local aspects, i.e not the scene.
 			 */
 			function initializeDemo() {
+                //var shaderMaterial = createShaderMaterial();
+
                 var geom = new THREE.CubeGeometry( 2, 2, 2 );
+
+                var texture = new THREE.ImageUtils.loadTexture("grass.jpg");
+                var mask = new THREE.ImageUtils.loadTexture("Alpha-Map.png");
+
+                var material = new THREE.MeshBasicMaterial( { map:texture, alphaMap:mask, side:THREE.DoubleSide, transparent:true } );
+                //material.transparent = true;
+
+                var mesh = new THREE.Mesh( geom, material );
+                mesh.doubleSided = true;
+                gfxScene.add(mesh);
+
+			}
+
+			function createShaderMaterial() {
 
                 var vertShader = document.getElementById('vertex_shader').innerHTML;
 
@@ -101,11 +115,8 @@
                     fragmentShader: fragShader
                 });
 
-                var mesh = new THREE.Mesh( geom, material_shader );
-                mesh.doubleSided = true;
-                gfxScene.add(mesh);
-
-			}
+                return material_shader;
+            }
 
 			/**
 			 * Animate the scene and call rendering.

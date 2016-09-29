@@ -16,43 +16,6 @@
         <script src="../js/Stats.js" type="text/javascript"></script>
         <script src="../js/gfx-scene.js" type="text/javascript"></script>
 
-		<!-- the shaders -->
-		<script id="fragment_shader" type="x-shader/x-fragment">
-            #ifdef GL_ES
-            precision highp float;
-            #endif
-
-            uniform sampler2D tOne;
-            uniform sampler2D tSec;
-
-            varying vec2 vUv;
-
-            void main(void)
-            {
-                vec3 c;
-                vec4 Ca = texture2D(tOne, vUv);
-                vec4 Cb = texture2D(tSec, vUv);
-                /* c = Ca.rgb * Ca.a + Cb.rgb * Cb.a * (1.0 - Ca.a); */
-                c = Ca.rgb * Ca.a + Cb.rgb * Cb.a * Ca.a;
-                gl_FragColor= vec4(c, 1.0);
-
-            }
-
-        </script>
-
-		<script id="vertex_shader" type="x-shader/x-vertex">
-
-            varying vec2 vUv;
-
-            void main()
-            {
-                vUv = uv;
-                vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-                gl_Position = projectionMatrix * mvPosition;
-            }
-
-        </script>
-
 	</head>
 	<body>
 
@@ -78,8 +41,8 @@
 
                 var geom = new THREE.CubeGeometry( 2, 2, 2 );
 
-                var texture = new THREE.ImageUtils.loadTexture("grass.jpg");
-                var mask = new THREE.ImageUtils.loadTexture("Alpha-Map.png");
+                var texture = new THREE.ImageUtils.loadTexture("images/image1.bmp");
+                var mask = new THREE.ImageUtils.loadTexture("images/mask1.bmp");
 
                 var material = new THREE.MeshBasicMaterial( { map:texture, alphaMap:mask, side:THREE.DoubleSide, transparent:true } );
                 //material.transparent = true;
@@ -89,34 +52,6 @@
                 gfxScene.add(mesh);
 
 			}
-
-			function createShaderMaterial() {
-
-                var vertShader = document.getElementById('vertex_shader').innerHTML;
-
-                var fragShader = document.getElementById('fragment_shader').innerHTML;
-
-                var attributes = {};
-
-                //var tex1 = THREE.ImageUtils.loadTexture("grass.jpg", {}, function() { renderer.render(scene, camera);});
-                //var tex2 = THREE.ImageUtils.loadTexture("frog.png", {}, function() { renderer.render(scene, camera);});
-
-                var uniforms = {
-
-                    tOne: { type: "t", value: THREE.ImageUtils.loadTexture( "wow.png" ) },
-                    tSec: { type: "t", value: THREE.ImageUtils.loadTexture( "grass.jpg" ) }
-
-                };
-
-                var material_shader = new THREE.ShaderMaterial({
-                    uniforms: uniforms,
-                    attributes: attributes,
-                    vertexShader: vertShader,
-                    fragmentShader: fragShader
-                });
-
-                return material_shader;
-            }
 
 			/**
 			 * Animate the scene and call rendering.

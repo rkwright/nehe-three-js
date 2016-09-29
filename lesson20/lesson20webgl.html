@@ -20,9 +20,11 @@
 	<body>
 
 		<script type="text/javascript">
+            var number = 1;
+            var mesh;
 
             // allocate the Scene object, and set the camera position
-            var gfxScene = new GFX.Scene( { cameraPos : [5,7.5,20],
+            var gfxScene = new GFX.Scene( { cameraPos : [3, 5, 10],
                                             controls : true,
 											axesHeight:10,
                                             displayStats:true});
@@ -37,22 +39,47 @@
 			 *  Initialize the demo's local aspects, i.e not the scene.
 			 */
 			function initializeDemo() {
-                //var shaderMaterial = createShaderMaterial();
+                makeMesh();
+
+                // Add a listener for 'keydown' events. There's another event type: 'keypress',
+                // but it will report only the visible characters like 'a', but not the function keys
+                // like 'cursor up'.
+                document.addEventListener("keydown", onDocumentKeyDown, false);
+			}
+
+			function makeMesh() {
+
+			    gfxScene.remove(mesh);
 
                 var geom = new THREE.CubeGeometry( 2, 2, 2 );
 
-                var texture = new THREE.ImageUtils.loadTexture("images/image2.bmp");
-                var mask = new THREE.ImageUtils.loadTexture("images/mask2.bmp");
+                var texture = new THREE.ImageUtils.loadTexture("images/image" + number + ".bmp");
+                var mask = new THREE.ImageUtils.loadTexture("images/mask" + number + ".bmp");
 
                 var material = new THREE.MeshBasicMaterial( { map:texture, alphaMap:mask, side:THREE.DoubleSide, transparent:true } );
                 //material.transparent = true;
 
-                var mesh = new THREE.Mesh( geom, material );
+                mesh = new THREE.Mesh( geom, material );
                 mesh.doubleSided = true;
                 gfxScene.add(mesh);
+            }
 
-			}
+            /**
+             * This function is called, when a key is pushed down.
+             */
+            function onDocumentKeyDown(event){
 
+                var keyCode = event.which;      // Get the key code of the pressed key
+
+                if (keyCode == 49) {             // '1'
+                    number = 1;
+                    makeMesh();
+                }
+                else if (keyCode == 50) {        // '2'
+                    number = 2;
+                    makeMesh();
+                }
+            }
 			/**
 			 * Animate the scene and call rendering.
 			 */

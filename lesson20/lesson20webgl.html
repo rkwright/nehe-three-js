@@ -20,7 +20,7 @@
 	<body>
 
 		<script type="text/javascript">
-            var number = 1;
+            // the global var (ick!) for the cube's mesh
             var mesh;
 
             // allocate the Scene object, and set the camera position
@@ -39,7 +39,7 @@
 			 *  Initialize the demo's local aspects, i.e not the scene.
 			 */
 			function initializeDemo() {
-                makeMesh();
+                makeMesh( 1 );
 
                 // Add a listener for 'keydown' events. There's another event type: 'keypress',
                 // but it will report only the visible characters like 'a', but not the function keys
@@ -47,7 +47,12 @@
                 document.addEventListener("keydown", onDocumentKeyDown, false);
 			}
 
-			function makeMesh() {
+			/**
+             *  Rebuild the mesh completely and add it to the scene.  We need to do
+             *  because you can't refresh textures or alpha-Maps without rebuilding
+             *  mesh.
+             */
+			function makeMesh( number ) {
 
 			    gfxScene.remove(mesh);
 
@@ -72,12 +77,10 @@
                 var keyCode = event.which;      // Get the key code of the pressed key
 
                 if (keyCode == 49) {             // '1'
-                    number = 1;
-                    makeMesh();
+                    makeMesh(1);
                 }
                 else if (keyCode == 50) {        // '2'
-                    number = 2;
-                    makeMesh();
+                    makeMesh(2);
                 }
             }
 			/**

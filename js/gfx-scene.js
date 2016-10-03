@@ -19,7 +19,12 @@ GFX.Scene = function ( parameters ) {
 	this.canvasWidth = 0;
 	this.canvasHeight = 0;
 
+    this.perspective = true;
+    this.fov = 45;
+    this.near = 0.1;
+    this.far = 1000;
 	this.cameraPos = [0,20,40];
+    this.orthoProp = 2;
 
 	this.controls = false;
 	this.orbitControls = null;
@@ -131,13 +136,8 @@ GFX.Scene.prototype = {
 		}
 	
 		// set up the camera
-		this.camera = new THREE.PerspectiveCamera(45, this.canvasWidth / this.canvasHeight, 0.1, 5000);
-		if (this.cameraPos == undefined)
-			this.camera.position.set(0, 10, 20);
-		else
-			this.camera.position.set(this.cameraPos[0], this.cameraPos[1], this.cameraPos[2]);
+		this.setCamera(null);
 
-		this.camera.lookAt(this.scene.position);
 		this.scene.add(this.camera);
 	
 		// allocate the THREE.js renderer
@@ -197,9 +197,30 @@ GFX.Scene.prototype = {
 		this.scene.remove(obj);
 	},
 
-/**
- * Render the scene. Map the 3D world to the 2D screen.
- */
+	/**
+	 *
+	 */
+	setCamera: function ( jsonObj ) {
+	    if (jsonObj != null)
+	        this.setParameters(jsonObj);
+
+        if (this.perspective == true)
+		    this.camera = new THREE.PerspectiveCamera(this.fov, this.canvasWidth / this.canvasHeight, this.near, this.far);
+        else
+            this.camera = new THREE.OrthographicCamera(this.canvasWidth / -this.orthoProp, this.canvasWidth / this.orthoProp,
+                 this.canvasHeight / -this.orthoProp, this.canvasHeight / this.orthoProp, this.near, this.far);
+
+		if (this.cameraPos == undefined)
+			this.camera.position.set(0, 10, 20);
+		else
+			this.camera.position.set(this.cameraPos[0], this.cameraPos[1], this.cameraPos[2]);
+
+		this.camera.lookAt(this.scene.position);
+	},
+
+	/**
+	 * Render the scene. Map the 3D world to the 2D screen.
+     */
 	renderScene: function() {
 		
 		this.renderer.render(this.scene, this.camera);

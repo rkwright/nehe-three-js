@@ -17,7 +17,7 @@
 		<!-- Include several libraries from THREE.js and the Scene class  -->
 		<script src="../js/three.js" type="text/javascript"></script>
 		<script src="../js/Detector.js" type="text/javascript"></script>
-		<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
+		<script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
 		<script src="../js/Stats.js" type="text/javascript"></script>
 		<script src="../js/gfx-scene.js" type="text/javascript"></script>
 	</head>
@@ -84,7 +84,7 @@
                 if (keyChar == 'p')
                     gfxScene.setCamera({ perspective:true, cameraPos:[2,5,20]  });
                 else if (keyChar == 'o')
-                    gfxScene.setCamera({ perspective:false, cameraPos:[2,5,2] });
+                    gfxScene.setCamera({ perspective:false, cameraPos:[2,5,20] });
  			}
 			/**
 			 * Animate the scene and call rendering.

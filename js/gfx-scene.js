@@ -21,10 +21,10 @@ GFX.Scene = function ( parameters ) {
 
     this.perspective = true;
     this.fov = 45;
-    this.near = 0.1;
+    this.near = 0.01;
     this.far = 1000;
 	this.cameraPos = [0,20,40];
-    this.orthoProp = 2;
+    this.orthoProp = 100;
 
 	this.controls = false;
 	this.orbitControls = null;
@@ -169,7 +169,7 @@ GFX.Scene.prototype = {
 
 		// request the orbitControls be created and enabled
 		// add the controls
-		if (this.controls == true)
+		if (this.controls == true && this.renderer != null)
 			this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
 		
 		if ( this.axesHeight != 0 )
@@ -208,15 +208,20 @@ GFX.Scene.prototype = {
 		    this.camera = new THREE.PerspectiveCamera(this.fov, this.canvasWidth / this.canvasHeight, this.near, this.far);
         else
             this.camera = new THREE.OrthographicCamera(this.canvasWidth / -this.orthoProp, this.canvasWidth / this.orthoProp,
-                 this.canvasHeight / -this.orthoProp, this.canvasHeight / this.orthoProp, this.near, this.far);
+                 this.canvasHeight / this.orthoProp, this.canvasHeight / -this.orthoProp, this.near, this.far);
 
-		if (this.cameraPos == undefined)
+        this.camera.updateProjectionMatrix();
+
+        if (this.cameraPos == undefined)
 			this.camera.position.set(0, 10, 20);
 		else
 			this.camera.position.set(this.cameraPos[0], this.cameraPos[1], this.cameraPos[2]);
 
 		this.camera.lookAt(this.scene.position);
-	},
+
+        if (this.controls == true && this.renderer != null)
+            this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+    },
 
 	/**
 	 * Render the scene. Map the 3D world to the 2D screen.

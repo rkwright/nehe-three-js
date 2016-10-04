@@ -27,13 +27,14 @@
 			 var REPEAT_SIZE = 10;
 
 			var crateTexture;
-			var	yTranslation = CUBE_SIZE/2.0;
+			var	yTranslation = CUBE_SIZE/2.0 + 0.1;
 			var	zTranslation = 0.0;
 			var	xPos, yPos;
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
-				cameraPos:[2,2,20],
+			    perspective:false,
+				cameraPos:[2,5,20],   //2,2,20],
 				axisHeight:10,
 				controls:true,
 				displayStats:true,
@@ -81,9 +82,9 @@
 				var keyChar = String.fromCharCode(event.which);
 
                 if (keyChar == 'p')
-                    gfxScene.setCamera( { perspective:true, cameraPos:[2,2,20]  });
+                    gfxScene.setCamera({ perspective:true, cameraPos:[2,5,20]  });
                 else if (keyChar == 'o')
-                    gfxScene.setCamera({ perspective:false, cameraPos:[200,100,200] });
+                    gfxScene.setCamera({ perspective:false, cameraPos:[2,5,2] });
  			}
 			/**
 			 * Animate the scene and call rendering.

@@ -114,9 +114,21 @@ GFX.Scene.prototype = {
 			window.addEventListener('resize', function() {
                 _self.canvasWidth  = window.innerWidth;
                 _self.canvasHeight = window.innerHeight;
-                _self.renderer.setSize( _self.canvasWidth, _self.canvasHeight );
-                _self.camera.aspect = _self.canvasWidth / _self.canvasHeight;
-                _self.camera.updateProjectionMatrix();
+
+                if (_self.perspective == true ) {
+                    _self.renderer.setSize(_self.canvasWidth, _self.canvasHeight);
+                    _self.camera.aspect = _self.canvasWidth / _self.canvasHeight;
+                    _self.camera.updateProjectionMatrix();
+                } else {
+                    _self.camera.left   = _self.canvasWidth / -2;
+                    _self.camera.right  = _self.canvasWidth / 2;
+                    _self.camera.top    = _self.canvasHeight / 2;
+                    _self.camera.bottom = _self.canvasHeight / -2;
+                    _self.camera.updateProjectionMatrix();
+                    _self.renderer.setSize( _self.canvasWidth, _self.canvasHeight );
+
+                }
+
             });
 		}
 	
@@ -198,7 +210,7 @@ GFX.Scene.prototype = {
 	},
 
 	/**
-	 *
+	 * Set up the camera for the scene.  Perspective or Orthographic
 	 */
 	setCamera: function ( jsonObj ) {
 	    if (jsonObj != null)
@@ -207,10 +219,11 @@ GFX.Scene.prototype = {
         if (this.perspective == true)
 		    this.camera = new THREE.PerspectiveCamera(this.fov, this.canvasWidth / this.canvasHeight, this.near, this.far);
         else {
-        	var aspectRatio = this.canvasHeight / this.canvasWidth;
-			this.camera = new THREE.OrthographicCamera(this.canvasWidth / -this.orthoProp, this.canvasWidth / this.orthoProp,
-				aspectRatio * this.canvasHeight / this.orthoProp, aspectRatio * this.canvasHeight / -this.orthoProp, this.near, this.far);
-		}
+
+            this.camera = new THREE.OrthographicCamera( this.canvasWidth / -2, this.canvasWidth / 2,
+                this.canvasHeight / 2, this.canvasHeight / -2, 0.01, 1000 );
+
+        }
 
         this.camera.updateProjectionMatrix();
 

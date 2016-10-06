@@ -34,6 +34,7 @@
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
 			    perspective:false,
+				orthoSize: REPEAT_SIZE * 2,
 				cameraPos:[2,5,20],   //2,2,20],
 				axisHeight:10,
 				controls:true,

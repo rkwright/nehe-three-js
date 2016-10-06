@@ -24,7 +24,7 @@ GFX.Scene = function ( parameters ) {
     this.near = 0.01;
     this.far = 1000;
 	this.cameraPos = [0,20,40];
-    this.orthoProp = 100;
+    this.orthoSize = 1;
 
 	this.controls = false;
 	this.orbitControls = null;
@@ -114,21 +114,23 @@ GFX.Scene.prototype = {
 			window.addEventListener('resize', function() {
                 _self.canvasWidth  = window.innerWidth;
                 _self.canvasHeight = window.innerHeight;
+                var aspect = _self.canvasWidth / _self.canvasHeight;
 
                 if (_self.perspective == true ) {
                     _self.renderer.setSize(_self.canvasWidth, _self.canvasHeight);
-                    _self.camera.aspect = _self.canvasWidth / _self.canvasHeight;
+                    _self.camera.aspect = aspect;
                     _self.camera.updateProjectionMatrix();
                 } else {
-                    _self.camera.left   = _self.canvasWidth / -2;
-                    _self.camera.right  = _self.canvasWidth / 2;
-                    _self.camera.top    = _self.canvasHeight / 2;
-                    _self.camera.bottom = _self.canvasHeight / -2;
+                    var w2 = _self.orthoSize * aspect / 2;
+                    var h2 = _self.orthoSize / 2;
+
+                    _self.camera.left   = -w2;
+                    _self.camera.right  = w2;
+                    _self.camera.top    = h2;
+                    _self.camera.bottom = -h2;
                     _self.camera.updateProjectionMatrix();
                     _self.renderer.setSize( _self.canvasWidth, _self.canvasHeight );
-
                 }
-
             });
 		}
 	
@@ -220,8 +222,13 @@ GFX.Scene.prototype = {
 		    this.camera = new THREE.PerspectiveCamera(this.fov, this.canvasWidth / this.canvasHeight, this.near, this.far);
         else {
 
-            this.camera = new THREE.OrthographicCamera( this.canvasWidth / -2, this.canvasWidth / 2,
-                this.canvasHeight / 2, this.canvasHeight / -2, 0.01, 1000 );
+            var aspect = this.canvasWidth / this.canvasHeight;
+            var w2 = this.orthoSize * aspect / 2;
+            var h2 = this.orthoSize / 2;
+            this.camera = new THREE.OrthographicCamera( -w2, w2, h2, -h2, 0.01, 1000);
+
+            //this.camera = new THREE.OrthographicCamera( this.canvasWidth / -2, this.canvasWidth / 2,
+            //    this.canvasHeight / 2, this.canvasHeight / -2, 0.01, 1000 );
 
         }
 

@@ -206,9 +206,11 @@ GFX.Scene.prototype = {
 
         if (this.perspective == true)
 		    this.camera = new THREE.PerspectiveCamera(this.fov, this.canvasWidth / this.canvasHeight, this.near, this.far);
-        else
-            this.camera = new THREE.OrthographicCamera(this.canvasWidth / -this.orthoProp, this.canvasWidth / this.orthoProp,
-                 this.canvasHeight / this.orthoProp, this.canvasHeight / -this.orthoProp, this.near, this.far);
+        else {
+        	var aspectRatio = this.canvasHeight / this.canvasWidth;
+			this.camera = new THREE.OrthographicCamera(this.canvasWidth / -this.orthoProp, this.canvasWidth / this.orthoProp,
+				aspectRatio * this.canvasHeight / this.orthoProp, aspectRatio * this.canvasHeight / -this.orthoProp, this.near, this.far);
+		}
 
         this.camera.updateProjectionMatrix();
 

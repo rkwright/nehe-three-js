@@ -17,10 +17,12 @@
 <body>
 
 <script src="../js/three.js"></script>
+<script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
 
 <script>
     var container;
     var camera, scene, renderer;
+    var controls;
 
     init();
     animate();
@@ -35,15 +37,14 @@
         camera.position.z = 10;
         scene = new THREE.Scene();
 
-        var material = new THREE.MeshBasicMaterial({ color:0x8080FF, side:THREE.DoubleSide });
-
-        var cube = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200 ), material );
-        cube.position.y = 0;
+        var material = new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } );
+        var cube = new THREE.Mesh( new THREE.CubeGeometry( 5, 5, 5 ), material );
         scene.add( cube );
 
         // Lights
         var ambientLight = new THREE.AmbientLight( Math.random() * 0x10 );
         scene.add( ambientLight );
+
         var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
         directionalLight.position.x = 20;
         directionalLight.position.y = 10;
@@ -56,7 +57,8 @@
         renderer.setSize( window.innerWidth, window.innerHeight );
         container.appendChild( renderer.domElement );
 
-        //
+        controls = new THREE.OrbitControls( camera, renderer.domElement );
+        
         window.addEventListener( 'resize', onWindowResize, false );
     }
 

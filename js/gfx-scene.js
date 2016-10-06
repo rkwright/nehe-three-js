@@ -117,9 +117,7 @@ GFX.Scene.prototype = {
                 var aspect = _self.canvasWidth / _self.canvasHeight;
 
                 if (_self.perspective == true ) {
-                    _self.renderer.setSize(_self.canvasWidth, _self.canvasHeight);
                     _self.camera.aspect = aspect;
-                    _self.camera.updateProjectionMatrix();
                 } else {
                     var w2 = _self.orthoSize * aspect / 2;
                     var h2 = _self.orthoSize / 2;
@@ -128,9 +126,10 @@ GFX.Scene.prototype = {
                     _self.camera.right  = w2;
                     _self.camera.top    = h2;
                     _self.camera.bottom = -h2;
-                    _self.camera.updateProjectionMatrix();
-                    _self.renderer.setSize( _self.canvasWidth, _self.canvasHeight );
                 }
+                
+                _self.camera.updateProjectionMatrix();
+                _self.renderer.setSize( _self.canvasWidth, _self.canvasHeight );
             });
 		}
 	

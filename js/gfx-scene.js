@@ -127,7 +127,7 @@ GFX.Scene.prototype = {
                     _self.camera.top    = h2;
                     _self.camera.bottom = -h2;
                 }
-                
+
                 _self.camera.updateProjectionMatrix();
                 _self.renderer.setSize( _self.canvasWidth, _self.canvasHeight );
             });

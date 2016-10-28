@@ -24,8 +24,7 @@
 		<div id="overlaytext" style="position: absolute; top: 10px; left: 10px">
 			Cursor left / right: Control y rotation speed<br/>
 			Cursor up / down: Control x rotation speed<br/>
-			Page up / down: Move along z axis<br/>
-			Renderer:
+			Page up / down: Move along z axis
 		</div>
 
 		<!-- This JavaScript block encloses the Three.js commands -->
@@ -45,7 +44,6 @@
 			var zTranslation = 0.0;
 
 			// Global mesh object of the cube
-			var texture;
 			var cubeMesh;
 
 			// Initialize the demo
@@ -62,7 +60,7 @@
 				var geometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
 
                 // Load an image as texture
-                var texture = THREE.ImageUtils.loadTexture("images/texture-atlas.jpg");
+                var texture = THREE.ImageUtils.loadTexture("images/texture-atlas.png");
                 var material = new THREE.MeshLambertMaterial( { map : texture } );
 
                 var bricks = [
@@ -144,10 +142,10 @@
 					xSpeed += 0.01;
 				}
                 else if(keyCode == 37) {        // Cursor left
-					ySpeed -= 0.01;
+					ySpeed -= 0.015;
 				}
                 else if(keyCode == 39) {        // Cursor right
-					ySpeed += 0.01;
+					ySpeed += 0.015;
 				}
                 else if(keyCode == 33) {        // Page up
 					zTranslation -= 0.2;

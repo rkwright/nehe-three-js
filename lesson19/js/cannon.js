@@ -86,7 +86,7 @@ CANNON.Cannon.prototype = {
      * Launch a new beachball, either by creating one or, if available,
      * fetch an existing one from the magazine
      */
-	launch: function() {
+	launchBall: function() {
         var now = performance.now();
         if ((now - this.lastT) < this.deltaT)
             return;
@@ -101,7 +101,7 @@ CANNON.Cannon.prototype = {
             newBall = new BALL.BeachBall( { xLimit : this.xLimit,
                                             zLimit : this.zLimit } );
             this.ballCount++;
-            console.log("ballcount = " + this.ballCount);
+            // console.log("ballcount = " + this.ballCount);
         }
 
         this.active.push( newBall );
@@ -113,7 +113,7 @@ CANNON.Cannon.prototype = {
      * array of active balls
      */
     update: function() {
-
+        // console.log(" active: " + this.active.length + " magazine: " + this.magazine.length);
         for ( var i=this.active.length-1; i>=0; i-- ) {
             var ball = this.active[i];
 
@@ -129,7 +129,7 @@ CANNON.Cannon.prototype = {
             ball.update();
 
             if ( (Math.abs(ball.loc.x) > this.xLimit || Math.abs(ball.loc.z) > this.zLimit) && ball.loc.y < 0) {
-                ball.mesh.material.opacity -= 0.05;
+                ball.mesh.material.opacity -= 0.025;
             }
         }
 

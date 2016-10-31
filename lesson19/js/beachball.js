@@ -12,7 +12,7 @@ var BASE_VELOCITY_H = 0.025;
 var MIN_RHO         = 60.0 * Math.PI / 180.0;
 var DELTA_RHO       = 30.0 * Math.PI / 180.0;
 var BASE_RADIUS     = 0.1;
-var DELTA_RADIUS    = 0.01;
+var DELTA_RADIUS    = 0.025;
 
 BALL.BeachBall = function ( parameters ) {
 	
@@ -69,11 +69,11 @@ BALL.BeachBall.prototype = {
      * Initialize all the parameters of the beachball
      */
 	init: function () {
-        this.radius = BASE_RADIUS;  // + DELTA_RADIUS * Math.random();
+        this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();
 
         var geometry = new THREE.SphereGeometry( this.radius, SEGMENTS, SEGMENTS );
 
-        var material = new THREE.MeshLambertMaterial();
+        var material = new THREE.MeshLambertMaterial( { transparent: true });
         material.color.setRGB(Math.random(), Math.random(), Math.random());
 
         var theta = Math.PI * 2.0 * Math.random();
@@ -87,7 +87,6 @@ BALL.BeachBall.prototype = {
         this.loc.set(0, this.radius, 0);
 
         this.mesh = new THREE.Mesh( geometry, material );
-        //this.mesh.position.set(0, this.radius, 0);
     },
 
 

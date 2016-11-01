@@ -66,7 +66,7 @@ CANNON.Cannon.prototype = {
      * Initialize all the parameters of the cannon
      */
 	init: function () {
-        this.radius = BASE_RADIUS;  // + DELTA_RADIUS * Math.random();
+        this.radius = BASE_RADIUS;
 
         var geometry = new THREE.CylinderGeometry( this.radius * 2.0,
                                                    this.radius * 3.0,
@@ -101,26 +101,26 @@ CANNON.Cannon.prototype = {
             newBall = new BALL.BeachBall( { xLimit : this.xLimit,
                                             zLimit : this.zLimit } );
             this.ballCount++;
+            this.scene.add( newBall.mesh );
             // console.log("ballcount = " + this.ballCount);
         }
 
         this.active.push( newBall );
-        this.scene.add( newBall.mesh );
-	},
+ 	},
 
     /**
      * Update each beachball's location by iterating through the
      * array of active balls
      */
     update: function() {
-        // console.log(" active: " + this.active.length + " magazine: " + this.magazine.length);
+        //console.log(" active: " + this.active.length + " magazine: " + this.magazine.length);
         for ( var i=this.active.length-1; i>=0; i-- ) {
             var ball = this.active[i];
 
             if (ball.mesh.material.opacity <= 0) {
                 this.active.splice(i, 1);
                 this.magazine.push( ball );
-                this.scene.remove(ball.mesh);
+                //this.scene.remove(ball.mesh);
                 continue;
             }
 

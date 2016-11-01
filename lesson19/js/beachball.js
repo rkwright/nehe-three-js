@@ -26,6 +26,15 @@ BALL.BeachBall = function ( parameters ) {
 
     this.setParameters( parameters );
 
+    this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();
+
+    var geometry = new THREE.SphereGeometry( this.radius, SEGMENTS, SEGMENTS );
+
+    var material = new THREE.MeshLambertMaterial( { transparent: true });
+    material.color.setRGB(Math.random(), Math.random(), Math.random());
+
+    this.mesh = new THREE.Mesh( geometry, material );
+
     this.init();
 };
 
@@ -69,12 +78,6 @@ BALL.BeachBall.prototype = {
      * Initialize all the parameters of the beachball
      */
 	init: function () {
-        this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();
-
-        var geometry = new THREE.SphereGeometry( this.radius, SEGMENTS, SEGMENTS );
-
-        var material = new THREE.MeshLambertMaterial( { transparent: true });
-        material.color.setRGB(Math.random(), Math.random(), Math.random());
 
         var theta = Math.PI * 2.0 * Math.random();
         var velX = Math.sin(theta) * BASE_VELOCITY_H;
@@ -86,7 +89,7 @@ BALL.BeachBall.prototype = {
         this.vel.set( velX, velY, velZ);
         this.loc.set(0, this.radius, 0);
 
-        this.mesh = new THREE.Mesh( geometry, material );
+        this.mesh.material.opacity = 1;
     },
 
 

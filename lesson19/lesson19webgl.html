@@ -114,15 +114,10 @@
 			 */
 			function animateScene() {
 
-                cannon.launchBall();
-
                 cannon.update();
 
                 animateParticles();
 
-                //console.log(" veloc: " + veloc.x.toFixed(3) + ", " + veloc.y.toFixed(3) + ", " + veloc.z.toFixed(3) + ", loc: " + loc.x.toFixed(3) + ", " + loc.y.toFixed(3) + ", "+ loc.z.toFixed(3));
-
-				// Tell the browser to call this function back
 				requestAnimationFrame(animateScene);
 
                 // Map the 3D scene down to the 2D screen (render the frame)

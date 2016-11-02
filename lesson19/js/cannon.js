@@ -114,6 +114,9 @@ CANNON.Cannon.prototype = {
      */
     update: function() {
         //console.log(" active: " + this.active.length + " magazine: " + this.magazine.length);
+
+        this.launchBall();
+
         for ( var i=this.active.length-1; i>=0; i-- ) {
             var ball = this.active[i];
 

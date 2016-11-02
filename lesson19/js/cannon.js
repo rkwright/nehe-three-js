@@ -5,7 +5,6 @@
 var CANNON = { revision: '01' };
 
 // some constants
-var RHO        = 60.0 * Math.PI / 180.0;
 var RADIUS     = 0.5;
 
 CANNON.Cannon = function ( parameters ) {
@@ -21,7 +20,7 @@ CANNON.Cannon = function ( parameters ) {
     this.scene    = null;
     this.ballCount = 0;
 
-    this.setParameters( parameters );
+    GFX.setParameters( this, parameters );
 
     this.init();
 };
@@ -29,38 +28,6 @@ CANNON.Cannon = function ( parameters ) {
 // the scene's parameters from the values JSON object
 // lifted from MrDoob's implementation in three.js
 CANNON.Cannon.prototype = {
-		
-	setParameters: function( values ) {
-
-		if ( values === undefined ) return;
-	
-		for ( var key in values ) {
-	
-			var newValue = values[ key ];
-	
-			if ( newValue === undefined ) {
-				console.warn( "BALL: '" + key + "' parameter is undefined." );
-				continue;
-			}
-	
-			if ( key in this ) {
-				var currentValue = this[ key ];
-	
-				if ( currentValue instanceof THREE.Color ) {
-					currentValue.set( newValue );
-				}
-                else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
-					currentValue.copy( newValue );
-				}
-                else if (currentValue instanceof Array) {
-                    this[ key ] = newValue.slice();
-				}
-                else {
-                    this[ key ] = newValue;
-                }
-			}
-		}
-	},
 
     /**
      * Initialize all the parameters of the cannon

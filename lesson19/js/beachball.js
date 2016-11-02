@@ -24,7 +24,7 @@ BALL.BeachBall = function ( parameters ) {
     this.zLimit   = 0;
     this.mesh     = null;
 
-    this.setParameters( parameters );
+    GFX.setParameters(this, parameters);
 
     this.radius = BASE_RADIUS + DELTA_RADIUS * Math.random();
 

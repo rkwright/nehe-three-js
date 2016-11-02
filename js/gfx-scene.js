@@ -48,50 +48,49 @@ GFX.Scene = function ( parameters ) {
 	this.fogNear = 0.015;
 	this.fogFar = 100;
 
-    this.setParameters( parameters );
+    GFX.setParameters( this, parameters );
 
     this.initialize();
 };
 
+GFX.setParameters= function( object, values ) {
+
+    if ( values === undefined ) return;
+
+    for ( var key in values ) {
+
+        var newValue = values[ key ];
+
+        if ( newValue === undefined ) {
+            console.warn( "GFX: '" + key + "' parameter is undefined." );
+            continue;
+        }
+
+        if ( key in object ) {
+            var currentValue = object[ key ];
+
+            if ( currentValue instanceof THREE.Color ) {
+                currentValue.set( newValue );
+            }
+            else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
+                currentValue.copy( newValue );
+            }
+            else if ( key == 'overdraw' ) {
+                // ensure overdraw is backwards-compatible with legacy boolean type
+                object[ key ] = Number( newValue );
+            }
+            else if (currentValue instanceof Array) {
+                object[ key ] = newValue.slice();
+            }
+            else {
+                object[ key ] = newValue;
+            }
+        }
+    }
+}
 // the scene's parameters from the values JSON object
 // lifted from MrDoob's implementation in three.js
 GFX.Scene.prototype = {
-		
-	setParameters: function( values ) {
-
-		if ( values === undefined ) return;
-	
-		for ( var key in values ) {
-	
-			var newValue = values[ key ];
-	
-			if ( newValue === undefined ) {
-				console.warn( "NEHE: '" + key + "' parameter is undefined." );
-				continue;
-			}
-	
-			if ( key in this ) {
-				var currentValue = this[ key ];
-	
-				if ( currentValue instanceof THREE.Color ) {
-					currentValue.set( newValue );
-				}
-                else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
-					currentValue.copy( newValue );
-				}
-                else if ( key == 'overdraw' ) {
-					// ensure overdraw is backwards-compatible with legacy boolean type
-					this[ key ] = Number( newValue );
-				}
-                else if (currentValue instanceof Array) {
-                    this[ key ] = newValue.slice();
-				}
-                else {
-                    this[ key ] = newValue;
-                }
-			}
-		}
-	},
 
 	initialize: function () {
 		// Check whether the browser supports WebGL. 

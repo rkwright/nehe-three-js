@@ -22,12 +22,9 @@
 
 		<script type="text/javascript">
             var ELEV         = 25;
-            var DISTRIBX     = 20;
-            var DISTRIBZ     = 20;
             var DELTA_ELEV   = 10;
             var FLOOR_REPEAT = 5;
             var clock;
-            var deltaTime;
 
             var particleSystem;
 
@@ -71,6 +68,8 @@
 			}
 
 			function createParticleSystem() {
+				var DISTRIBX     = 20;
+				var DISTRIBZ     = 20;
 
 				// The number of particles in a particle system is not easily changed.
 				var particleCount = 500;
@@ -125,7 +124,7 @@
 			}
 
 			function animateParticles() {
-                deltaTime = clock.getDelta();
+                var deltaTime = clock.getDelta();
 
                 var verts = particleSystem.geometry.vertices;
 				for(var i = 0; i < verts.length; i++) {

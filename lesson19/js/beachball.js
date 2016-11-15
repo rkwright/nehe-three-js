@@ -4,16 +4,17 @@
 
 var BALL = { revision: '02' };
 
-// some constants
-var SEGMENTS        = 8;
-var BASE_RADIUS     = 0.1;
-var DELTA_RADIUS    = 0.025;
-var RESTITUTION     = 0.75;
 
 BALL.BeachBall = function ( parameters ) {
-	
-	this.vel      = new THREE.Vector3(0,0,0);
+
+    var SEGMENTS        = 8;
+    var BASE_RADIUS     = 0.1;
+    var DELTA_RADIUS    = 0.025;
+    var RESTITUTION     = 0.75;
+
+    this.vel      = new THREE.Vector3(0,0,0);
 	this.loc      = new THREE.Vector3(0,0,0);
+    this.gravity  = new THREE.Vector3(0,-0.002,0);
     this.radius   = 0;
     this.mesh     = null;
 
@@ -34,12 +35,12 @@ BALL.BeachBall = function ( parameters ) {
 BALL.BeachBall.prototype = {
 
 /**
- * Update the ball's location and velocity as well as its life-force
+ * Update the ball's location and velocity
  */
-	update: function( gravity ) {
+	update: function() {
 
         this.loc.add( this.vel );
-        this.vel.add( gravity );
+        this.vel.add( this.gravity );
         this.mesh.position.set(this.loc.x, this.loc.y, this.loc.z);
 	}
 };

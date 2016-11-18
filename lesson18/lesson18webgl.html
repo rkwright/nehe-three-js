@@ -125,11 +125,12 @@
 			function onDocumentKeyPress(event) {
 				// Get the key code of the pressed key
 				var keyChar = String.fromCharCode(event.which);
-	
+                keyChar = keyChar.toLowerCase();
+
 				var quadString = "0123456789ab";
 				var matString = "ptw";
 				
-				if ( quadString.indexOf(keyChar) != -1) {
+					if ( quadString.indexOf(keyChar) != -1) {
 					quadric = makeQuad(keyChar);
 				}
 				else if (matString.indexOf(keyChar) != -1) {

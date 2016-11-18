@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>NeHe - Lesson 20 - Alpha Masks</title>
+		<title>NeHe - Lesson 22 - Bump Mapping</title>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
 
 		<!-- The following meta line optimizes the site for mobile devices. It sets the viewport size
@@ -21,11 +21,14 @@
     <!-- Create a DIV element, which will be shown over the WebGL canvas. The last line
     ("Renderer: ") will be completed either by "WebGL Renderer" or by "Canvas Renderer". -->
     <div id="overlaytext" style="position: absolute; top: 10px; left: 10px">
-        '1 ,2 ' select image/mask 1 or 2
+        'b' turn bump mapping on/off
+        't' swap textures
     </div>
 		<script type="text/javascript">
             // the global var (ick!) for the cube's mesh
             var mesh;
+            var bumped = true;
+            var image = "flower";
 
             // allocate the Scene object, and set the camera position
             var gfxScene = new GFX.Scene( { cameraPos : [3, 5, 10],
@@ -43,7 +46,7 @@
 			 *  Initialize the demo's local aspects, i.e not the scene.
 			 */
 			function initializeDemo() {
-                makeMesh( 1 );
+                makeMesh( bumped, image );
 
                 // Add a listener for 'keydown' events. There's another event type: 'keypress',
                 // but it will report only the visible characters like 'a', but not the function keys
@@ -56,16 +59,18 @@
              *  because you can't refresh textures or alpha-Maps without rebuilding
              *  the mesh.
              */
-			function makeMesh( number ) {
+			function makeMesh( bumped, image ) {
 
 			    gfxScene.remove(mesh);
 
                 var geom = new THREE.CubeGeometry( 2, 2, 2 );
+                //geom.computeVertexNormals();
 
-                var texture = new THREE.ImageUtils.loadTexture("images/image" + number + ".bmp");
-                var mask = new THREE.ImageUtils.loadTexture("images/mask" + number + ".bmp");
+                var texture = new THREE.ImageUtils.loadTexture("images/" + image + ".jpg");
+                var bump = bumped == true ? new THREE.ImageUtils.loadTexture("images/" + image + "-bump.jpg") : null;
+                var scale = bumped == true ? 0.2 : 0;
 
-                var material = new THREE.MeshBasicMaterial( { map:texture, alphaMap:mask, side:THREE.DoubleSide, transparent:true } );
+                var material = new THREE.MeshPhongMaterial( { map:texture, bumpMap:bump, bumpScale:scale } );
 
                 mesh = new THREE.Mesh( geom, material );
                 mesh.doubleSided = true;
@@ -77,14 +82,20 @@
              */
             function onDocumentKeyDown(event){
 
-                var keyCode = event.which;      // Get the key code of the pressed key
+                var keyChar = String.fromCharCode(event.which);
+                keyChar = keyChar.toLowerCase();
 
-                if (keyCode == 49) {             // '1'
-                    makeMesh(1);
+                if (keyChar == 'b') {
+                    bumped = !bumped;
                 }
-                else if (keyCode == 50) {        // '2'
-                    makeMesh(2);
+                else if (keyChar == 't') {
+                    if ( image.indexOf('f') != -1)
+                        image = "stone";
+                    else
+                        image = "flower";
                 }
+
+                makeMesh(bumped, image);
             }
 			/**
 			 * Animate the scene and call rendering.

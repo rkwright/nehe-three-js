@@ -36,7 +36,10 @@
 									                    controls:true,
 									                    displayStats:true });
 
-			// then initialize our demo's stuff
+            var glContext = gfxScene.renderer.getContext();
+            var available_extensions = glContext.getSupportedExtensions();
+
+            // then initialize our demo's stuff
 			initializeDemo();
 	
 			// Animate the scene

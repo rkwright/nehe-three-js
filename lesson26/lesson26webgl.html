@@ -1,0 +1,107 @@
+<!DOCTYPE html>	<!-- Tells the browser that the page uses the HTML5 standard -->
+<html>
+	<head>
+		<!-- -------------------------------------
+  			Roughly based (or inspired by) NeHe Tutorial 23
+  			Original:  http://nehe.gamedev.net/tutorial/sphere_mapping_quadrics_in_opengl/15005/
+  
+  			@author: rkwright@geofx.com
+		-------------------------------------- -->
+		<title>NEHE Lesson 25</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+		<!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+		<link rel="stylesheet" type="text/css" href="../css/NEHE.css" /> 
+
+		<!-- Include several libraries from THREE.js and the Scene class  -->
+		<script src="../js/three.js" type="text/javascript"></script>
+        <script src="../js/Mirror.js" type="text/javascript"></script>
+		<script src="../js/Detector.js" type="text/javascript"></script>
+		<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
+		<script src="../js/Stats.js" type="text/javascript"></script>
+        <script src="../js/gfx-scene.js" type="text/javascript"></script>
+	</head>
+	<body>	
+		<script type="text/javascript">
+            var groundMirror;
+
+			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+			var gfxScene = new GFX.Scene( { cameraPos : [0, 6, 12],
+				                                        axesHeight:10,
+									                    controls:true,
+									                    displayStats:true });
+
+            // then initialize our demo's stuff
+			initializeDemo();
+	
+			// Animate the scene
+			animateScene();
+	
+			/**
+			 * Initialize the Demo.  
+			 */
+			function initializeDemo() {
+
+                var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
+
+                // MIRROR planes
+                groundMirror = new THREE.Mirror( gfxScene.renderer, gfxScene.camera,
+                    { clipBias: 0.003, textureWidth: gfxScene.canvasWidth, textureHeight: gfxScene.canvasHeight, color: 0x777777 } );
+
+                var mirrorMesh = new THREE.Mesh( planeGeo, groundMirror.material );
+                mirrorMesh.add( groundMirror );
+                mirrorMesh.rotateX( - Math.PI / 2 );
+                gfxScene.add( mirrorMesh );
+
+                var sphereGeom = new THREE.SphereGeometry(2.0, 32, 32);
+                var mat = new THREE.MeshLambertMaterial({ color: '#00abb1' });
+                var mesh = new THREE.Mesh(sphereGeom, mat);
+
+                //gfxScene.add(mesh);
+
+                document.addEventListener("keypress", onDocumentKeyPress, false);
+			}
+
+
+            /**
+             * Just a handler for the keypress event to control parameters of the demo
+             */
+			function onDocumentKeyPress(event) {
+				// Get the key code of the pressed key
+				var keyChar = String.fromCharCode(event.which);
+                keyChar = keyChar.toLowerCase();
+
+				var renderString = "012";
+
+					if ( renderString.indexOf(keyChar) != -1) {
+					    var newVertType = keyChar - '0';
+					    if (newVertType != vertType)
+                            initMorph(newVertType);
+                    }
+			}
+	
+			/**
+			 * Animate the scene and call rendering.
+			 */
+			function animateScene() {
+	
+				// Tell the browser to call this function when page is visible
+				requestAnimationFrame(animateScene);
+
+                //groundMirrorMaterial.visible = false;
+                groundMirror.render();
+                //groundMirrorMaterial.visible = true;
+
+				// Map the 3D scene down to the 2D screen (render the frame)
+				gfxScene.renderScene();
+			}
+
+		</script>
+
+		<!-- Create a DIV element, which will be shown over the WebGL canvas. -->
+		<div style="position: absolute; top: 10px; left: 10px;color:white">
+		<br/>
+        </div>
+	</body>
+</html>

@@ -43,22 +43,23 @@
 			 */
 			function initializeDemo() {
 
-                var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
+                var planeGeo = new THREE.PlaneBufferGeometry( 20, 20 );
 
                 // MIRROR planes
                 groundMirror = new THREE.Mirror( gfxScene.renderer, gfxScene.camera,
-                    { clipBias: 0.003, textureWidth: gfxScene.canvasWidth, textureHeight: gfxScene.canvasHeight, color: 0x777777 } );
+                    { clipBias: 0.003, textureWidth: gfxScene.canvasWidth, textureHeight: gfxScene.canvasHeight, color: 0x777777, debugMode : true } );
 
                 var mirrorMesh = new THREE.Mesh( planeGeo, groundMirror.material );
                 mirrorMesh.add( groundMirror );
-                mirrorMesh.rotateX( - Math.PI / 2 );
+                mirrorMesh.rotateX( -Math.PI / 2 );
                 gfxScene.add( mirrorMesh );
 
                 var sphereGeom = new THREE.SphereGeometry(2.0, 32, 32);
                 var mat = new THREE.MeshLambertMaterial({ color: '#00abb1' });
                 var mesh = new THREE.Mesh(sphereGeom, mat);
+                mesh.position.y = 2.0;
 
-                //gfxScene.add(mesh);
+                gfxScene.add(mesh);
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
 			}

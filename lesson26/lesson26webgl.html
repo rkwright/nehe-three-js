@@ -7,7 +7,7 @@
   
   			@author: rkwright@geofx.com
 		-------------------------------------- -->
-		<title>NEHE Lesson 25</title>
+		<title>NEHE Lesson 26</title>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
 		<!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
@@ -27,7 +27,7 @@
             var groundMirror;
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
-			var gfxScene = new GFX.Scene( { cameraPos : [0, 6, 12],
+			var gfxScene = new GFX.Scene( { cameraPos : [2, 4, 20],
 				                                        axesHeight:10,
 									                    controls:true,
 									                    displayStats:true });
@@ -47,19 +47,29 @@
 
                 // MIRROR planes
                 groundMirror = new THREE.Mirror( gfxScene.renderer, gfxScene.camera,
-                    { clipBias: 0.003, textureWidth: gfxScene.canvasWidth, textureHeight: gfxScene.canvasHeight, color: 0x777777, debugMode : true } );
+                    { clipBias: 0.003, textureWidth: gfxScene.canvasWidth, textureHeight: gfxScene.canvasHeight, color: 0x808080, debugMode : true } );
 
                 var mirrorMesh = new THREE.Mesh( planeGeo, groundMirror.material );
                 mirrorMesh.add( groundMirror );
                 mirrorMesh.rotateX( -Math.PI / 2 );
                 gfxScene.add( mirrorMesh );
 
-                var sphereGeom = new THREE.SphereGeometry(2.0, 32, 32);
-                var mat = new THREE.MeshLambertMaterial({ color: '#00abb1' });
+                var sphereGeom = new THREE.SphereGeometry(1.5, 32, 32);
+                var ballTexture = new THREE.ImageUtils.loadTexture("images/ball.png");
+                var mat = new THREE.MeshLambertMaterial({ map:ballTexture });
                 var mesh = new THREE.Mesh(sphereGeom, mat);
-                mesh.position.y = 2.0;
+                mesh.position.y = 1.5;
 
                 gfxScene.add(mesh);
+
+                var texture = new THREE.ImageUtils.loadTexture("images/envwall.png");
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set( 4, 4 );
+
+                var planeBack = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { map: texture } ) );
+                planeBack.position.z = -10;
+                planeBack.position.y = 10;
+                gfxScene.add( planeBack );
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
 			}

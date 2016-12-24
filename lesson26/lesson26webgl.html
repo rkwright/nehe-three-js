@@ -25,6 +25,7 @@
 	<body>	
 		<script type="text/javascript">
             var groundMirror;
+            var smallSphere;
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( { cameraPos : [2, 4, 20],
@@ -71,6 +72,11 @@
                 planeBack.position.y = 10;
                 gfxScene.add( planeBack );
 
+                var geometry = new THREE.IcosahedronGeometry( 0.5, 0 );
+                var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, shading: THREE.FlatShading } );
+                smallSphere = new THREE.Mesh( geometry, material );
+                gfxScene.add(smallSphere);
+
                 document.addEventListener("keypress", onDocumentKeyPress, false);
 			}
 
@@ -100,11 +106,19 @@
 				// Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
 
-                //groundMirrorMaterial.visible = false;
                 groundMirror.render();
-                //groundMirrorMaterial.visible = true;
 
-				// Map the 3D scene down to the 2D screen (render the frame)
+                var timer = Date.now() * 0.01;
+
+                smallSphere.position.set(
+                    Math.cos( timer * 0.1 ) * 3,
+                    Math.abs( Math.cos( timer * 0.2 ) ) * 2 + 0.5,
+                    Math.sin( timer * 0.1 ) * 3
+                );
+                smallSphere.rotation.y = ( Math.PI / 2 ) - timer * 0.1;
+                smallSphere.rotation.z = timer * 0.8;
+
+                // Map the 3D scene down to the 2D screen (render the frame)
 				gfxScene.renderScene();
 			}
 

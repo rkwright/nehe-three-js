@@ -48,7 +48,7 @@
 
                 // MIRROR planes
                 groundMirror = new THREE.Mirror( gfxScene.renderer, gfxScene.camera,
-                    { clipBias: 0.003, textureWidth: gfxScene.canvasWidth, textureHeight: gfxScene.canvasHeight, color: 0x808080, debugMode : true } );
+                    { clipBias: 0.003, textureWidth: gfxScene.canvasWidth, textureHeight: gfxScene.canvasHeight, color: 0x505050, debugMode : true } );
 
                 var mirrorMesh = new THREE.Mesh( planeGeo, groundMirror.material );
                 mirrorMesh.add( groundMirror );

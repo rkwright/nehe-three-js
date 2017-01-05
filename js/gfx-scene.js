@@ -32,8 +32,11 @@ GFX.Scene = function ( parameters ) {
 	this.displayStats = false;
 	this.stats = null;
 
-	this.ambientLight = null;
-	this.directionalLight = null;
+	this.ambientLights = [];
+	this.directionalLights = [];
+	this.pointLights = [];
+	this.hemisphereLight = null;
+	this.spotlights = [];
 
 	this.axesHeight = 0;
 	
@@ -85,9 +88,11 @@ GFX.setParameters= function( object, values ) {
             else {
                 object[ key ] = newValue;
             }
+
         }
     }
 }
+
 // the scene's parameters from the values JSON object
 // lifted from MrDoob's implementation in three.js
 GFX.Scene.prototype = {
@@ -247,37 +252,85 @@ GFX.Scene.prototype = {
 	 * Add one or more lights to the current scene.  If the JSON object is null,
 	 * then the default lights are used.
 	 *
-	 * This call supports
+     * All lights support color and intensity
+	 * Supported types of light and their parameters are
 	 * 	AmbientLight
      *  DirectionalLight
+     *    castShadow
+     *    position
+     *    target
      *  HemisphereLight
+     *    castShadow
+     *    position
+     *    color   (of the sky)
+     *    groundColor
      *  PointLight
+     *    castShadow
+     *    position
+     *    decay
+     *    power
      *  SpotLight
+     *    distance
+     *    angle
+     *    penumbra
+     *    decay
+     *
      * @param jsonObj
      */
-    setLights: function ( jsonObj ) {
-        if (jsonObj != null)
-            this.setParameters(jsonObj);
+    addLight: function ( type, values ) {
 
-        // Ambient light has no direction, it illuminates every object with the same
-        // intensity. If only ambient light is used, no shading effects will occur.
-        this.ambientLight = new THREE.AmbientLight(0x404040);
-        this.scene.add(this.ambientLight);
+        var light;
+        var color = this.getLightProp('color', values, 0xffffff);
+        var intensity = this.getLightProp ('intensity', values, 1);
+        var castShadow = this.getLightProp('castShadow', values, false);
 
-        // Directional light has a source and shines in all directions, like the sun.
-        // This behaviour creates shading effects.
-        this.directionalLight = new THREE.DirectionalLight(0xffffff);
-        this.directionalLight.position.set(5, 20, 12);
-        this.scene.add(this.directionalLight);
+        if (type == 'ambient') {
+            light = new THREE.AmbientLight( color, intensity );
+            this.ambientLights.push( light );
+        }
+        else {
+            var pos = this.getLightProp('position', values, [0, 10, 0]);
 
-        this.pointLight = new THREE.PointLight(0xffffff, 0.25);
-        this.pointLight.position.set(15, -20, -12);
-        this.scene.add(this.pointLight);
+            if (type == 'directional') {
+                var target = this.getLightProp('target', values, undefined);
+                light = new THREE.DirectionalLight(color, intensity);
+                this.directionalLights.push(light);
+           }
+            else if (type == 'point') {
+                var distance = this.getLightProp('distance', values, 0);
+                var decay = this.getLightProp('decay', values, 1);
+                light = new THREE.PointLight(color, intensity, distance, decay);
+                this.pointLights.push(light);
+            }
+            else if (type == 'hemisphere') {
+                var groundColor = this.getLightProp('groundColor', values, 0x000000);
+                light = new THREE.HemisphereLight(color, groundColor, intensity);
+                this.pointLights.push(light);
+             }
+            else if (type == 'spot') {
+                var angle = this.getLightProp('angle', values, 0);
+                var penumbra = this.getLightProp('penumbra', values, 0);
+                var distance = this.getLightProp('distance', values, 0);
+                var decay = this.getLightProp('decay', values, 1);
+                light = new THREE.PointLight(color, intensity, distance, decay);
+                this.pointLights.push(light);
+            }
 
+            light.position.set(pos[0], pos[1], pos[2]);
+            light.castShadow = castShadow;
+        }
 
+         this.scene.add( light );
+
+        return light;
     },
 
-        /**
+    getLightProp: function ( prop, values, def ) {
+        value = values[ prop ];
+        return ( value === undefined ) ? def : value;
+    },
+
+    /**
 	 * Render the scene. Map the 3D world to the 2D screen.
      */
 	renderScene: function() {

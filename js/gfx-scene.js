@@ -243,7 +243,41 @@ GFX.Scene.prototype = {
             this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
     },
 
-	/**
+    /**
+	 * Add one or more lights to the current scene.  If the JSON object is null,
+	 * then the default lights are used.
+	 *
+	 * This call supports
+	 * 	AmbientLight
+     *  DirectionalLight
+     *  HemisphereLight
+     *  PointLight
+     *  SpotLight
+     * @param jsonObj
+     */
+    setLights: function ( jsonObj ) {
+        if (jsonObj != null)
+            this.setParameters(jsonObj);
+
+        // Ambient light has no direction, it illuminates every object with the same
+        // intensity. If only ambient light is used, no shading effects will occur.
+        this.ambientLight = new THREE.AmbientLight(0x404040);
+        this.scene.add(this.ambientLight);
+
+        // Directional light has a source and shines in all directions, like the sun.
+        // This behaviour creates shading effects.
+        this.directionalLight = new THREE.DirectionalLight(0xffffff);
+        this.directionalLight.position.set(5, 20, 12);
+        this.scene.add(this.directionalLight);
+
+        this.pointLight = new THREE.PointLight(0xffffff, 0.25);
+        this.pointLight.position.set(15, -20, -12);
+        this.scene.add(this.pointLight);
+
+
+    },
+
+        /**
 	 * Render the scene. Map the 3D world to the 2D screen.
      */
 	renderScene: function() {

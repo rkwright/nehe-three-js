@@ -15,6 +15,7 @@ GFX.Scene = function ( parameters ) {
 	this.renderer = null;
 	this.camera = null;
     this.containerID = null;
+    this.shadowMapEnabled = false;
 
     this.clearColor = 0x000000;
 
@@ -164,7 +165,10 @@ GFX.Scene.prototype = {
 	
 		// Set the background color of the renderer to black, with full opacity
 		this.renderer.setClearColor(new THREE.Color( this.clearColor ), 1);
-	
+
+		if (this.shadowMapEnabled == true )
+		    this.renderer.shadowMapEnabled = true;
+
 		// Set the renderers size to the content areas size
 		this.renderer.setSize(this.canvasWidth, this.canvasHeight);
 	
@@ -270,6 +274,7 @@ GFX.Scene.prototype = {
         var color = this.getLightProp('color', values, 0xffffff);
         var intensity = this.getLightProp ('intensity', values, 1);
         var castShadow = this.getLightProp('castShadow', values, false);
+        var debug = this.getLightProp('debug', values, false);
 
         if (type == 'ambient') {
             light = new THREE.AmbientLight( color, intensity );
@@ -305,6 +310,9 @@ GFX.Scene.prototype = {
 
             light.position.set(pos[0], pos[1], pos[2]);
             light.castShadow = castShadow;
+            if (debug == true) {
+                light.shadowCameraVisible = true;
+            }
         }
 
          this.scene.add( light );

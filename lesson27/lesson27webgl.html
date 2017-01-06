@@ -24,15 +24,17 @@
 	</head>
 	<body>	
 		<script type="text/javascript">
-            var groundMirror;
-            var smallSphere;
+
+            var ORBIT_RADIUS = 8;
+            var ORBIT_ELEV   = 5;
+            var sphereLightMesh;
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
-			    cameraPos : [2, 4, 20],
-                axesHeight:10,
+			    cameraPos : [2, 8, 20],
                 controls:true,
-                displayStats:true
+                displayStats:true,
+                clearColor : 0xe8f7f7
             });
 
 			gfxScene.addLight( 'ambient', { color:0x404040 });
@@ -51,17 +53,56 @@
 			 */
 			function initializeDemo() {
 
-                var sphereGeom = new THREE.SphereGeometry(1.5, 32, 32);
-                var mat = new THREE.MeshPhongMaterial({ color: '#00abb1' });
-                var mesh = new THREE.Mesh(sphereGeom, mat);
-                mesh.position.y = 1.5;
-
-                gfxScene.add(mesh);
+                createShapes();
 
                 createFloorAndWall();
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
 			}
+
+			function createShapes() {
+                var globe = new THREE.SphereGeometry(1.5, 32, 32);
+
+                var textureLoader = new THREE.TextureLoader();
+                var mat = new THREE.MeshPhongMaterial({ color: '#ffffff' });
+                textureLoader.load( "images/land_ocean_ice_cloud_2048.jpg", function( texture ) {
+                    mat.map = texture;
+                    mat.needsUpdate = true;
+                } );
+
+                var mesh = new THREE.Mesh(globe, mat);
+                mesh.position.set(5,1.5,5);
+                gfxScene.add(mesh);
+
+                var icoGeom = new THREE.IcosahedronGeometry(2.0);
+                var icoMat = new THREE.MeshPhongMaterial({ color: '#ff0000', emissive: 0x333333, shading: THREE.FlatShading  });
+                var icoMesh = new THREE.Mesh(icoGeom, icoMat);
+                icoMesh.position.set(-5,1.75,5);
+                gfxScene.add(icoMesh);
+
+                var monolith = new THREE.BoxGeometry(4.0, 9.0, 1.0);
+                var monoMat = new THREE.MeshPhongMaterial({ color: '#000000', emissive: 0x000000, shininess:100,
+                     specular: 0x050505  });
+                var monoMesh = new THREE.Mesh(monolith, monoMat);
+                monoMesh.position.set(-5,4.5,-5);
+                gfxScene.add(monoMesh);
+
+                var knot = new THREE.TorusKnotGeometry(1.5, 0.25, 100, 16);
+                var knotMat = new THREE.MeshPhongMaterial({ color: '#808080', emissive: 0x000000, specular: 0x050505,
+                    shininess: 100  });
+                var knotMesh = new THREE.Mesh(knot, knotMat);
+                knotMesh.position.set(5,3.25,-5);
+                gfxScene.add(knotMesh);
+
+                // add a small sphere simulating the pointlight
+                var sphereLight = new THREE.SphereGeometry(0.2);
+                var sphereLightMaterial = new THREE.MeshBasicMaterial({color: 0xac6c25});
+                sphereLightMesh = new THREE.Mesh(sphereLight, sphereLightMaterial);
+                sphereLightMesh.castShadow = true;
+
+                sphereLightMesh.position = new THREE.Vector3(3, 20, 3);
+                gfxScene.add(sphereLightMesh);
+            }
 
 			function createFloorAndWall() {
 			    var FLOOR_S = 5;
@@ -75,6 +116,7 @@
                     metalness: 0.2,
                     bumpScale: 0.0005
                 });
+
                 var textureLoader = new THREE.TextureLoader();
                 textureLoader.load( "images/hardwood2_diffuse.jpg", function( texture ) {
                     texture.wrapS = THREE.RepeatWrapping;
@@ -174,8 +216,16 @@
 			 * Animate the scene and call rendering.
 			 */
 			function animateScene() {
-	
-				// Tell the browser to call this function when page is visible
+
+                var timer = Date.now() * 0.01;
+
+                sphereLightMesh.position.set(
+                    Math.cos( timer * 0.1 ) * ORBIT_RADIUS,
+                    Math.abs( ORBIT_ELEV + Math.cos( timer * 0.2 ) ) * 2,
+                    Math.sin( timer * 0.1 ) * ORBIT_RADIUS
+                );
+
+ 				// Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
 
                 // Map the 3D scene down to the 2D screen (render the frame)

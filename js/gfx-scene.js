@@ -16,6 +16,8 @@ GFX.Scene = function ( parameters ) {
 	this.camera = null;
     this.containerID = null;
 
+    this.clearColor = 0x000000;
+
 	this.canvasWidth = 0;
 	this.canvasHeight = 0;
 
@@ -161,7 +163,7 @@ GFX.Scene.prototype = {
 		this.renderer = new THREE.WebGLRenderer({antialias:true});
 	
 		// Set the background color of the renderer to black, with full opacity
-		this.renderer.setClearColor(0x000000, 1);
+		this.renderer.setClearColor(new THREE.Color( this.clearColor ), 1);
 	
 		// Set the renderers size to the content areas size
 		this.renderer.setSize(this.canvasWidth, this.canvasHeight);

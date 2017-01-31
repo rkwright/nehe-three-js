@@ -35,11 +35,12 @@ GFX.Scene = function ( parameters ) {
 	this.displayStats = false;
 	this.stats = null;
 
+	this.defaultLights = true;
 	this.ambientLights = [];
 	this.directionalLights = [];
 	this.pointLights = [];
-	this.hemisphereLight = null;
-	this.spotlights = [];
+	this.hemisphereLights =[];
+	this.spotLights = [];
 
 	this.axesHeight = 0;
 	
@@ -94,7 +95,7 @@ GFX.setParameters= function( object, values ) {
 
         }
     }
-}
+};
 
 // the scene's parameters from the values JSON object
 // lifted from MrDoob's implementation in three.js
@@ -167,13 +168,17 @@ GFX.Scene.prototype = {
 		this.renderer.setClearColor(new THREE.Color( this.clearColor ), 1);
 
 		if (this.shadowMapEnabled == true )
-		    this.renderer.shadowMapEnabled = true;
+		    this.renderer.shadowMap.enabled = true;
 
 		// Set the renderers size to the content areas size
 		this.renderer.setSize(this.canvasWidth, this.canvasHeight);
 	
 		// Get the DIV element from the HTML document by its ID and append the renderer's DOM object
 		container.appendChild(this.renderer.domElement);
+
+		// if the user hasn't set defaultLights to false, then set them up
+		if (this.defaultLights == true)
+		    this.setDefaultLights();
 
 		// request the orbitControls be created and enabled
 		// add the controls
@@ -210,7 +215,7 @@ GFX.Scene.prototype = {
 	 */
 	setCamera: function ( jsonObj ) {
 	    if (jsonObj != null)
-	        this.setParameters(jsonObj);
+	        GFX.setParameters(this, jsonObj);
 
         if (this.perspective == true)
 		    this.camera = new THREE.PerspectiveCamera(this.fov, this.canvasWidth / this.canvasHeight, this.near, this.far);
@@ -237,6 +242,29 @@ GFX.Scene.prototype = {
 
         if (this.controls == true && this.renderer != null)
             this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+    },
+
+    /**
+     * If the user doesn't want to set custom lights, just allocate some defaults
+     */
+    setDefaultLights: function () {
+        // Ambient light has no direction, it illuminates every object with the same
+        // intensity. If only ambient light is used, no shading effects will occur.
+        var ambLight = new THREE.AmbientLight(0x404040);
+        this.scene.add( ambLight );
+        this.ambientLights.push( ambLight);
+
+        // Directional light has a source and shines in all directions, like the sun.
+        // This behaviour creates shading effects.
+        var dirLight = new THREE.DirectionalLight(0xffffff);
+        dirLight.position.set(5, 20, 12);
+        this.scene.add( dirLight );
+        this.directionalLights.push( dirLight );
+
+        var pointLight = new THREE.PointLight(0xffffff, 0.25);
+        pointLight.position.set(15, -20, -12);
+        this.scene.add( pointLight );
+        this.pointLights.push( pointLight );
     },
 
     /**
@@ -286,6 +314,13 @@ GFX.Scene.prototype = {
             if (type == 'directional') {
                 var target = this.getLightProp('target', values, undefined);
                 light = new THREE.DirectionalLight(color, intensity);
+                light.shadow.mapSize.x = 2048;
+                light.shadow.mapSize.y = 2048;
+                light.shadow.camera.left = -20;
+                light.shadow.camera.bottom = -20;
+                light.shadow.camera.right = 20;
+                light.shadow.camera.top = 20;
+
                 this.directionalLights.push(light);
            }
             else if (type == 'point') {
@@ -297,25 +332,27 @@ GFX.Scene.prototype = {
             else if (type == 'hemisphere') {
                 var groundColor = this.getLightProp('groundColor', values, 0x000000);
                 light = new THREE.HemisphereLight(color, groundColor, intensity);
-                this.pointLights.push(light);
+                this.hemisphereLights.push(light);
              }
             else if (type == 'spot') {
-                var angle = this.getLightProp('angle', values, 0);
+                var angle = this.getLightProp('angle', values, Math.PI/3);
                 var penumbra = this.getLightProp('penumbra', values, 0);
                 var distance = this.getLightProp('distance', values, 0);
                 var decay = this.getLightProp('decay', values, 1);
-                light = new THREE.PointLight(color, intensity, distance, decay);
-                this.pointLights.push(light);
+                light = new THREE.SpotLight(color, intensity, distance, angle, penumbra, decay);
+                this.spotLights.push(light);
             }
 
             light.position.set(pos[0], pos[1], pos[2]);
             light.castShadow = castShadow;
             if (debug == true) {
-                light.shadowCameraVisible = true;
+                var helper = new THREE.CameraHelper( light.shadow.camera );
+                this.scene.add( helper );
+                //light.shadowCameraVisible = true;
             }
         }
 
-         this.scene.add( light );
+        this.scene.add( light );
 
         return light;
     },
@@ -323,6 +360,28 @@ GFX.Scene.prototype = {
     getLightProp: function ( prop, values, def ) {
         value = values[ prop ];
         return ( value === undefined ) ? def : value;
+    },
+
+    /**
+	 * Remove all the lights currently created for the scene
+     */
+	clearAllLights: function () {
+
+	    this.clearLights( this.ambientLights );
+        this.clearLights( this.directionalLights );
+        this.clearLights( this.pointLights );
+        this.clearLights( this.spotLights );
+        this.clearLights( this.hemisphereLights );
+    },
+
+    /**
+     * Remove all the lights from the specified array
+     */
+    clearLights : function ( lightArray ) {
+
+        while (lightArray.length > 0) {
+            this.scene.remove(lightArray.pop());
+        }
     },
 
     /**

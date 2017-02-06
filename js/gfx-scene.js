@@ -250,7 +250,7 @@ GFX.Scene.prototype = {
     setDefaultLights: function () {
         // Ambient light has no direction, it illuminates every object with the same
         // intensity. If only ambient light is used, no shading effects will occur.
-        var ambLight = new THREE.AmbientLight(0x404040);
+        var ambLight = new THREE.AmbientLight(0x808080);
         this.scene.add( ambLight );
         this.ambientLights.push( ambLight);
 

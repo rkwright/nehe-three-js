@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<!-- -------------------------------------
-  			Roughly based (or inspired by) NeHe Tutorial 27
-  			Original:  http://nehe.gamedev.net/tutorial/sphere_mapping_quadrics_in_opengl/15005/
+  			Roughly based (or inspired by) NeHe Tutorial 29
+  			Original:  http://nehe.gamedev.net/tutorial/blitter_function_raw_texture_loading/18006/
   
   			@author: rkwright@geofx.com
 		-------------------------------------- -->
@@ -16,7 +16,6 @@
 
 		<!-- Include several libraries from THREE.js and the Scene class  -->
 		<script src="../js/three.js" type="text/javascript"></script>
-        <script src="../js/Mirror.js" type="text/javascript"></script>
 		<script src="../js/Detector.js" type="text/javascript"></script>
 		<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
 		<script src="../js/Stats.js" type="text/javascript"></script>
@@ -24,14 +23,13 @@
 	</head>
 	<body>
 	<!-- shader scripts ------------------ -->
-		<script id="fragment_shh" type="x-shader/x-fragment">
+		<script id="fragment_shader" type="x-shader/x-fragment">
             #ifdef GL_ES
             precision highp float;
             #endif
 
             uniform sampler2D tOne;
             uniform sampler2D tSec;
-
             varying vec2 vUv;
 
             void main(void)
@@ -45,7 +43,7 @@
             }
         </script>
 
-		<script id="vertex_shh" type="x-shader/x-vertex">
+		<script id="vertex_shader" type="x-shader/x-vertex">
 
             varying vec2 vUv;
 
@@ -61,7 +59,7 @@
 
 		<script type="text/javascript">
 
-			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+			// allocate the Scene object, request orbitControls, and the stats
 			var gfxScene = new GFX.Scene( {
 			    cameraPos : [2, 8, 10],
                 controls:true,
@@ -81,28 +79,35 @@
 
                 var cubeGeom = new THREE.BoxGeometry( 2, 2, 2 );
 
-                var vertShader = document.getElementById('vertex_shh').innerHTML;
-                var fragShader = document.getElementById('fragment_shh').innerHTML;
+                var vertShader = document.getElementById('vertex_shader').innerHTML;
+                var fragShader = document.getElementById('fragment_shader').innerHTML;
 
-                var uniforms = {
-                    tOne: { type: "t", value: THREE.ImageUtils.loadTexture( "images/cover.png" ) },
-                    tSec: { type: "t", value: THREE.ImageUtils.loadTexture( "images/grass.png" ) }
-                };
-
-                var material_shh = new THREE.ShaderMaterial({
-                    uniforms: uniforms,
-                    //attributes: attributes,
-                    vertexShader: vertShader,
-                    fragmentShader: fragShader
+                var textureLoader = new THREE.TextureLoader();
+                var cover, grass;
+                textureLoader.load( "images/gl.png", function( texture ) {
+                    cover = texture;
                 });
 
-                var mesh = new THREE.Mesh( cubeGeom, material_shh );
-                mesh.doubleSided = true;
-                gfxScene.add(mesh);
+                textureLoader.load( "images/monitor.png", function( texture ) {
+                    grass = texture;
+
+                   var uniforms = {
+                        tOne: { type: "t", value: cover  },
+                        tSec: { type: "t", value: grass  }
+                    };
+
+                    var shaderMat = new THREE.ShaderMaterial({
+                        uniforms: uniforms,
+                        vertexShader: vertShader,
+                        fragmentShader: fragShader
+                    });
+
+                    var mesh = new THREE.Mesh( cubeGeom, shaderMat );
+                    gfxScene.add(mesh);
+                });
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
 			}
-
 
             /**
              * Just a handler for the keypress event to control parameters of the demo

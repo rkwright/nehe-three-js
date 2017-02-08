@@ -83,28 +83,19 @@
                 var fragShader = document.getElementById('fragment_shader').innerHTML;
 
                 var textureLoader = new THREE.TextureLoader();
-                var cover, grass;
-                textureLoader.load( "images/gl.png", function( texture ) {
-                    cover = texture;
+                var uniforms = {
+                    tOne: {type: "t", value: textureLoader.load("images/gl.png")},
+                    tSec: {type: "t", value: textureLoader.load("images/monitor.png")}
+                };
+
+                var shaderMat = new THREE.ShaderMaterial({
+                    uniforms: uniforms,
+                    vertexShader: vertShader,
+                    fragmentShader: fragShader
                 });
 
-                textureLoader.load( "images/monitor.png", function( texture ) {
-                    grass = texture;
-
-                   var uniforms = {
-                        tOne: { type: "t", value: cover  },
-                        tSec: { type: "t", value: grass  }
-                    };
-
-                    var shaderMat = new THREE.ShaderMaterial({
-                        uniforms: uniforms,
-                        vertexShader: vertShader,
-                        fragmentShader: fragShader
-                    });
-
-                    var mesh = new THREE.Mesh( cubeGeom, shaderMat );
-                    gfxScene.add(mesh);
-                });
+                var mesh = new THREE.Mesh( cubeGeom, shaderMat );
+                gfxScene.add(mesh);
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
 			}

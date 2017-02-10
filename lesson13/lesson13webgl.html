@@ -128,9 +128,9 @@
 		var canvas = document.createElement('canvas');
 		var context = canvas.getContext('2d');
 
-		// set a large-enough fixed-size canvas
-		canvas.width = 1800;
-		canvas.height = 900;
+		// set a large-enough fixed-size canvas.  Both dimensions should be powers of 2.
+		canvas.width  = 2048;
+		canvas.height = 1024;
 
 		context.font = fontsize + "px " + fontface;
 		context.textBaseline = "alphabetic";

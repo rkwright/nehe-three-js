@@ -29,7 +29,6 @@
 		
 		<!-- the shaders -------------------------------------------------- -->
 		<script id="vertexShader" type="x-shader/x-vertex">
-			varying vec3 		vNormal;
 			varying vec2 		vUv;
 		
 			/**
@@ -40,7 +39,6 @@
 				
 				// set the variables passed (behind the scenes) by three.js to our
 				// "varying" variables, which makes them available to the other shader
-				vNormal = normal;
 				vUv = uv;
 
 				gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
@@ -50,7 +48,6 @@
 		<!-- Note we have two fragment shaders - one for each texture 	 -->	
 		<script id="fragmentShader" type="x-shader/x-fragment">
 			// create the shared variables. which are set in the vertex shader
-			varying vec3 		vNormal;
 			varying vec2 		vUv;
 			uniform sampler2D 	texImage;
 
@@ -62,7 +59,7 @@
 		
 		<script id="fragmentShader-L" type="x-shader/x-fragment">
 			// create the shared variables. which are set in the vertex shader
-			varying vec3 		vNormal;
+			//varying vec3 		vNormal;
 			varying vec2 		vUv;
 			uniform sampler2D 	leatherImage;
 

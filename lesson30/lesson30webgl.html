@@ -1,0 +1,169 @@
+<!DOCTYPE html>	<!-- Tells the browser that the page uses the HTML5 standard -->
+<html>
+	<head>
+		<!-- -------------------------------------
+  			Roughly based (or inspired by) NeHe Tutorial 27
+  			Original:  http://nehe.gamedev.net/tutorial/shadows/16010/
+  
+  			@author: rkwright@geofx.com
+		-------------------------------------- -->
+		<title>NEHE Lesson 27</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+		<!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+		<link rel="stylesheet" type="text/css" href="../css/NEHE.css" /> 
+
+		<!-- Include several libraries from THREE.js and the Scene class  -->
+		<script src="../js/three.js" type="text/javascript"></script>
+		<script src="../js/Detector.js" type="text/javascript"></script>
+		<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
+		<script src="../js/Stats.js" type="text/javascript"></script>
+        <script src="../js/gfx-scene.js" type="text/javascript"></script>
+	</head>
+	<body>	
+		<script type="text/javascript">
+
+			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+			var gfxScene = new GFX.Scene( {
+			    cameraPos : [2, 8, 20],
+                controls:true,
+                displayStats:true
+            });
+
+            // then initialize our demo's stuff
+			initializeDemo();
+	
+			// Animate the scene
+			animateScene();
+	
+			/**
+			 * Initialize the Demo.  
+			 */
+			function initializeDemo() {
+
+                createFloorAndWall();
+
+                document.addEventListener("keypress", onDocumentKeyPress, false);
+			}
+
+
+
+			function createFloorAndWall() {
+			    var FLOOR_S = 5;
+			    var FLOOR_T = 5;
+			    var WALL_S  = 2;
+			    var WALL_T  = 2;
+
+                floorMat = new THREE.MeshStandardMaterial( {
+                    roughness: 0.8,
+                    color: 0xffffff,
+                    //metalness: 0.2,
+                    bumpScale: 0.0005
+                });
+
+                var textureLoader = new THREE.TextureLoader();
+                textureLoader.load( "images/hardwood2_diffuse.jpg", function( texture ) {
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.anisotropy = 4;
+                    texture.repeat.set( FLOOR_S, FLOOR_T );
+                    floorMat.side = THREE.DoubleSide;
+                    floorMat.map = texture;
+                    floorMat.needsUpdate = true;
+                } );
+                textureLoader.load( "images/hardwood2_bump.jpg", function( texture ) {
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.anisotropy = 4;
+                    texture.repeat.set( FLOOR_S, FLOOR_T );
+                    floorMat.side = THREE.DoubleSide;
+                    floorMat.bumpMap = texture;
+                    floorMat.needsUpdate = true;
+                } );
+
+                textureLoader.load( "images/hardwood2_roughness.jpg", function( texture ) {
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.anisotropy = 4;
+                    texture.repeat.set( FLOOR_S, FLOOR_T );
+                    floorMat.side = THREE.DoubleSide;
+                    floorMat.roughnessMap = texture;
+                    floorMat.needsUpdate = true;
+                } );
+
+                var floorGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+                var floorMesh = new THREE.Mesh( floorGeometry, floorMat );
+                floorMesh.rotation.x = -Math.PI / 2.0;
+                gfxScene.add( floorMesh );
+
+                wallMat = new THREE.MeshStandardMaterial( {
+                    color: 0x808080
+                });
+
+                // walls
+                var planeGeo = new THREE.PlaneBufferGeometry( 20, 20 );
+
+                var planeTop = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
+                planeTop.position.y = 10;
+                planeTop.rotateX( Math.PI / 2 );
+                gfxScene.add( planeTop );
+
+                var planeBack = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x808080 } ) );
+                planeBack.position.z = -10;
+                planeBack.position.y = 10;
+                gfxScene.add( planeBack );
+
+                var planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
+                planeFront.position.z = 10;
+                planeFront.position.y = 10;
+                planeFront.rotateY( Math.PI );
+                gfxScene.add( planeFront );
+
+                var planeRight = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x00ff00 } ) );
+                planeRight.position.x = 10;
+                planeRight.position.y = 10;
+                planeRight.rotateY( - Math.PI / 2 );
+                gfxScene.add( planeRight );
+
+                var planeLeft = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xff0000 } ) );
+                planeLeft.position.x = -10;
+                planeLeft.position.y = 10;
+                planeLeft.rotateY( Math.PI / 2 );
+                gfxScene.add( planeLeft );
+            }
+
+            /**
+             * Just a handler for the keypress event to control parameters of the demo
+             */
+			function onDocumentKeyPress(event) {
+				// Get the key code of the pressed key
+				var keyChar = String.fromCharCode(event.which);
+                keyChar = keyChar.toLowerCase();
+
+				var renderString = "012";
+
+					if ( renderString.indexOf(keyChar) != -1) {
+                    }
+			}
+	
+			/**
+			 * Animate the scene and call rendering.
+			 */
+			function animateScene() {
+
+                // Tell the browser to call this function when page is visible
+				requestAnimationFrame(animateScene);
+
+                // Map the 3D scene down to the 2D screen (render the frame)
+				gfxScene.renderScene();
+			}
+
+		</script>
+
+		<!-- Create a DIV element, which will be shown over the WebGL canvas. -->
+		<div style="position: absolute; top: 10px; left: 10px;color:white">
+		<br/>
+        </div>
+	</body>
+</html>

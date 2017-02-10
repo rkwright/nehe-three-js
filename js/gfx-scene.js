@@ -256,12 +256,12 @@ GFX.Scene.prototype = {
 
         // Directional light has a source and shines in all directions, like the sun.
         // This behaviour creates shading effects.
-        var dirLight = new THREE.DirectionalLight(0xffffff);
+        var dirLight = new THREE.DirectionalLight(0xc0c0c0);
         dirLight.position.set(5, 20, 12);
         this.scene.add( dirLight );
         this.directionalLights.push( dirLight );
 
-        var pointLight = new THREE.PointLight(0xffffff, 0.25);
+        var pointLight = new THREE.PointLight(0xc0c0c0, 0.25);
         pointLight.position.set(15, -20, -12);
         this.scene.add( pointLight );
         this.pointLights.push( pointLight );

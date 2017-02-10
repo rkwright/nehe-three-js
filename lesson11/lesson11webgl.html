@@ -23,7 +23,7 @@
 		<!-- This JavaScript block encloses the Three.js commands -->
 		<script>
 			// allocate the Scene object, request orbitControls and an set of 3D axes 10 units high
-			var nScene = new GFX.Scene( { axesHeight:10, controls:true, displayStats:true });
+			var nScene = new GFX.Scene( { cameraPos : [0, 10, 20], axesHeight:10, controls:true, displayStats:true });
 			
 			var wiggle_count = 0;		// Counter Used To Control How Fast Flag Waves
 			var texture;

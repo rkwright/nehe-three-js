@@ -3,7 +3,7 @@
 	<head>
 		<!-- -------------------------------------
   			Roughly based (or inspired by) NeHe Tutorial 27
-  			Original:  http://nehe.gamedev.net/tutorial/sphere_mapping_quadrics_in_opengl/15005/
+  			Original:  http://nehe.gamedev.net/tutorial/shadows/16010/
   
   			@author: rkwright@geofx.com
 		-------------------------------------- -->
@@ -80,7 +80,8 @@
                 gfxScene.add(mesh);
 
                 var icoGeom = new THREE.IcosahedronGeometry(2.0);
-                var icoMat = new THREE.MeshPhongMaterial({ color: '#ff0000', emissive: 0x333333, shading: THREE.FlatShading  });
+                var icoMat = new THREE.MeshPhongMaterial({ color: '#ff0000', emissive: 0x333333, shininess:100,
+                    specular: 0x050505   });
                 var icoMesh = new THREE.Mesh(icoGeom, icoMat);
                 icoMesh.position.set(-5,1.75,5);
                 icoMesh.castShadow = true;

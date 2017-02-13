@@ -23,10 +23,10 @@
 	</head>
 	<body>	
 		<script type="text/javascript">
-            var mesh;
+            var box;
             var walls = [];
             var objects = [];
-
+            var incrementX = 0.05;
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
 			    cameraPos : [2, 8, 20],
@@ -61,10 +61,10 @@
 
                 var geom = new THREE.BoxGeometry( 1,1,1 );
                 var material = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.FlatShading, opacity:0.5, transparent:true  } );
-                mesh = new THREE.Mesh( geom, material );
-                mesh.position.set(0, 1, 0);
-                objects.push(mesh);
-                gfxScene.add(mesh);
+                var box = new THREE.Mesh( geom, material );
+                box.position.set(0, 1, 0);
+                objects.push(box);
+                gfxScene.add(box);
             }
 
             function createPartitions() {
@@ -194,7 +194,7 @@
                     var mesh = objects[i];
                     var geom = mesh.geometry;
                     var originPoint = mesh.position.clone();
-                    console.log(" origin: " + originPoint.x + ", " + originPoint.y + ", " + originPoint.z);
+                    //console.log(" origin: " + originPoint.x + ", " + originPoint.y + ", " + originPoint.z);
                     for ( var vertexIndex = 0; vertexIndex < geom.vertices.length; vertexIndex++ )
                     {
                         var localVertex = geom.vertices[vertexIndex].clone();
@@ -204,30 +204,47 @@
                         var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
                         var collisionResults = ray.intersectObjects( walls );
 
-                        var color = collisionResults.length > 0 ? 0x0000ff : 0xffff00;
-                        var arrowHelper = new THREE.ArrowHelper( directionVector.clone().normalize(), originPoint, 30, color );
-                        gfxScene.add( arrowHelper );
+                       // var color = collisionResults.length > 0 ? 0x0000ff : 0xffff00;
+                        //var arrowHelper = new THREE.ArrowHelper( directionVector.clone().normalize(), originPoint, 30, color );
+                        //gfxScene.add( arrowHelper );
 
-                        if ( collisionResults.length > 0 )  { // && collisionResults[0].distance < directionVector.length() ) {
-                            console.log("Hit: " + collisionResults.length);
+                        if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
+                            incrementX = -incrementX;
+                            break;
+
+                            //console.log("Hit: " + collisionResults.length);
                             for ( var n=0; n<collisionResults.length; n++ ) {
                                 var c = collisionResults[n];
-                                console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +
-                                    " name: " + c.object.name + " dist: " + c.distance + " point: " + c.point.x + ", " + c.point.y + ", " + c.point.z );
+                                //console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +
+                                //" name: " + c.object.name + " dist: " + c.distance + " point: " + c.point.x + ", " + c.point.y + ", " + c.point.z );
 
+                                /*
                                 var hpGeom = new THREE.SphereGeometry(0.1);
                                 var hpMat = new THREE.MeshBasicMaterial({color: 0xff0000});
                                 var hpMesh = new THREE.Mesh(hpGeom, hpMat);
                                 hpMesh.position = new THREE.Vector3(c.point.x, c.point.y,c.pointz);
                                 gfxScene.add(hpMesh);
+                                */
                             }
                         }
-                        else {
-                            console.log(" Missed! vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z);
-                        }
+                        //else {
+                        //    console.log(" Missed! vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z);
+                        //}
                     }
                 }
             }
+
+            function updatePositions() {
+                for (var i = 0; i < objects.length; i++) {
+                    var mesh = objects[i];
+                    mesh.position.x += incrementX;
+                    mesh.updateMatrixWorld();
+
+                    checkIntersections();
+
+                }
+            }
+
 			/**
 			 * Animate the scene and call rendering.
 			 */
@@ -236,13 +253,11 @@
                 // Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
 
-				//mesh.position.x += 0.05;
-
                 // Map the 3D scene down to the 2D screen (render the frame)
 				gfxScene.renderScene();
 
-                //checkIntersections();
-            }
+				updatePositions();
+           }
 
 		</script>
 

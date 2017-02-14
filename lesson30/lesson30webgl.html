@@ -64,18 +64,10 @@
                 var material = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.FlatShading, opacity:0.5, transparent:true  } );
                 var box = new THREE.Mesh( geom, material );
                 box.position.set(0, 1, 0);
+                box.velocity = new THREE.Vector3(incrementX, 0, 0);
+                box.spin = new THREE.Euler(0, 0.05, 0);
                 objects.push(box);
                 gfxScene.add(box);
-            }
-
-            function createPartitions() {
-
-                var geom = new THREE.BoxGeometry( 20, 20, 1 );
-                var material = new THREE.MeshLambertMaterial( { color: 0x008000, shading: THREE.FlatShading  } );
-                mesh = new THREE.Mesh( geom, material );
-                mesh.position.set(0, 0, -20);
-                walls.push(mesh);
-                gfxScene.add(mesh);
             }
 
 			function createFloorAndWalls() {
@@ -92,7 +84,6 @@
                     bumpScale: 0.0005
                 });
 
-                var floorGeom = new THREE.BoxGeometry(20,20,0.5);
                 var textureLoader = new THREE.TextureLoader();
                 textureLoader.load( "images/hardwood2_diffuse.jpg", function( texture ) {
                     texture.wrapS = THREE.RepeatWrapping;
@@ -126,8 +117,7 @@
                 var planeFloor = new THREE.Mesh( planeGeo, floorMat );
                 planeFloor.name = "floor";
                 planeFloor.rotation.x = -Math.PI / 2.0;
-                //planeFloor.updateMatrixWorld();
-                walls.push(planeFloor);
+                 walls.push(planeFloor);
                 gfxScene.add( planeFloor );
 
                 // walls
@@ -136,7 +126,6 @@
                 planeTop.name = "top";
                 planeTop.position.y = 20;
                 planeTop.rotateX( Math.PI / 2 );
-                //planeTop.updateMatrixWorld();
                 walls.push(planeTop);
                 gfxScene.add( planeTop );
 
@@ -144,7 +133,6 @@
                 planeBack.name = "back";
                 planeBack.position.z = -10;
                 planeBack.position.y = 10;
-                //planeTop.updateMatrixWorld();
                 walls.push(planeBack);
                 gfxScene.add( planeBack );
 
@@ -153,7 +141,6 @@
                 planeFront.position.z = 10;
                 planeFront.position.y = 10;
                 planeFront.rotateY( Math.PI );
-                //planeFront.updateMatrixWorld();
                 walls.push(planeFront);
                 gfxScene.add( planeFront );
 
@@ -162,7 +149,6 @@
                 planeRight.position.x = 10;
                 planeRight.position.y = 10;
                 planeRight.rotateY( - Math.PI / 2 );
-                //planeRight.updateMatrixWorld();
                 walls.push(planeRight);
                 gfxScene.add( planeRight );
 
@@ -171,7 +157,6 @@
                 planeLeft.position.x = -10;
                 planeLeft.position.y = 10;
                 planeLeft.rotateY( Math.PI / 2 );
-                //planeLeft.updateMatrixWorld();
                 walls.push(planeLeft);
                 gfxScene.add( planeLeft );
             }
@@ -205,12 +190,9 @@
                         raycaster.set( originPoint, directionVector.clone().normalize() );
                         var collisionResults = raycaster.intersectObjects( walls );
 
-                       // var color = collisionResults.length > 0 ? 0x0000ff : 0xffff00;
-                        //var arrowHelper = new THREE.ArrowHelper( directionVector.clone().normalize(), originPoint, 30, color );
-                        //gfxScene.add( arrowHelper );
-
                         if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-                            incrementX = -incrementX;
+                            mesh.velocity.x = -mesh.velocity.x;
+                            console.log("Reversing incrementX: " + incrementX);
                             break;
 
                             //console.log("Hit: " + collisionResults.length);
@@ -218,19 +200,8 @@
                                 var c = collisionResults[n];
                                 //console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +
                                 //" name: " + c.object.name + " dist: " + c.distance + " point: " + c.point.x + ", " + c.point.y + ", " + c.point.z );
-
-                                /*
-                                var hpGeom = new THREE.SphereGeometry(0.1);
-                                var hpMat = new THREE.MeshBasicMaterial({color: 0xff0000});
-                                var hpMesh = new THREE.Mesh(hpGeom, hpMat);
-                                hpMesh.position = new THREE.Vector3(c.point.x, c.point.y,c.pointz);
-                                gfxScene.add(hpMesh);
-                                */
                             }
                         }
-                        //else {
-                        //    console.log(" Missed! vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z);
-                        //}
                     }
                 }
             }
@@ -238,11 +209,11 @@
             function updatePositions() {
                 for (var i = 0; i < objects.length; i++) {
                     var mesh = objects[i];
-                    mesh.position.x += incrementX;
+                    mesh.position.x += mesh.velocity.x;
+                    mesh.rotateY(mesh.spin.y);
                     mesh.updateMatrixWorld();
 
                     checkIntersections();
-
                 }
             }
 

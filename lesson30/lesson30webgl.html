@@ -23,6 +23,7 @@
 	</head>
 	<body>	
 		<script type="text/javascript">
+            var raycaster = new THREE.Raycaster();
             var box;
             var walls = [];
             var objects = [];
@@ -125,7 +126,7 @@
                 var planeFloor = new THREE.Mesh( planeGeo, floorMat );
                 planeFloor.name = "floor";
                 planeFloor.rotation.x = -Math.PI / 2.0;
-                planeFloor.updateMatrixWorld();
+                //planeFloor.updateMatrixWorld();
                 walls.push(planeFloor);
                 gfxScene.add( planeFloor );
 
@@ -135,7 +136,7 @@
                 planeTop.name = "top";
                 planeTop.position.y = 20;
                 planeTop.rotateX( Math.PI / 2 );
-                planeTop.updateMatrixWorld();
+                //planeTop.updateMatrixWorld();
                 walls.push(planeTop);
                 gfxScene.add( planeTop );
 
@@ -143,7 +144,7 @@
                 planeBack.name = "back";
                 planeBack.position.z = -10;
                 planeBack.position.y = 10;
-                planeTop.updateMatrixWorld();
+                //planeTop.updateMatrixWorld();
                 walls.push(planeBack);
                 gfxScene.add( planeBack );
 
@@ -152,7 +153,7 @@
                 planeFront.position.z = 10;
                 planeFront.position.y = 10;
                 planeFront.rotateY( Math.PI );
-                planeFront.updateMatrixWorld();
+                //planeFront.updateMatrixWorld();
                 walls.push(planeFront);
                 gfxScene.add( planeFront );
 
@@ -161,7 +162,7 @@
                 planeRight.position.x = 10;
                 planeRight.position.y = 10;
                 planeRight.rotateY( - Math.PI / 2 );
-                planeRight.updateMatrixWorld();
+                //planeRight.updateMatrixWorld();
                 walls.push(planeRight);
                 gfxScene.add( planeRight );
 
@@ -170,7 +171,7 @@
                 planeLeft.position.x = -10;
                 planeLeft.position.y = 10;
                 planeLeft.rotateY( Math.PI / 2 );
-                planeLeft.updateMatrixWorld();
+                //planeLeft.updateMatrixWorld();
                 walls.push(planeLeft);
                 gfxScene.add( planeLeft );
             }
@@ -201,8 +202,8 @@
                         var globalVertex = localVertex.applyMatrix4( mesh.matrix );
                         var directionVector = globalVertex.sub( mesh.position );
 
-                        var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-                        var collisionResults = ray.intersectObjects( walls );
+                        raycaster.set( originPoint, directionVector.clone().normalize() );
+                        var collisionResults = raycaster.intersectObjects( walls );
 
                        // var color = collisionResults.length > 0 ? 0x0000ff : 0xffff00;
                         //var arrowHelper = new THREE.ArrowHelper( directionVector.clone().normalize(), originPoint, 30, color );

@@ -64,7 +64,7 @@
                 var material = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.FlatShading, opacity:0.5, transparent:true  } );
                 var box = new THREE.Mesh( geom, material );
                 box.position.set(0, 1, 0);
-                box.velocity = new THREE.Vector3(incrementX, 0, 0);
+                box.velocity = new THREE.Vector3(-incrementX, 0, 0);
                 box.spin = new THREE.Euler(0, 0.05, 0);
                 objects.push(box);
                 gfxScene.add(box);
@@ -186,20 +186,23 @@
                         var localVertex = geom.vertices[vertexIndex].clone();
                         var globalVertex = localVertex.applyMatrix4( mesh.matrix );
                         var directionVector = globalVertex.sub( mesh.position );
+                        var angle = mesh.velocity.angleTo( directionVector);
+                        if ( angle <= Math.PI/2) {
 
-                        raycaster.set( originPoint, directionVector.clone().normalize() );
-                        var collisionResults = raycaster.intersectObjects( walls );
+                            raycaster.set( originPoint, directionVector.clone().normalize() );
+                            var collisionResults = raycaster.intersectObjects( walls );
 
-                        if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-                            mesh.velocity.x = -mesh.velocity.x;
-                            console.log("Reversing incrementX: " + incrementX);
-                            break;
+                            if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
+                                mesh.velocity.x = -mesh.velocity.x;
+                                console.log("Reversing incrementX: " + incrementX);
+                                break;
 
-                            //console.log("Hit: " + collisionResults.length);
-                            for ( var n=0; n<collisionResults.length; n++ ) {
-                                var c = collisionResults[n];
-                                //console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +
-                                //" name: " + c.object.name + " dist: " + c.distance + " point: " + c.point.x + ", " + c.point.y + ", " + c.point.z );
+                                //console.log("Hit: " + collisionResults.length);
+                                for ( var n=0; n<collisionResults.length; n++ ) {
+                                    var c = collisionResults[n];
+                                    //console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +
+                                    //" name: " + c.object.name + " dist: " + c.distance + " point: " + c.point.x + ", " + c.point.y + ", " + c.point.z );
+                                }
                             }
                         }
                     }

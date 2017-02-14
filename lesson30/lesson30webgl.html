@@ -21,16 +21,24 @@
 		<script src="../js/Stats.js" type="text/javascript"></script>
         <script src="../js/gfx-scene.js" type="text/javascript"></script>
 	</head>
-	<body>	
-		<script type="text/javascript">
+	<body>
+    <!-- Create a DIV element, which will be shown over the WebGL canvas. -->
+    <div style="position: absolute; top: 10px; left: 10px;color:white">
+        <p>Hits: <span id="LogText"></span></p>
+
+    </div>
+
+    <script type="text/javascript">
             var raycaster = new THREE.Raycaster();
             var box;
             var walls = [];
             var objects = [];
-            var incrementX = 0.05;
+            var incrementX = 0.15;
+            var incrementY = 0.15;
+            var incrementZ = 0.15;
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
-			    cameraPos : [2, 8, 20],
+			    cameraPos : [2, -10, 50],
                 axesHeight: 30,
                 controls:true,
                 displayStats:true
@@ -64,8 +72,8 @@
                 var material = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.FlatShading, opacity:0.5, transparent:true  } );
                 var box = new THREE.Mesh( geom, material );
                 box.position.set(0, 1, 0);
-                box.velocity = new THREE.Vector3(-incrementX, 0, 0);
-                box.spin = new THREE.Euler(0, 0.05, 0);
+                box.velocity = new THREE.Vector3(incrementX, incrementY, incrementZ);
+                box.spin = new THREE.Euler(0.05,0.05,0.05);
                 objects.push(box);
                 gfxScene.add(box);
             }
@@ -187,21 +195,24 @@
                         var globalVertex = localVertex.applyMatrix4( mesh.matrix );
                         var directionVector = globalVertex.sub( mesh.position );
                         var angle = mesh.velocity.angleTo( directionVector);
+                        console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +" angle; " + angle);
+
                         if ( angle <= Math.PI/2) {
 
                             raycaster.set( originPoint, directionVector.clone().normalize() );
                             var collisionResults = raycaster.intersectObjects( walls );
 
+                            document.getElementById("LogText").innerHTML = collisionResults.length;
+
                             if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-                                mesh.velocity.x = -mesh.velocity.x;
-                                console.log("Reversing incrementX: " + incrementX);
+                                reverseVelocity( mesh, collisionResults[0].object.name);
                                 break;
 
                                 //console.log("Hit: " + collisionResults.length);
                                 for ( var n=0; n<collisionResults.length; n++ ) {
                                     var c = collisionResults[n];
-                                    //console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +
-                                    //" name: " + c.object.name + " dist: " + c.distance + " point: " + c.point.x + ", " + c.point.y + ", " + c.point.z );
+
+                                    console.log(" name: " + c.object.name + " dist: " + c.distance + " point: " + c.point.x + ", " + c.point.y + ", " + c.point.z );
                                 }
                             }
                         }
@@ -209,11 +220,27 @@
                 }
             }
 
+            function reverseVelocity( mesh, name ) {
+
+			    if (name == "left" || name == "right")
+                    mesh.velocity.x = -mesh.velocity.x;
+			    else if (name == "top" || name == "floor")
+			        mesh.velocity.y = -mesh.velocity.y;
+			    else
+			        mesh.velocity.z = -mesh.velocity.z;
+
+                console.log("Reversing increment: ");
+            }
+
             function updatePositions() {
                 for (var i = 0; i < objects.length; i++) {
                     var mesh = objects[i];
                     mesh.position.x += mesh.velocity.x;
+                    mesh.position.y += mesh.velocity.y;
+                    mesh.position.z += mesh.velocity.z;
+                    mesh.rotateX(mesh.spin.x);
                     mesh.rotateY(mesh.spin.y);
+                    mesh.rotateZ(mesh.spin.z);
                     mesh.updateMatrixWorld();
 
                     checkIntersections();
@@ -236,9 +263,5 @@
 
 		</script>
 
-		<!-- Create a DIV element, which will be shown over the WebGL canvas. -->
-		<div style="position: absolute; top: 10px; left: 10px;color:white">
-		<br/>
-        </div>
 	</body>
 </html>

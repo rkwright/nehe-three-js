@@ -65,7 +65,7 @@
 
                 gfxScene.renderScene();
 
-                checkIntersections();
+                //checkIntersections();
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
 			}
@@ -90,27 +90,61 @@
                 var geom = new THREE.SphereGeometry(1, 8, 8);
                 var material = new THREE.MeshLambertMaterial( { color: 0x00ff00, shading: THREE.FlatShading  } );
                 var sphere = new THREE.Mesh( geom, material );
-                sphere.position.set(0, 1, 0);
-                sphere.velocity = new THREE.Vector3(-incrementX, -incrementY, incrementZ);
+                sphere.position.set(0, 1, 0);sphere.velocity = new THREE.Vector3(-incrementX, -incrementY, incrementZ);
                 sphere.spin = new THREE.Euler(0,0,0);
-                //var helper = new THREE.BoundingBoxHelper(sphere, 0xff0000);
-                //helper.update();
+                var helper = new THREE.BoundingBoxHelper(sphere, 0xff0000);
+                helper.update();
                 objects.push(sphere);
                 gfxScene.add(sphere);
             }
 
             function createCylinder() {
 
-                var geom = new THREE.CylinderGeometry(1.0, 1.0, 4, 8);
+                var geom = new THREE.CylinderGeometry(0, 1.0, 4, 8);
                 var material = new THREE.MeshLambertMaterial( { color: 0x0000ff, shading: THREE.FlatShading  } );
                 var cylinder = new THREE.Mesh( geom, material );
                 cylinder.position.set(0, 1, 0);
                 cylinder.velocity = new THREE.Vector3(-incrementX, incrementY, incrementZ);
                 cylinder.spin = new THREE.Euler(-0.05,0.05,-0.05);
-                //var helper = new THREE.BoundingBoxHelper(sphere, 0xff0000);
-                //helper.update();
+                cylinder.AABB = createAABBVertices( cylinder );
                 objects.push(cylinder);
                 gfxScene.add(cylinder);
+            }
+
+            /**
+             *  Create a set of vertices that represent the AABB box from BoxHelper
+             *
+             *     5____4
+             *   1/___0/|
+             *   | 6__|_7
+             *   2/___3/
+             *
+             *  0: max.x, max.y, max.z
+             *  1: min.x, max.y, max.z
+             *  2: min.x, min.y, max.z
+             *  3: max.x, min.y, max.z
+             *  4: max.x, max.y, min.z
+             *  5: min.x, max.y, min.z
+             *  6: min.x, min.y, min.z
+             *  7: max.x, min.y, min.z
+             */
+            function createAABBVertices ( mesh ) {
+                var vertices = [];
+                var helper = new THREE.BoundingBoxHelper(mesh, 0xff0000);
+                helper.update();
+                var max = helper.box.max;
+                var min = helper.box.min;
+
+                vertices.push(new THREE.Vector3(max.x, max.y, max.z));
+                vertices.push(new THREE.Vector3(min.x, max.y, max.z));
+                vertices.push(new THREE.Vector3(min.x, min.y, max.z));
+                vertices.push(new THREE.Vector3(max.x, min.y, max.z));
+                vertices.push(new THREE.Vector3(max.x, max.y, min.z));
+                vertices.push(new THREE.Vector3(min.x, max.y, min.z));
+                vertices.push(new THREE.Vector3(min.x, min.y, min.z));
+                vertices.push(new THREE.Vector3(max.x, min.y, min.z));
+
+                return vertices;
             }
 
             /**
@@ -226,40 +260,48 @@
                     }
 			}
 
-			function checkIntersections() {
+			function collisionCheck() {
                 for (var i=0; i<objects.length; i++) {
                     var mesh = objects[i];
                     var originPoint = mesh.position.clone();
                     //console.log(" origin: " + originPoint.x + ", " + originPoint.y + ", " + originPoint.z);
-                    for ( var vertexIndex = 0; vertexIndex < mesh.geometry.vertices.length; vertexIndex++ )
-                    {
-                        var localVertex = mesh.geometry.vertices[vertexIndex].clone();
-                        var globalVertex = localVertex.applyMatrix4( mesh.matrix );
-                        var directionVector = globalVertex.sub( mesh.position );
-                        var angle = mesh.velocity.angleTo( directionVector);
-                        //console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +" angle; " + angle);
 
-                        if ( angle <= Math.PI/2) {
+                    if (mesh.AABB == undefined )
+                        checkVertices( mesh, originPoint, mesh.geometry.vertices);
+                    else
+                        checkVertices( mesh, originPoint, mesh.AABB );
+                }
+            }
 
-                            raycaster.set( originPoint, directionVector.clone().normalize() );
-                            var collisionResults = raycaster.intersectObjects( walls );
+            function checkVertices ( mesh, originPoint, vertices ) {
 
-                            if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-                                wallCollision( mesh, collisionResults[0].object.name);
-                                break;
+                for ( var vertexIndex = 0; vertexIndex < vertices.length; vertexIndex++ )
+                {
+                    var localVertex = vertices[vertexIndex].clone();
+                    var globalVertex = localVertex.applyMatrix4( mesh.matrix );
+                    var directionVector = globalVertex.sub( mesh.position );
+                    var angle = mesh.velocity.angleTo( directionVector);
+                    //console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +" angle; " + angle);
 
-                                //console.log("Hit: " + collisionResults.length);
-                                for ( var n=0; n<collisionResults.length; n++ ) {
-                                    var c = collisionResults[n];
+                    if ( angle <= Math.PI/2) {
 
-                                    console.log(" name: " + c.object.name + " dist: " + c.distance + " point: " + c.point.x + ", " + c.point.y + ", " + c.point.z );
-                                }
+                        raycaster.set( originPoint, directionVector.clone().normalize() );
+                        var collisionResults = raycaster.intersectObjects( walls );
+
+                        if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
+                            wallCollision( mesh, collisionResults[0].object.name);
+                            break;
+
+                            //console.log("Hit: " + collisionResults.length);
+                            for ( var n=0; n<collisionResults.length; n++ ) {
+                                var c = collisionResults[n];
+
+                                console.log(" name: " + c.object.name + " dist: " + c.distance + " point: " + c.point.x + ", " + c.point.y + ", " + c.point.z );
                             }
                         }
                     }
                 }
             }
-
             /**
              * Handle the case where an object hits the wall
              */
@@ -286,7 +328,7 @@
                     mesh.rotateZ(mesh.spin.z);
                     mesh.updateMatrixWorld();
 
-                    checkIntersections();
+                    collisionCheck();
                 }
             }
 

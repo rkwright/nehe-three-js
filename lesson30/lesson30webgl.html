@@ -69,7 +69,7 @@
             function createBox() {
 
                 var geom = new THREE.BoxGeometry( 1,1,1 );
-                var material = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.FlatShading, opacity:0.5, transparent:true  } );
+                var material = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.FlatShading, opacity:1, transparent:true  } );
                 var box = new THREE.Mesh( geom, material );
                 box.position.set(0, 1, 0);
                 box.velocity = new THREE.Vector3(incrementX, incrementY, incrementZ);
@@ -78,6 +78,9 @@
                 gfxScene.add(box);
             }
 
+            /**
+             *
+             */
 			function createFloorAndWalls() {
 			    var FLOOR_S = 5;
 			    var FLOOR_T = 5;
@@ -130,21 +133,24 @@
 
                 // walls
 
-                var planeTop = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
+                var matTop = new THREE.MeshPhongMaterial( { color: 0xffffff, side:THREE.DoubleSide, opacity:0.3, transparent:true } );
+                var planeTop = new THREE.Mesh( planeGeo, matTop );
                 planeTop.name = "top";
                 planeTop.position.y = 20;
                 planeTop.rotateX( Math.PI / 2 );
                 walls.push(planeTop);
                 gfxScene.add( planeTop );
 
-                var planeBack = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x808080 } ) );
+                var matBack = new THREE.MeshPhongMaterial( { color: 0x808080, side:THREE.DoubleSide, opacity:0.3, transparent:true });
+                var planeBack = new THREE.Mesh( planeGeo, matBack );
                 planeBack.name = "back";
                 planeBack.position.z = -10;
                 planeBack.position.y = 10;
                 walls.push(planeBack);
                 gfxScene.add( planeBack );
 
-                var planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
+                var matFront = new THREE.MeshPhongMaterial( { color: 0xffffff, side:THREE.DoubleSide, opacity:0.3, transparent:true  } );
+                var planeFront = new THREE.Mesh( planeGeo, matBack );
                 planeFront.name = "front";
                 planeFront.position.z = 10;
                 planeFront.position.y = 10;
@@ -152,7 +158,8 @@
                 walls.push(planeFront);
                 gfxScene.add( planeFront );
 
-                var planeRight = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x00ff00 } ) );
+                var matRight = new THREE.MeshPhongMaterial( { color: 0x00ff00, side:THREE.DoubleSide, opacity:0.3, transparent:true } );
+                var planeRight = new THREE.Mesh( planeGeo, matRight );
                 planeRight.name = "right";
                 planeRight.position.x = 10;
                 planeRight.position.y = 10;
@@ -160,7 +167,8 @@
                 walls.push(planeRight);
                 gfxScene.add( planeRight );
 
-                var planeLeft = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xff0000 } ) );
+                var matLeft = new THREE.MeshPhongMaterial( { color: 0xff0000, side:THREE.DoubleSide, opacity:0.3, transparent:true  } );
+                var planeLeft = new THREE.Mesh( planeGeo, matLeft );
                 planeLeft.name = "left";
                 planeLeft.position.x = -10;
                 planeLeft.position.y = 10;
@@ -195,14 +203,12 @@
                         var globalVertex = localVertex.applyMatrix4( mesh.matrix );
                         var directionVector = globalVertex.sub( mesh.position );
                         var angle = mesh.velocity.angleTo( directionVector);
-                        console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +" angle; " + angle);
+                        //console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +" angle; " + angle);
 
                         if ( angle <= Math.PI/2) {
 
                             raycaster.set( originPoint, directionVector.clone().normalize() );
                             var collisionResults = raycaster.intersectObjects( walls );
-
-                            document.getElementById("LogText").innerHTML = collisionResults.length;
 
                             if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
                                 reverseVelocity( mesh, collisionResults[0].object.name);

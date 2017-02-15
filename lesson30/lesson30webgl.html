@@ -59,6 +59,10 @@
 
                 createBox();
 
+                createSphere();
+
+                createCylinder();
+
                 gfxScene.renderScene();
 
                 checkIntersections();
@@ -66,16 +70,47 @@
                 document.addEventListener("keypress", onDocumentKeyPress, false);
 			}
 
+			/**
+             *
+             */
             function createBox() {
 
                 var geom = new THREE.BoxGeometry( 1,1,1 );
-                var material = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.FlatShading, opacity:1, transparent:true  } );
+                var material = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.FlatShading  } );
                 var box = new THREE.Mesh( geom, material );
                 box.position.set(0, 1, 0);
                 box.velocity = new THREE.Vector3(incrementX, incrementY, incrementZ);
                 box.spin = new THREE.Euler(0.05,0.05,0.05);
                 objects.push(box);
                 gfxScene.add(box);
+            }
+
+            function createSphere() {
+
+                var geom = new THREE.SphereGeometry(1, 8, 8);
+                var material = new THREE.MeshLambertMaterial( { color: 0x00ff00, shading: THREE.FlatShading  } );
+                var sphere = new THREE.Mesh( geom, material );
+                sphere.position.set(0, 1, 0);
+                sphere.velocity = new THREE.Vector3(-incrementX, -incrementY, incrementZ);
+                sphere.spin = new THREE.Euler(0,0,0);
+                //var helper = new THREE.BoundingBoxHelper(sphere, 0xff0000);
+                //helper.update();
+                objects.push(sphere);
+                gfxScene.add(sphere);
+            }
+
+            function createCylinder() {
+
+                var geom = new THREE.CylinderGeometry(1.0, 1.0, 4, 8);
+                var material = new THREE.MeshLambertMaterial( { color: 0x0000ff, shading: THREE.FlatShading  } );
+                var cylinder = new THREE.Mesh( geom, material );
+                cylinder.position.set(0, 1, 0);
+                cylinder.velocity = new THREE.Vector3(-incrementX, incrementY, incrementZ);
+                cylinder.spin = new THREE.Euler(-0.05,0.05,-0.05);
+                //var helper = new THREE.BoundingBoxHelper(sphere, 0xff0000);
+                //helper.update();
+                objects.push(cylinder);
+                gfxScene.add(cylinder);
             }
 
             /**
@@ -128,7 +163,7 @@
                 var planeFloor = new THREE.Mesh( planeGeo, floorMat );
                 planeFloor.name = "floor";
                 planeFloor.rotation.x = -Math.PI / 2.0;
-                 walls.push(planeFloor);
+                walls.push(planeFloor);
                 gfxScene.add( planeFloor );
 
                 // walls
@@ -150,7 +185,7 @@
                 gfxScene.add( planeBack );
 
                 var matFront = new THREE.MeshPhongMaterial( { color: 0xffffff, side:THREE.DoubleSide, opacity:0.3, transparent:true  } );
-                var planeFront = new THREE.Mesh( planeGeo, matBack );
+                var planeFront = new THREE.Mesh( planeGeo, matFront );
                 planeFront.name = "front";
                 planeFront.position.z = 10;
                 planeFront.position.y = 10;
@@ -194,12 +229,11 @@
 			function checkIntersections() {
                 for (var i=0; i<objects.length; i++) {
                     var mesh = objects[i];
-                    var geom = mesh.geometry;
                     var originPoint = mesh.position.clone();
                     //console.log(" origin: " + originPoint.x + ", " + originPoint.y + ", " + originPoint.z);
-                    for ( var vertexIndex = 0; vertexIndex < geom.vertices.length; vertexIndex++ )
+                    for ( var vertexIndex = 0; vertexIndex < mesh.geometry.vertices.length; vertexIndex++ )
                     {
-                        var localVertex = geom.vertices[vertexIndex].clone();
+                        var localVertex = mesh.geometry.vertices[vertexIndex].clone();
                         var globalVertex = localVertex.applyMatrix4( mesh.matrix );
                         var directionVector = globalVertex.sub( mesh.position );
                         var angle = mesh.velocity.angleTo( directionVector);
@@ -211,7 +245,7 @@
                             var collisionResults = raycaster.intersectObjects( walls );
 
                             if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-                                reverseVelocity( mesh, collisionResults[0].object.name);
+                                wallCollision( mesh, collisionResults[0].object.name);
                                 break;
 
                                 //console.log("Hit: " + collisionResults.length);
@@ -226,7 +260,10 @@
                 }
             }
 
-            function reverseVelocity( mesh, name ) {
+            /**
+             * Handle the case where an object hits the wall
+             */
+            function wallCollision( mesh, name ) {
 
 			    if (name == "left" || name == "right")
                     mesh.velocity.x = -mesh.velocity.x;

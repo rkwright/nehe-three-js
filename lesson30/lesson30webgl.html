@@ -36,6 +36,9 @@
             var incrementX = 0.25;
             var incrementY = 0.15;
             var incrementZ = 0.15;
+            var objSize = 1;
+            var objMass = 1;
+
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
 			    cameraPos : [2, -10, 50],
@@ -67,8 +70,6 @@
 
                 gfxScene.renderScene();
 
-                //checkIntersections();
-
                 document.addEventListener("keypress", onDocumentKeyPress, false);
 			}
 
@@ -81,33 +82,33 @@
              */
             function createBox() {
 
-                var geom = new THREE.BoxGeometry( 1,1,1 );
+                var geom = new THREE.BoxGeometry( objSize*2,objSize*2,objSize*2 );
                 var material = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.FlatShading  } );
                 var box = new THREE.Mesh( geom, material );
                 box.position.set(Math.random()*9, 1, Math.random()*9);
                 box.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
                 box.spin = new THREE.Euler(0.05,0.05,0.05);
+                box.mass = objMass;
                 objects.push(box);
                 gfxScene.add(box);
             }
 
             function createSphere() {
 
-                var geom = new THREE.SphereGeometry(1, 8, 8);
+                var geom = new THREE.SphereGeometry(objSize, 8, 8);
                 var material = new THREE.MeshLambertMaterial( { color: 0x00ff00, shading: THREE.FlatShading  } );
                 var sphere = new THREE.Mesh( geom, material );
                 sphere.position.set(Math.random()*9, 1, Math.random()*9);
                 sphere.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
                 sphere.spin = new THREE.Euler(0,0,0);
-                var helper = new THREE.BoundingBoxHelper(sphere, 0xff0000);
-                helper.update();
+                sphere.mass = objMass;
                 objects.push(sphere);
                 gfxScene.add(sphere);
             }
 
             function createCylinder() {
 
-                var geom = new THREE.CylinderGeometry(1, 1.0, 4, 8);
+                var geom = new THREE.CylinderGeometry(objSize, objSize, objSize*2, 8);
                 var material = new THREE.MeshLambertMaterial( { color: 0x0000ff, shading: THREE.FlatShading  } );
                 var cylinder = new THREE.Mesh( geom, material );
                 cylinder.position.set(Math.random()*9, 1, Math.random()*9);
@@ -115,6 +116,7 @@
                 cylinder.spin = new THREE.Euler(-0.03,0.03,-0.03);
                 //cylinder.AABB = createAABBVertices( cylinder );
                 cylinder.name = "cylinder";
+                cylinder.mass = objMass;
                 objects.push(cylinder);
                 gfxScene.add(cylinder);
             }
@@ -283,20 +285,20 @@
                     }
 			}
 
-			function collisionCheck() {
+			function checkWallCollisions() {
                 for (var i=0; i<objects.length; i++) {
                     var mesh = objects[i];
                     var originPoint = mesh.position.clone();
                     //console.log(" origin: " + originPoint.x + ", " + originPoint.y + ", " + originPoint.z);
 
                     if (mesh.AABB == undefined )
-                        checkVertices( mesh, originPoint, mesh.geometry.vertices);
+                        checkObjectWallCollision( mesh, originPoint, mesh.geometry.vertices);
                     else
-                        checkVertices( mesh, originPoint, mesh.AABB );
+                        checkObjectWallCollision( mesh, originPoint, mesh.AABB );
                 }
             }
 
-            function checkVertices ( mesh, originPoint, vertices ) {
+            function checkObjectWallCollision ( mesh, originPoint, vertices ) {
 
                 for ( var vertexIndex = 0; vertexIndex < vertices.length; vertexIndex++ )
                 {
@@ -312,23 +314,17 @@
                         var collisionResults = raycaster.intersectObjects( walls );
 
                         if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-                            wallCollision( mesh, collisionResults[0].object.name);
+                            handleWallCollision( mesh, collisionResults[0].object.name);
                             break;
-
-                            //console.log("Hit: " + collisionResults.length);
-                            for ( var n=0; n<collisionResults.length; n++ ) {
-                                var c = collisionResults[n];
-
-                                console.log(" name: " + c.object.name + " dist: " + c.distance + " point: " + c.point.x + ", " + c.point.y + ", " + c.point.z );
-                            }
-                        }
+                       }
                     }
                 }
             }
+
             /**
              * Handle the case where an object hits the wall
              */
-            function wallCollision( mesh, name ) {
+            function handleWallCollision( mesh, name ) {
 
 			    if (name == "left" || name == "right")
                     mesh.velocity.x = -mesh.velocity.x;
@@ -337,8 +333,72 @@
 			    else
 			        mesh.velocity.z = -mesh.velocity.z;
 
-                console.log("Reversing increment: ");
             }
+
+            function checkObjectCollisions() {
+                for (var i=0; i<objects.length; i++) {
+                    var mesh = objects[i];
+                    var originPoint = mesh.position.clone();
+                    //console.log(" origin: " + originPoint.x + ", " + originPoint.y + ", " + originPoint.z);
+
+                    checkObjectsCollision( mesh, originPoint, mesh.geometry.vertices);
+                }
+            }
+
+            function checkObjectsCollision ( mesh, originPoint, vertices ) {
+
+                for ( var vertexIndex = 0; vertexIndex < vertices.length; vertexIndex++ )
+                {
+                    var localVertex = vertices[vertexIndex].clone();
+                    var globalVertex = localVertex.applyMatrix4( mesh.matrix );
+                    var directionVector = globalVertex.sub( mesh.position );
+                    var angle = mesh.velocity.angleTo( directionVector);
+                    //console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +" angle; " + angle);
+
+                    if ( angle <= Math.PI/2) {
+
+                        raycaster.set( originPoint, directionVector.clone().normalize() );
+                        var collisionResults = raycaster.intersectObjects( objects );
+
+                        if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
+                            handleObjectsCollision( mesh, collisionResults[0] );
+                            break;
+                        }
+                    }
+                }
+            }
+
+            function handleObjectsCollision( meshA, collisionResult ) {
+
+                var meshB = collisionResult.object;
+
+                console.log("Objects Collided");
+                if (meshA === meshB)
+                    console.log("Appears to be same object");
+
+                var collision = new THREE.Vector3();
+                collision.x = ((meshA.position.x * objSize) + (meshB.position.x * objSize)) / (objSize + objSize);
+                collision.y = ((meshA.position.y * objSize) + (meshB.position.y * objSize)) / (objSize + objSize);
+                collision.z = ((meshA.position.z * objSize) + (meshB.position.z * objSize)) / (objSize + objSize);
+
+                /*
+                newVelX1 = (firstBall.speed.x * (firstBall.mass – secondBall.mass) + (2 * secondBall.mass * secondBall.speed.x)) / (firstBall.mass + secondBall.mass);
+                newVelY1 = (firstBall.speed.y * (firstBall.mass – secondBall.mass) + (2 * secondBall.mass * secondBall.speed.y)) / (firstBall.mass + secondBall.mass);
+                newVelX2 = (secondBall.speed.x * (secondBall.mass – firstBall.mass) + (2 * firstBall.mass * firstBall.speed.x)) / (firstBall.mass + secondBall.mass);
+                newVelY2 = (secondBall.speed.y * (secondBall.mass – firstBall.mass) + (2 * firstBall.mass * firstBall.speed.y)) / (firstBall.mass + secondBall.mass);
+                */
+
+                var avX = (meshA.velocity.x * (meshA.mass - meshB.mass) + (2 * meshB.mass * meshB.velocity.x)) / (meshA.mass + meshB.mass);
+                var avY = (meshA.velocity.y * (meshA.mass - meshB.mass) + (2 * meshB.mass * meshB.velocity.y)) / (meshA.mass + meshB.mass);
+                var avZ = (meshA.velocity.z * (meshA.mass - meshB.mass) + (2 * meshB.mass * meshB.velocity.z)) / (meshA.mass + meshB.mass);
+                var bvX = (meshB.velocity.x * (meshB.mass - meshA.mass) + (2 * meshA.mass * meshA.velocity.x)) / (meshA.mass + meshB.mass);
+                var bvY = (meshB.velocity.y * (meshB.mass - meshA.mass) + (2 * meshA.mass * meshA.velocity.y)) / (meshA.mass + meshB.mass);
+                var bvZ = (meshB.velocity.z * (meshB.mass - meshA.mass) + (2 * meshA.mass * meshA.velocity.z)) / (meshA.mass + meshB.mass);
+
+                meshA.velocity.set(avX, avY, avZ);
+                meshB.velocity.set(bvX, bvY, bvZ);
+           }
+
 
             function updatePositions() {
                 for (var i = 0; i < objects.length; i++) {
@@ -351,7 +411,9 @@
                     mesh.rotateZ(mesh.spin.z);
                     mesh.updateMatrixWorld();
 
-                    collisionCheck();
+                    checkWallCollisions();
+
+                    checkObjectCollisions();
                 }
             }
 

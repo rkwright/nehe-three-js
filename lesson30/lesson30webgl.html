@@ -33,11 +33,11 @@
             var box;
             var walls = [];
             var objects = [];
-            var incrementX = 0.25;
-            var incrementY = 0.15;
-            var incrementZ = 0.15;
-            var objSize = 1;
-            var objMass = 1;
+            var OBJ_VEL = 0.1;
+            var OBJ_SIZE = 1;
+            var OBJ_MASS = 1;
+            var OBJ_SPIN = 0.1;
+            var PLANE_SIZE = 20
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
@@ -60,12 +60,14 @@
 
                 createFloorAndWalls();
 
-                for (var n=0; n<3; n++ ) {
+                for (var n=0; n<2; n++ ) {
                     createBox();
 
                     createSphere();
 
                     createCylinder();
+
+                    createIcosahedron();
                 }
 
                 gfxScene.renderScene();
@@ -74,7 +76,19 @@
 			}
 
 			function randVel() {
-                return incrementX * (Math.random()-0.5);
+                return OBJ_VEL * (Math.random()-0.5);
+            }
+
+            function randPos () {
+			    return (PLANE_SIZE-2) * (Math.random()-0.5);
+            }
+
+            function randPosY () {
+                return PLANE_SIZE - (PLANE_SIZE-2) * Math.random();
+            }
+
+            function randSpin () {
+                return OBJ_SPIN * (Math.random()- 0.5);
             }
 
 			/**
@@ -82,59 +96,58 @@
              */
             function createBox() {
 
-                var geom = new THREE.BoxGeometry( objSize*2,objSize*2,objSize*2 );
+                var geom = new THREE.BoxGeometry( OBJ_SIZE*2,OBJ_SIZE*2,OBJ_SIZE*2 );
                 var material = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.FlatShading  } );
                 var box = new THREE.Mesh( geom, material );
-                box.position.set(Math.random()*9, 1, Math.random()*9);
+                box.position.set(randPos(), randPosY(), randPos());
                 box.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
-                box.spin = new THREE.Euler(0.05,0.05,0.05);
-                box.mass = objMass;
+                box.spin = new THREE.Euler(randSpin(),randSpin(),randSpin());
+                box.mass = OBJ_MASS;
                 objects.push(box);
                 gfxScene.add(box);
             }
 
             function createSphere() {
 
-                var geom = new THREE.SphereGeometry(objSize, 8, 8);
+                var geom = new THREE.SphereGeometry(OBJ_SIZE, 6, 6);
                 var material = new THREE.MeshLambertMaterial( { color: 0x00ff00, shading: THREE.FlatShading  } );
                 var sphere = new THREE.Mesh( geom, material );
-                sphere.position.set(Math.random()*9, 1, Math.random()*9);
+                sphere.position.set(randPos(), randPosY(), randPos());
                 sphere.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
                 sphere.spin = new THREE.Euler(0,0,0);
-                sphere.mass = objMass;
+                sphere.mass = OBJ_MASS;
                 objects.push(sphere);
                 gfxScene.add(sphere);
             }
 
             function createCylinder() {
 
-                var geom = new THREE.CylinderGeometry(objSize, objSize, objSize*2, 8);
+                var geom = new THREE.CylinderGeometry(OBJ_SIZE, OBJ_SIZE, OBJ_SIZE*2, 8);
                 var material = new THREE.MeshLambertMaterial( { color: 0x0000ff, shading: THREE.FlatShading  } );
                 var cylinder = new THREE.Mesh( geom, material );
-                cylinder.position.set(Math.random()*9, 1, Math.random()*9);
+                cylinder.position.set(randPos(), randPosY(), randPos());
                 cylinder.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
-                cylinder.spin = new THREE.Euler(-0.03,0.03,-0.03);
+                cylinder.spin = new THREE.Euler(randSpin(),randSpin(),randSpin());
                 //cylinder.AABB = createAABBVertices( cylinder );
                 cylinder.name = "cylinder";
-                cylinder.mass = objMass;
+                cylinder.mass = OBJ_MASS;
                 objects.push(cylinder);
                 gfxScene.add(cylinder);
             }
 
-            /*
-            function createCylinder() {
+            function createIcosahedron() {
 
-                var geom = new THREE.CylinderGeometry(0.6, 0.6, 3, 8);
-                var material = new THREE.MeshLambertMaterial( { color: 0x0000ff, shading: THREE.FlatShading  } );
-                var cylinder = new THREE.Mesh( geom, material );
-                cylinder.position.set(1, 1, 0);
-                cylinder.velocity = new THREE.Vector3(-incrementX, incrementY, incrementZ);
-                cylinder.spin = new THREE.Euler(-0.02,0.02,-0.02);
-                cylinder.AABB = createAABBVertices( cylinder );
-                objects.push(cylinder);
-                gfxScene.add(cylinder);
+                var geom = new THREE.IcosahedronGeometry(OBJ_SIZE);
+                var material = new THREE.MeshLambertMaterial( { color: 0x00ffff, shading: THREE.FlatShading  } );
+                var icosahedron = new THREE.Mesh( geom, material );
+                icosahedron.position.set(randPos(), randPosY(), randPos());
+                icosahedron.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
+                icosahedron.spin = new THREE.Euler(randSpin(),randSpin(),randSpin());
+                icosahedron.mass = OBJ_MASS;
+                objects.push(icosahedron);
+                gfxScene.add(icosahedron);
             }
-            */
+
 
             /**
              *  Create a set of vertices that represent the AABB box from BoxHelper
@@ -181,7 +194,7 @@
 			    var WALL_S  = 2;
 			    var WALL_T  = 2;
 
-                var planeGeo = new THREE.PlaneGeometry( 20, 20 );
+                var planeGeo = new THREE.PlaneGeometry( PLANE_SIZE, PLANE_SIZE );
 
                 var floorMat = new THREE.MeshStandardMaterial( {
                     roughness: 0.8,
@@ -291,6 +304,13 @@
                     var originPoint = mesh.position.clone();
                     //console.log(" origin: " + originPoint.x + ", " + originPoint.y + ", " + originPoint.z);
 
+                    if (originPoint.x > 11 || originPoint.x < -11 || originPoint.y > 21 || originPoint.y < -1 || originPoint.z > 11 || originPoint.z < -11)  {
+                        //console.log("Yikes!  The object has escaped!! Velocity is x: " + mesh.velocity.x  + " y: " + mesh.velocity.y  + " z: " + mesh.velocity.z);
+                        //debugger;
+
+                        objects.splice(i,1);
+                    }
+
                     if (mesh.AABB == undefined )
                         checkObjectWallCollision( mesh, originPoint, mesh.geometry.vertices);
                     else
@@ -372,21 +392,14 @@
 
                 var meshB = collisionResult.object;
 
-                console.log("Objects Collided");
+                //console.log("Objects Collided");
                 if (meshA === meshB)
                     console.log("Appears to be same object");
 
                 var collision = new THREE.Vector3();
-                collision.x = ((meshA.position.x * objSize) + (meshB.position.x * objSize)) / (objSize + objSize);
-                collision.y = ((meshA.position.y * objSize) + (meshB.position.y * objSize)) / (objSize + objSize);
-                collision.z = ((meshA.position.z * objSize) + (meshB.position.z * objSize)) / (objSize + objSize);
-
-                /*
-                newVelX1 = (firstBall.speed.x * (firstBall.mass – secondBall.mass) + (2 * secondBall.mass * secondBall.speed.x)) / (firstBall.mass + secondBall.mass);
-                newVelY1 = (firstBall.speed.y * (firstBall.mass – secondBall.mass) + (2 * secondBall.mass * secondBall.speed.y)) / (firstBall.mass + secondBall.mass);
-                newVelX2 = (secondBall.speed.x * (secondBall.mass – firstBall.mass) + (2 * firstBall.mass * firstBall.speed.x)) / (firstBall.mass + secondBall.mass);
-                newVelY2 = (secondBall.speed.y * (secondBall.mass – firstBall.mass) + (2 * firstBall.mass * firstBall.speed.y)) / (firstBall.mass + secondBall.mass);
-                */
+                collision.x = ((meshA.position.x * OBJ_SIZE) + (meshB.position.x * OBJ_SIZE)) / (OBJ_SIZE + OBJ_SIZE);
+                collision.y = ((meshA.position.y * OBJ_SIZE) + (meshB.position.y * OBJ_SIZE)) / (OBJ_SIZE + OBJ_SIZE);
+                collision.z = ((meshA.position.z * OBJ_SIZE) + (meshB.position.z * OBJ_SIZE)) / (OBJ_SIZE + OBJ_SIZE);
 
                 var avX = (meshA.velocity.x * (meshA.mass - meshB.mass) + (2 * meshB.mass * meshB.velocity.x)) / (meshA.mass + meshB.mass);
                 var avY = (meshA.velocity.y * (meshA.mass - meshB.mass) + (2 * meshB.mass * meshB.velocity.y)) / (meshA.mass + meshB.mass);

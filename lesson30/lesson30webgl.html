@@ -33,7 +33,7 @@
             var box;
             var walls = [];
             var objects = [];
-            var incrementX = 0.15;
+            var incrementX = 0.25;
             var incrementY = 0.15;
             var incrementZ = 0.15;
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
@@ -57,11 +57,13 @@
 
                 createFloorAndWalls();
 
-                createBox();
+                for (var n=0; n<3; n++ ) {
+                    createBox();
 
-                createSphere();
+                    createSphere();
 
-                createCylinder();
+                    createCylinder();
+                }
 
                 gfxScene.renderScene();
 
@@ -69,6 +71,10 @@
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
 			}
+
+			function randVel() {
+                return incrementX * (Math.random()-0.5);
+            }
 
 			/**
              *
@@ -78,8 +84,8 @@
                 var geom = new THREE.BoxGeometry( 1,1,1 );
                 var material = new THREE.MeshLambertMaterial( { color: 0xff0000, shading: THREE.FlatShading  } );
                 var box = new THREE.Mesh( geom, material );
-                box.position.set(0, 1, 0);
-                box.velocity = new THREE.Vector3(incrementX, incrementY, incrementZ);
+                box.position.set(Math.random()*9, 1, Math.random()*9);
+                box.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
                 box.spin = new THREE.Euler(0.05,0.05,0.05);
                 objects.push(box);
                 gfxScene.add(box);
@@ -90,7 +96,8 @@
                 var geom = new THREE.SphereGeometry(1, 8, 8);
                 var material = new THREE.MeshLambertMaterial( { color: 0x00ff00, shading: THREE.FlatShading  } );
                 var sphere = new THREE.Mesh( geom, material );
-                sphere.position.set(0, 1, 0);sphere.velocity = new THREE.Vector3(-incrementX, -incrementY, incrementZ);
+                sphere.position.set(Math.random()*9, 1, Math.random()*9);
+                sphere.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
                 sphere.spin = new THREE.Euler(0,0,0);
                 var helper = new THREE.BoundingBoxHelper(sphere, 0xff0000);
                 helper.update();
@@ -100,16 +107,32 @@
 
             function createCylinder() {
 
-                var geom = new THREE.CylinderGeometry(0, 1.0, 4, 8);
+                var geom = new THREE.CylinderGeometry(1, 1.0, 4, 8);
                 var material = new THREE.MeshLambertMaterial( { color: 0x0000ff, shading: THREE.FlatShading  } );
                 var cylinder = new THREE.Mesh( geom, material );
-                cylinder.position.set(0, 1, 0);
+                cylinder.position.set(Math.random()*9, 1, Math.random()*9);
+                cylinder.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
+                cylinder.spin = new THREE.Euler(-0.03,0.03,-0.03);
+                //cylinder.AABB = createAABBVertices( cylinder );
+                cylinder.name = "cylinder";
+                objects.push(cylinder);
+                gfxScene.add(cylinder);
+            }
+
+            /*
+            function createCylinder() {
+
+                var geom = new THREE.CylinderGeometry(0.6, 0.6, 3, 8);
+                var material = new THREE.MeshLambertMaterial( { color: 0x0000ff, shading: THREE.FlatShading  } );
+                var cylinder = new THREE.Mesh( geom, material );
+                cylinder.position.set(1, 1, 0);
                 cylinder.velocity = new THREE.Vector3(-incrementX, incrementY, incrementZ);
-                cylinder.spin = new THREE.Euler(-0.05,0.05,-0.05);
+                cylinder.spin = new THREE.Euler(-0.02,0.02,-0.02);
                 cylinder.AABB = createAABBVertices( cylinder );
                 objects.push(cylinder);
                 gfxScene.add(cylinder);
             }
+            */
 
             /**
              *  Create a set of vertices that represent the AABB box from BoxHelper

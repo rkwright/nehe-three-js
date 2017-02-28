@@ -2,7 +2,7 @@
  *  @author rkwright   /  http://www.geofx.com
  */
 
-var GFX = { revision: '01' };
+var GFX = { revision: '02' };
 
 //some constants
 	var    	X_AXIS = 0;
@@ -15,8 +15,19 @@ GFX.Scene = function ( parameters ) {
 	this.renderer = null;
 	this.camera = null;
     this.containerID = null;
+    this.shadowMapEnabled = false;
 
+    this.clearColor = 0x000000;
+
+	this.canvasWidth = 0;
+	this.canvasHeight = 0;
+
+    this.perspective = true;
+    this.fov = 45;
+    this.near = 0.01;
+    this.far = 1000;
 	this.cameraPos = [0,20,40];
+    this.orthoSize = 1;
 
 	this.controls = false;
 	this.orbitControls = null;
@@ -24,12 +35,19 @@ GFX.Scene = function ( parameters ) {
 	this.displayStats = false;
 	this.stats = null;
 
-	this.ambientLight = null;
-	this.directionalLight = null;
+	this.defaultLights = true;
+	this.ambientLights = [];
+	this.directionalLights = [];
+	this.pointLights = [];
+	this.hemisphereLights =[];
+	this.spotLights = [];
 
-	this.axisHeight = 0;
+	this.axesHeight = 0;
 	
 	this.floorRepeat = 0;
+	this.floorX      = 0;
+	this.floorZ      = 0;
+    this.floorImage  = null;
 	
 	this.fogType = 'none';	// else 'linear' or 'exponential' 
 	this.fogDensity = 0;
@@ -37,42 +55,51 @@ GFX.Scene = function ( parameters ) {
 	this.fogNear = 0.015;
 	this.fogFar = 100;
 
-	this.setParameters( parameters );
+    GFX.setParameters( this, parameters );
+
+    this.initialize();
+};
+
+GFX.setParameters= function( object, values ) {
+
+    if ( values === undefined ) return;
+
+    for ( var key in values ) {
+
+        var newValue = values[ key ];
+
+        if ( newValue === undefined ) {
+            console.warn( "GFX: '" + key + "' parameter is undefined." );
+            continue;
+        }
+
+        if ( key in object ) {
+            var currentValue = object[ key ];
+
+            if ( currentValue instanceof THREE.Color ) {
+                currentValue.set( newValue );
+            }
+            else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
+                currentValue.copy( newValue );
+            }
+            else if ( key == 'overdraw' ) {
+                // ensure overdraw is backwards-compatible with legacy boolean type
+                object[ key ] = Number( newValue );
+            }
+            else if (currentValue instanceof Array) {
+                object[ key ] = newValue.slice();
+            }
+            else {
+                object[ key ] = newValue;
+            }
+
+        }
+    }
 };
 
 // the scene's parameters from the values JSON object
 // lifted from MrDoob's implementation in three.js
 GFX.Scene.prototype = {
-		
-	setParameters: function( values ) {
-
-		if ( values === undefined ) return;
-	
-		for ( var key in values ) {
-	
-			var newValue = values[ key ];
-	
-			if ( newValue === undefined ) {
-				console.warn( "NEHE: '" + key + "' parameter is undefined." );
-				continue;
-			}
-	
-			if ( key in this ) {
-				var currentValue = this[ key ];
-	
-				if ( currentValue instanceof THREE.Color ) {
-					currentValue.set( newValue );
-				} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
-					currentValue.copy( newValue );
-				} else if ( key == 'overdraw' ) {
-					// ensure overdraw is backwards-compatible with legacy boolean type
-					this[ key ] = Number( newValue );
-				} else {
-					this[ key ] = newValue;
-				}
-			}
-		}
-	},
 
 	initialize: function () {
 		// Check whether the browser supports WebGL. 
@@ -83,9 +110,36 @@ GFX.Scene.prototype = {
 
 		this.addFog();
 		
-		// Get the size of the inner window (content area)
-		var canvasWidth = window.innerWidth;
-		var canvasHeight = window.innerHeight;
+		// If the user didn't supply a fixed size for the window,
+		// get the size of the inner window (content area)
+		if (this.canvasHeight == 0) {
+			this.canvasWidth = window.innerWidth;
+			this.canvasHeight = window.innerHeight;
+
+            var _self = this;
+
+			// add an event listener to handle changing the size of the window
+			window.addEventListener('resize', function() {
+                _self.canvasWidth  = window.innerWidth;
+                _self.canvasHeight = window.innerHeight;
+                var aspect = _self.canvasWidth / _self.canvasHeight;
+
+                if (_self.perspective == true ) {
+                    _self.camera.aspect = aspect;
+                } else {
+                    var w2 = _self.orthoSize * aspect / 2;
+                    var h2 = _self.orthoSize / 2;
+
+                    _self.camera.left   = -w2;
+                    _self.camera.right  = w2;
+                    _self.camera.top    = h2;
+                    _self.camera.bottom = -h2;
+                }
+
+                _self.camera.updateProjectionMatrix();
+                _self.renderer.setSize( _self.canvasWidth, _self.canvasHeight );
+            });
+		}
 	
 		// if the caller supplied the container elm ID try to find it
 		var container;
@@ -98,54 +152,41 @@ GFX.Scene.prototype = {
 			document.body.appendChild( container );
 		}
 		else {
-			canvasWidth = container.clientWidth;
-			canvasHeight = container.clientHeight;
+			this.canvasWidth = container.clientWidth;
+			this.canvasHeight = container.clientHeight;
 		}
 	
 		// set up the camera
-		this.camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 0.1, 5000);
-		if (this.cameraPos == undefined)
-			this.camera.position.set(0, 10, 20);
-		else
-			this.camera.position.set(this.cameraPos[0], this.cameraPos[1], this.cameraPos[2]);
+		this.setCamera(null);
 
-		this.camera.lookAt(this.scene.position);
 		this.scene.add(this.camera);
 	
 		// allocate the THREE.js renderer
 		this.renderer = new THREE.WebGLRenderer({antialias:true});
 	
 		// Set the background color of the renderer to black, with full opacity
-		this.renderer.setClearColor(0x000000, 1);
-	
+		this.renderer.setClearColor(new THREE.Color( this.clearColor ), 1);
+
+		if (this.shadowMapEnabled == true )
+		    this.renderer.shadowMap.enabled = true;
+
 		// Set the renderers size to the content areas size
-		this.renderer.setSize(canvasWidth, canvasHeight);
+		this.renderer.setSize(this.canvasWidth, this.canvasHeight);
 	
 		// Get the DIV element from the HTML document by its ID and append the renderer's DOM object
 		container.appendChild(this.renderer.domElement);
-				
-		// Ambient light has no direction, it illuminates every object with the same
-		// intensity. If only ambient light is used, no shading effects will occur.
-		this.ambientLight = new THREE.AmbientLight(0x404040);
-		this.scene.add(this.ambientLight);
-	
-		// Directional light has a source and shines in all directions, like the sun.
-		// This behaviour creates shading effects.
-		this.directionalLight = new THREE.DirectionalLight(0xffffff);
-		this.directionalLight.position.set(5, 20, 12);
-		this.scene.add(this.directionalLight);
 
-		this.pointLight = new THREE.PointLight(0xffffff, 0.25);
-		this.pointLight.position.set(15, -20, -12);
-		this.scene.add(this.pointLight);
+		// if the user hasn't set defaultLights to false, then set them up
+		if (this.defaultLights == true)
+		    this.setDefaultLights();
 
 		// request the orbitControls be created and enabled
 		// add the controls
-		if (this.controls == true)
+		if (this.controls == true && this.renderer != null)
 			this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
 		
-		if ( this.axisHeight != 0 )
-			this.drawAxes(this.axisHeight);
+		if ( this.axesHeight != 0 )
+			this.drawAxes(this.axesHeight);
 		
 		if (this.floorRepeat != 0)
 			this.addFloor(this.floorRepeat);
@@ -169,9 +210,183 @@ GFX.Scene.prototype = {
 		this.scene.remove(obj);
 	},
 
-/**
- * Render the scene. Map the 3D world to the 2D screen.
- */
+	/**
+	 * Set up the camera for the scene.  Perspective or Orthographic
+	 */
+	setCamera: function ( jsonObj ) {
+	    if (jsonObj != null)
+	        GFX.setParameters(this, jsonObj);
+
+        if (this.perspective == true)
+		    this.camera = new THREE.PerspectiveCamera(this.fov, this.canvasWidth / this.canvasHeight, this.near, this.far);
+        else {
+
+            var aspect = this.canvasWidth / this.canvasHeight;
+            var w2 = this.orthoSize * aspect / 2;
+            var h2 = this.orthoSize / 2;
+            this.camera = new THREE.OrthographicCamera( -w2, w2, h2, -h2, 0.01, 1000);
+
+            //this.camera = new THREE.OrthographicCamera( this.canvasWidth / -2, this.canvasWidth / 2,
+            //    this.canvasHeight / 2, this.canvasHeight / -2, 0.01, 1000 );
+
+        }
+
+        this.camera.updateProjectionMatrix();
+
+        if (this.cameraPos == undefined)
+			this.camera.position.set(0, 10, 20);
+		else
+			this.camera.position.set(this.cameraPos[0], this.cameraPos[1], this.cameraPos[2]);
+
+		this.camera.lookAt(this.scene.position);
+
+        if (this.controls == true && this.renderer != null)
+            this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+    },
+
+    /**
+     * If the user doesn't want to set custom lights, just allocate some defaults
+     */
+    setDefaultLights: function () {
+        // Ambient light has no direction, it illuminates every object with the same
+        // intensity. If only ambient light is used, no shading effects will occur.
+        var ambLight = new THREE.AmbientLight(0x808080);
+        this.scene.add( ambLight );
+        this.ambientLights.push( ambLight);
+
+        // Directional light has a source and shines in all directions, like the sun.
+        // This behaviour creates shading effects.
+        var dirLight = new THREE.DirectionalLight(0xc0c0c0);
+        dirLight.position.set(5, 20, 12);
+        this.scene.add( dirLight );
+        this.directionalLights.push( dirLight );
+
+        var pointLight = new THREE.PointLight(0xc0c0c0, 0.25);
+        pointLight.position.set(15, -20, -12);
+        this.scene.add( pointLight );
+        this.pointLights.push( pointLight );
+    },
+
+    /**
+	 * Add one or more lights to the current scene.  If the JSON object is null,
+	 * then the default lights are used.
+	 *
+     * All lights support color and intensity
+	 * Supported types of light and their parameters are
+	 * 	AmbientLight
+     *  DirectionalLight
+     *    castShadow
+     *    position
+     *    target
+     *  HemisphereLight
+     *    castShadow
+     *    position
+     *    color   (of the sky)
+     *    groundColor
+     *  PointLight
+     *    castShadow
+     *    position
+     *    decay
+     *    power
+     *  SpotLight
+     *    distance
+     *    angle
+     *    penumbra
+     *    decay
+     *
+     * @param jsonObj
+     */
+    addLight: function ( type, values ) {
+
+        var light;
+        var color = this.getLightProp('color', values, 0xffffff);
+        var intensity = this.getLightProp ('intensity', values, 1);
+        var castShadow = this.getLightProp('castShadow', values, false);
+        var debug = this.getLightProp('debug', values, false);
+
+        if (type == 'ambient') {
+            light = new THREE.AmbientLight( color, intensity );
+            this.ambientLights.push( light );
+        }
+        else {
+            var pos = this.getLightProp('position', values, [0, 10, 0]);
+
+            if (type == 'directional') {
+                var target = this.getLightProp('target', values, undefined);
+                light = new THREE.DirectionalLight(color, intensity);
+                light.shadow.mapSize.x = 2048;
+                light.shadow.mapSize.y = 2048;
+                light.shadow.camera.left = -20;
+                light.shadow.camera.bottom = -20;
+                light.shadow.camera.right = 20;
+                light.shadow.camera.top = 20;
+
+                this.directionalLights.push(light);
+           }
+            else if (type == 'point') {
+                var distance = this.getLightProp('distance', values, 0);
+                var decay = this.getLightProp('decay', values, 1);
+                light = new THREE.PointLight(color, intensity, distance, decay);
+                this.pointLights.push(light);
+            }
+            else if (type == 'hemisphere') {
+                var groundColor = this.getLightProp('groundColor', values, 0x000000);
+                light = new THREE.HemisphereLight(color, groundColor, intensity);
+                this.hemisphereLights.push(light);
+             }
+            else if (type == 'spot') {
+                var angle = this.getLightProp('angle', values, Math.PI/3);
+                var penumbra = this.getLightProp('penumbra', values, 0);
+                var distance = this.getLightProp('distance', values, 0);
+                var decay = this.getLightProp('decay', values, 1);
+                light = new THREE.SpotLight(color, intensity, distance, angle, penumbra, decay);
+                this.spotLights.push(light);
+            }
+
+            light.position.set(pos[0], pos[1], pos[2]);
+            light.castShadow = castShadow;
+            if (debug == true) {
+                var helper = new THREE.CameraHelper( light.shadow.camera );
+                this.scene.add( helper );
+                //light.shadowCameraVisible = true;
+            }
+        }
+
+        this.scene.add( light );
+
+        return light;
+    },
+
+    getLightProp: function ( prop, values, def ) {
+        value = values[ prop ];
+        return ( value === undefined ) ? def : value;
+    },
+
+    /**
+	 * Remove all the lights currently created for the scene
+     */
+	clearAllLights: function () {
+
+	    this.clearLights( this.ambientLights );
+        this.clearLights( this.directionalLights );
+        this.clearLights( this.pointLights );
+        this.clearLights( this.spotLights );
+        this.clearLights( this.hemisphereLights );
+    },
+
+    /**
+     * Remove all the lights from the specified array
+     */
+    clearLights : function ( lightArray ) {
+
+        while (lightArray.length > 0) {
+            this.scene.remove(lightArray.pop());
+        }
+    },
+
+    /**
+	 * Render the scene. Map the 3D world to the 2D screen.
+     */
 	renderScene: function() {
 		
 		this.renderer.render(this.scene, this.camera);
@@ -183,7 +398,7 @@ GFX.Scene.prototype = {
 		if (this.stats != null && typeof this.stats != 'undefined') 
 			this.stats.update();
 
-},
+	},
 
 	addFog: function( values ) {
 		
@@ -204,9 +419,7 @@ GFX.Scene.prototype = {
 					this.fogDensity = newValue;
 				else if ( key == 'fogColor' ) 
 					this.fogColor = newValue;
-				else if ( key == 'fogLinear' ) 
-					this.fogLinear = newValue;
-				else if ( key == 'fogNear' ) 
+				else if ( key == 'fogNear' )
 					this.fogNear = newValue;
 				else if ( key == 'fogFar' ) 
 					this.fogFar = newValue;
@@ -214,7 +427,7 @@ GFX.Scene.prototype = {
 		}
 				
 		if (this.fogType == 'exponential')
-			this.scene.fog = new THREE.FogExp2(this.fogColor, this.fogDensity, this.fogNear, this.fogFar );
+			this.scene.fog = new THREE.FogExp2(this.fogColor, this.fogDensity );
 		else if (this.fogType == 'linear')
 			this.scene.fog = new THREE.Fog( this.fogColor, this.fogNear, this.fogFar );
 		else
@@ -224,13 +437,17 @@ GFX.Scene.prototype = {
 	addFloor: function( floorRepeat ) {
 		
 		// note: 4x4 checker-board pattern scaled so that each square is 25 by 25 pixels.
-		var floorTexture = new THREE.ImageUtils.loadTexture( '../images/checkerboard.jpg' );
-		floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
-		floorTexture.repeat.set( floorRepeat, floorRepeat );
+        var image = this.floorImage == null ? '../images/checkerboard.jpg' : this.floorImage;
+		var texture = new THREE.ImageUtils.loadTexture( image );
+		texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+		texture.repeat.set( this.floorRepeat, this.floorRepeat );
 		
 		// DoubleSide: render texture on both sides of mesh
-		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-		var floorGeometry = new THREE.PlaneGeometry(50, 50, 1, 1);
+		var floorMaterial = new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } );
+        var width = this.floorX == 0 ? 10 : this.floorX;
+        var height = this.floorZ == 0 ? 10 : this.floorZ;
+
+        var floorGeometry = new THREE.PlaneGeometry(width, height, 1, 1);
 		var floor = new THREE.Mesh(floorGeometry, floorMaterial);
 		floor.position.y = 0.0;
 		floor.rotation.x = Math.PI / 2;

@@ -168,7 +168,7 @@ function initializeScene(){
 	cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
 
 	// Load an image as texture
-	crateTexture = new THREE.ImageUtils.loadTexture("StoneWall-"+textureSize+".png");
+	crateTexture = new THREE.ImageUtils.loadTexture("images/StoneWall-"+textureSize+".png");
 
 	// Create a material, which contains the texture.
 	// Unfortunately, the CanvasRenderer doesn't support MeshLambertMaterial in combination
@@ -257,7 +257,7 @@ function onDocumentKeyDown(event) {
 	else if (keyCode == 84) {       // 'T' switch textures
 		textureSize = textureSize == 1024 ? 256 : textureSize == 256 ? 64 : 1024;
 
-		cubeMesh.material.map = new THREE.ImageUtils.loadTexture("StoneWall-"+textureSize+".png");
+		cubeMesh.material.map = new THREE.ImageUtils.loadTexture("images/StoneWall-"+textureSize+".png");
 		updateFilter();
 		cubeMesh.material.needsUpdate = true;
 

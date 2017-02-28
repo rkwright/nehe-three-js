@@ -33,6 +33,7 @@
             var box;
             var walls = [];
             var objects = [];
+            var LOOPS = 3;
             var OBJ_VEL = 0.1;
             var OBJ_SIZE = 1;
             var OBJ_MASS = 1;
@@ -41,7 +42,7 @@
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
-			    cameraPos : [2, -10, 50],
+			    cameraPos : [8, -10, 60],
                 axesHeight: 30,
                 controls:true,
                 displayStats:true
@@ -60,7 +61,7 @@
 
                 createFloorAndWalls();
 
-                for (var n=0; n<2; n++ ) {
+                for (var n=0; n<LOOPS; n++ ) {
                     createBox();
 
                     createSphere();
@@ -84,7 +85,7 @@
             }
 
             function randPosY () {
-                return PLANE_SIZE - (PLANE_SIZE-2) * Math.random();
+                return PLANE_SIZE/2 + (PLANE_SIZE-2)/2 * (Math.random() - 0.5);
             }
 
             function randSpin () {
@@ -414,6 +415,7 @@
 
 
             function updatePositions() {
+
                 for (var i = 0; i < objects.length; i++) {
                     var mesh = objects[i];
                     mesh.position.x += mesh.velocity.x;

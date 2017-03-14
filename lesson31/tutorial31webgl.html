@@ -18,9 +18,10 @@
 		<script src="../js/three.js" type="text/javascript"></script>
 		<script src="../js/Detector.js" type="text/javascript"></script>
 		<script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
-		<script src="../js/Stats.js" type="text/javascript"></script>
+		<script src="../js/stats.min.js" type="text/javascript"></script>
 		<script src="../js/gfx-scene.js" type="text/javascript"></script>
         <script src="js/OBJLoader.js" type="text/javascript"></script>
+        <script src="js/ColladaLoader.js" type="text/javascript"></script>
         <!--script src="js/AWDLoader.js"></script>
         <script src="js/BabylonLoader.js"></script>
         <script src="js/PDBLoader.js"></script>
@@ -52,7 +53,9 @@
 	
 			function initializeDemo() {
 	
-				loadOBJ();
+				//loadCollada();
+
+			    loadOBJ();
 
                 //addCube();
 
@@ -66,32 +69,25 @@
                 var loader = new THREE.OBJLoader( manager );
 
                 //Launch loading of the obj file, addBananaInScene is the callback when it's ready
-                loader.load( 'models/banana.obj', addBananaInScene);
+                loader.load( 'models/banana.obj', addObjectToScene);
 			}
 
-            function addBananaInScene (object){
-                banana = object;
-                var bbs = getBoundingSphere( banana );
-;
-                //Move the banana in the scene
-                //banana.rotation.x = Math.PI/2;
-                //banana.position.y = -2.0;
-                //banana.position.z = 0.5;
-                //banana.scale.x = banana.scale.y = banana.scale.z = 0.01;
+            function addObjectToScene (object){
+                var bbs = getBoundingSphere( object );
 
-                moveObjectToOrigin(banana, bbs, 1);
+                moveObjectToOrigin(object, bbs, 1);
 
                 //Go through all children of the loaded object and search for a Mesh
                 object.traverse( function ( child ) {
                     //This allow us to check if the children is an instance of the Mesh constructor
-                    if(child instanceof THREE.Mesh){
+                    if (child instanceof THREE.Mesh){
                         child.material.color = new THREE.Color(0X00FF00);
                         // Sometimes there are some vertex normals missing in the .obj files, three.js will compute them
                         child.geometry.computeVertexNormals();
                     }
                 });
                 //Add the 3D object in the scene
-                gfxScene.add(banana);
+                gfxScene.add(object);
             }
 
             function getBoundingSphere ( object ) {
@@ -118,11 +114,32 @@
 
             }
 
-            function  addCube() {
-                var cubeGeometry = new THREE.BoxGeometry(5, 5, 5);
-                cubeMesh = new THREE.Mesh(cubeGeometry, new THREE.MeshBasicMaterial({color: 0xFF0000}));
-                cubeMesh.position.set(0.0, 0.0, 0.0);
-                gfxScene.add(cubeMesh);
+            function  loadCollada () {
+                var manager = new THREE.LoadingManager();
+                // Loader for Collada from Three.js
+                var loader = new THREE.ColladaLoader( manager );
+
+                // Launch loading of the Collada file, addColladaToScene is the callback when it's ready
+                loader.load( 'models/Shark/Shark.dae', addColladaToScene);
+            }
+
+            function addColladaToScene( object ) {
+                dae = object.scene;
+               // var bbs = getBoundingSphere( german );
+
+               // moveObjectToOrigin(german, bbs, 1);
+
+                // Go through all children of the loaded object and search for a Mesh
+                dae.traverse( function ( child ) {
+                    //This allow us to check if the children is an instance of the Mesh constructor
+                    if (child instanceof THREE.Mesh){
+                        child.material.color = new THREE.Color(0X00FF00);
+                        // Sometimes there are some vertex normals missing in the .obj files, three.js will compute them
+                        child.geometry.computeVertexNormals();
+                    }
+                });
+                //Add the 3D object in the scene
+                gfxScene.add(dae);
             }
 
             function onDocumentKeyPress(event) {

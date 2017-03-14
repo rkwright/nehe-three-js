@@ -102,6 +102,10 @@ GFX.setParameters= function( object, values ) {
 GFX.Scene.prototype = {
 
 	initialize: function () {
+		if (this.scene != null) {
+			console.error("GFXScene initialize called twice!");
+			return;
+		}
 		// Check whether the browser supports WebGL. 
 		if ( !Detector.webgl ) Detector.addGetWebGLMessage();
 	

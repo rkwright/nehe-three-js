@@ -32,7 +32,8 @@
 	</head>
 	<body>	
 		<script type="text/javascript">
-			var	 cubeMesh;
+			var	    modelMesh;
+			var     modelType;
 	
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
@@ -52,27 +53,38 @@
 			 */
 	
 			function initializeDemo() {
-	
-				//loadCollada();
 
-			    loadOBJ();
-
-                //addCube();
-
+			    loadModel('1');
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
             }
-	
+
+            function loadModel( type ) {
+
+                modelType = type;
+
+                gfxScene.remove( modelMesh );
+
+                switch ( modelType ) {
+                    case '0':
+                        loadCollada();
+                        break;
+                    case '1':
+                        loadOBJ();
+                        break;
+                }
+            }
+
 			function loadOBJ() {
                 var manager = new THREE.LoadingManager();
                 //Loader for Obj from Three.js
                 var loader = new THREE.OBJLoader( manager );
 
                 //Launch loading of the obj file, addBananaInScene is the callback when it's ready
-                loader.load( 'models/banana.obj', addObjectToScene);
+                loader.load( 'models/banana.obj', onLoadOBJ);
 			}
 
-            function addObjectToScene (object){
+            function onLoadOBJ (object) {
                 var bbs = getBoundingSphere( object );
 
                 moveObjectToOrigin(object, bbs, 1);
@@ -86,8 +98,42 @@
                         child.geometry.computeVertexNormals();
                     }
                 });
+
                 //Add the 3D object in the scene
-                gfxScene.add(object);
+                //gfxScene.add(object);
+
+                modelMesh = object;
+                gfxScene.add(modelMesh);
+            }
+
+            function  loadCollada () {
+                var manager = new THREE.LoadingManager();
+                // Loader for Collada from Three.js
+                var loader = new THREE.ColladaLoader( manager );
+
+                // Launch loading of the Collada file, onLoadCollada will be called when it's ready
+                loader.load( 'models/Shark/Shark.dae', onLoadCollada);
+            }
+
+            function onLoadCollada( object ) {
+                dae = object.scene;
+               // var bbs = getBoundingSphere( german );
+
+               // moveObjectToOrigin(german, bbs, 1);
+
+                // Go through all children of the loaded object and search for a Mesh
+                dae.traverse( function ( child ) {
+                    //This allow us to check if the children is an instance of the Mesh constructor
+                    if (child instanceof THREE.Mesh){
+                        child.material.color = new THREE.Color(0X00FF00);
+                        // Sometimes there are some vertex normals missing in the .obj files, three.js will compute them
+                        child.geometry.computeVertexNormals();
+                    }
+                });
+                //Add the 3D object in the scene
+                //gfxScene.add(dae);
+                modelMesh = dae;
+                gfxScene.add(modelMesh);
             }
 
             function getBoundingSphere ( object ) {
@@ -114,37 +160,14 @@
 
             }
 
-            function  loadCollada () {
-                var manager = new THREE.LoadingManager();
-                // Loader for Collada from Three.js
-                var loader = new THREE.ColladaLoader( manager );
-
-                // Launch loading of the Collada file, addColladaToScene is the callback when it's ready
-                loader.load( 'models/Shark/Shark.dae', addColladaToScene);
-            }
-
-            function addColladaToScene( object ) {
-                dae = object.scene;
-               // var bbs = getBoundingSphere( german );
-
-               // moveObjectToOrigin(german, bbs, 1);
-
-                // Go through all children of the loaded object and search for a Mesh
-                dae.traverse( function ( child ) {
-                    //This allow us to check if the children is an instance of the Mesh constructor
-                    if (child instanceof THREE.Mesh){
-                        child.material.color = new THREE.Color(0X00FF00);
-                        // Sometimes there are some vertex normals missing in the .obj files, three.js will compute them
-                        child.geometry.computeVertexNormals();
-                    }
-                });
-                //Add the 3D object in the scene
-                gfxScene.add(dae);
-            }
-
             function onDocumentKeyPress(event) {
 				// Get the key code of the pressed key
 				var keyChar = String.fromCharCode(event.which);
+                var modelString = "0123456789ab";
+
+                if ( modelString.indexOf(keyChar) != -1) {
+                    loadModel(keyChar);
+                }
 			}
 	
 			/**

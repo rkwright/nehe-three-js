@@ -17,8 +17,8 @@ THREE.BabylonLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
-        //loader.setCrossOrigin( '' );  //RKW
-        loader.crossOrigin = '';        //RKW
+		// specify a CORS handler so the rest of the code doesn't have a cow
+        loader.crossOrigin = '';
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );

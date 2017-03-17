@@ -27,8 +27,8 @@
         <script src="js/PDBLoader.js"></script>
         <script src="js/PLYLoader.js"></script>
         <script src="js/STLLoader.js"></script>
-        <!-- script src="js/VRMLLoader.js"></script>
-        <script src="js/VTKLoader.js"></script -->
+        <script src="js/VRMLLoader.js"></script>
+        <script src="js/VTKLoader.js"></script>
 	</head>
 	<body>	
 		<script type="text/javascript">
@@ -54,7 +54,7 @@
 	
 			function initializeDemo() {
 
-			    loadModel("5");
+			    loadModel("8");
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
             }
@@ -86,6 +86,12 @@
                         break;
                     case '6':
                         loadSTL();
+                        break;
+                    case '7':
+                        loadVRML();
+                        break;
+                    case '8':
+                        loadVTK();
                         break;
                 }
             }
@@ -131,7 +137,7 @@
 
             function onLoadCollada( object ) {
                 dae = object.scene;
- 
+
                 // Go through all children of the loaded object and search for a Mesh
                 dae.traverse( function ( child ) {
                     //This allow us to check if the children is an instance of the Mesh constructor
@@ -265,7 +271,7 @@
             function onLoadPLY ( geometry ) {
 
                 geometry.computeVertexNormals();
-                var material = new THREE.MeshLambertMaterial({color: 0xC0C0C0, shading:THREE.FlatShading, specular: 0xFF0000, shininess: 100});
+                var material = new THREE.MeshPhongMaterial({color: 0xC0C0C0, shading:THREE.FlatShading, specular: 0xFFFFFF, shininess: 100});
                 modelMesh = new THREE.Mesh(geometry, material);
                 modelMesh.rotation.set(-Math.PI / 2, 0, 0);
                 modelMesh.position.set(-2, 0, 5.36);
@@ -295,6 +301,43 @@
                 modelMesh.scale.set(0.5, 0.5, 0.5);
                 gfxScene.add(modelMesh);
                 updateLabel("STL");
+            }
+
+            // prepare WRL loader and load the model
+            function  loadVRML () {
+                var manager = new THREE.LoadingManager();
+                var loader = new THREE.VRMLLoader( manager );
+
+                // Launch loading of the VRML file, onLoad* will be called when it's ready
+                loader.load( 'models/VRML/house.wrl', onLoadVRML);
+            }
+
+            function onLoadVRML ( geometry ) {
+                modelMesh - geometry;
+                gfxScene.add(modelMesh);
+                updateLabel("VRML");
+            }
+
+            // prepare VTK loader and load the model
+            function  loadVTK () {
+                var manager = new THREE.LoadingManager();
+                var loader = new THREE.VTKLoader( manager );
+
+                // Launch loading of the VTK file, onLoad* will be called when it's ready
+                loader.load( 'models/VTK/bunny.vtk', onLoadVTK);
+            }
+
+            function onLoadVTK ( geometry ) {
+
+                geometry.computeVertexNormals();
+
+                var material = new THREE.MeshLambertMaterial( { color:0xEEEEEE, shading:THREE.FlatShading } );
+                modelMesh = new THREE.Mesh(geometry, material);
+                modelMesh.rotation.set(0, Math.PI/2, 0);
+                modelMesh.scale.set(10, 10, 10);
+                modelMesh.position.set(-0.15, -0.275, 0);
+                gfxScene.add(modelMesh);
+                updateLabel("VTK");
             }
             //================= Utilities ==========================
 

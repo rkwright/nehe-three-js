@@ -54,7 +54,7 @@
 	
 			function initializeDemo() {
 
-			    loadModel("8");
+			    loadModel("0");
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
             }
@@ -166,9 +166,6 @@
 
             function onLoadAWD ( object ) {
                 awd = object;
-                // var bbs = getBoundingSphere( german );
-
-                // moveObjectToOrigin(german, bbs, 1);
 
                 // Go through all children of the loaded object and search for a Mesh
                 awd.traverse( function ( child ) {
@@ -181,8 +178,7 @@
                 });
 
                 modelMesh = awd;
-                //modelMesh.position.set(-10, 1, -15);
-                modelMesh.scale.set(0.1, 0.1, 0.1);
+                modelMesh.scale.set(0.075, 0.075, 0.075);
                 gfxScene.add(modelMesh);
                 updateLabel("AWD");
             }
@@ -205,9 +201,6 @@
                         var textureD = THREE.ImageUtils.loadTexture('models/Babylon/0.jpg', undefined, function() {
 
                             child.material = new THREE.MeshLambertMaterial({  map: textureD });
-                            //child.position.set(0, 0, 0);
-                            //child.rotateY(Math.PI);
-                            //child.scale.set(0.05, 0.05, 0.05);
                         });
                         textureD.needsUpdate = true;
                         textureD.magFilter = THREE.NearestFilter;
@@ -218,7 +211,6 @@
                 });
 
                 modelMesh = babylon;
-                //modelMesh.position.set(-10, 1, -15);
                 modelMesh.rotateY(Math.PI);
                 modelMesh.scale.set(0.05, 0.05, 0.05);
                 gfxScene.add(modelMesh);
@@ -274,11 +266,8 @@
                 var material = new THREE.MeshPhongMaterial({color: 0xC0C0C0, shading:THREE.FlatShading, specular: 0xFFFFFF, shininess: 100});
                 modelMesh = new THREE.Mesh(geometry, material);
                 modelMesh.rotation.set(-Math.PI / 2, 0, 0);
-                modelMesh.position.set(-2, 0, 5.36);
-                //modelMesh.scale.set(2, 2, 2);
-
-                //modelMesh = group;
                 modelMesh.scale.set(0.5, 0.5, 0.5);
+                modelMesh.position.set(-2, 0, 5.36);
                 gfxScene.add(modelMesh);
                 updateLabel("PLY");
             }
@@ -303,7 +292,7 @@
                 updateLabel("STL");
             }
 
-            // prepare WRL loader and load the model
+            // prepare VRML loader and load the model
             function  loadVRML () {
                 var manager = new THREE.LoadingManager();
                 var loader = new THREE.VRMLLoader( manager );
@@ -312,8 +301,12 @@
                 loader.load( 'models/VRML/house.wrl', onLoadVRML);
             }
 
-            function onLoadVRML ( geometry ) {
-                modelMesh - geometry;
+            function onLoadVRML ( object ) {
+
+                modelMesh = object;
+                modelMesh.scale.set(0.5, 0.5, 0.5);
+                modelMesh.position.set(-1.5, 0, 2.5 );
+
                 gfxScene.add(modelMesh);
                 updateLabel("VRML");
             }
@@ -334,7 +327,7 @@
                 var material = new THREE.MeshLambertMaterial( { color:0xEEEEEE, shading:THREE.FlatShading } );
                 modelMesh = new THREE.Mesh(geometry, material);
                 modelMesh.rotation.set(0, Math.PI/2, 0);
-                modelMesh.scale.set(10, 10, 10);
+                modelMesh.scale.set(15, 15, 15);
                 modelMesh.position.set(-0.15, -0.275, 0);
                 gfxScene.add(modelMesh);
                 updateLabel("VTK");
@@ -372,7 +365,7 @@
             function onDocumentKeyPress(event) {
 				// Get the key code of the pressed key
 				var keyChar = String.fromCharCode(event.which);
-                var modelString = "0123456789ab";
+                var modelString = "012345678";
 
                 if ( modelString.indexOf(keyChar) != -1) {
                     loadModel(keyChar);

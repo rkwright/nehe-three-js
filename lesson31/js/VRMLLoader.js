@@ -31,7 +31,10 @@ THREE.VRMLLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( this.manager );
-		loader.load( url, function ( text ) {
+        // specify a CORS handler so the rest of the code doesn't have a cow
+        loader.crossOrigin = '';
+
+        loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
 

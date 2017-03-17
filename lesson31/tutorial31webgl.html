@@ -54,7 +54,7 @@
 	
 			function initializeDemo() {
 
-			    loadModel('6');
+			    loadModel("5");
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
             }
@@ -131,10 +131,7 @@
 
             function onLoadCollada( object ) {
                 dae = object.scene;
-               // var bbs = getBoundingSphere( german );
-
-               // moveObjectToOrigin(german, bbs, 1);
-
+ 
                 // Go through all children of the loaded object and search for a Mesh
                 dae.traverse( function ( child ) {
                     //This allow us to check if the children is an instance of the Mesh constructor
@@ -266,13 +263,15 @@
             }
 
             function onLoadPLY ( geometry ) {
-                var material = new THREE.MeshBasicMaterial({color: 0xC0C0C0});
+
+                geometry.computeVertexNormals();
+                var material = new THREE.MeshLambertMaterial({color: 0xC0C0C0, shading:THREE.FlatShading, specular: 0xFF0000, shininess: 100});
                 modelMesh = new THREE.Mesh(geometry, material);
-                modelMesh.rotation.set(-Math.PI / 2 - 0.2, 0, -Math.PI / 2 + 0.2);
-                //modelMesh.position.set(-20, 15, 10);
+                modelMesh.rotation.set(-Math.PI / 2, 0, 0);
+                modelMesh.position.set(-2, 0, 5.36);
                 //modelMesh.scale.set(2, 2, 2);
 
-                modelMesh = group;
+                //modelMesh = group;
                 modelMesh.scale.set(0.5, 0.5, 0.5);
                 gfxScene.add(modelMesh);
                 updateLabel("PLY");

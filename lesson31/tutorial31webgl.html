@@ -25,9 +25,9 @@
         <script src="js/AWDLoader.js"></script>
         <script src="js/BabylonLoader.js"></script>
         <script src="js/PDBLoader.js"></script>
-        <!-- script src="js/PLYLoader.js"></script>
+        <script src="js/PLYLoader.js"></script>
         <script src="js/STLLoader.js"></script>
-        <script src="js/VRMLLoader.js"></script>
+        <!-- script src="js/VRMLLoader.js"></script>
         <script src="js/VTKLoader.js"></script -->
 	</head>
 	<body>	
@@ -54,7 +54,7 @@
 	
 			function initializeDemo() {
 
-			    loadModel('4');
+			    loadModel('6');
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
             }
@@ -80,6 +80,12 @@
                         break;
                     case '4':
                         loadPDB();
+                        break;
+                    case '5':
+                        loadPLY();
+                        break;
+                    case '6':
+                        loadSTL();
                         break;
                 }
             }
@@ -221,7 +227,7 @@
                 var manager = new THREE.LoadingManager();
                 var loader = new THREE.PDBLoader( manager );
 
-                // Launch loading of the Babylon file, onLoadBabylon will be called when it's ready
+                // Launch loading of the PDB file, onLoadPDB will be called when it's ready
                 loader.load( 'models/PDB/caf2.pdb', onLoadPDB);
             }
 
@@ -251,6 +257,46 @@
                 updateLabel("PDB");
             }
 
+            function  loadPLY () {
+                var manager = new THREE.LoadingManager();
+                var loader = new THREE.PLYLoader( manager );
+
+                // Launch loading of the PLY file, onLoad* will be called when it's ready
+                loader.load( 'models/PLY/F117.ply', onLoadPLY);
+            }
+
+            function onLoadPLY ( geometry ) {
+                var material = new THREE.MeshBasicMaterial({color: 0xC0C0C0});
+                modelMesh = new THREE.Mesh(geometry, material);
+                modelMesh.rotation.set(-Math.PI / 2 - 0.2, 0, -Math.PI / 2 + 0.2);
+                //modelMesh.position.set(-20, 15, 10);
+                //modelMesh.scale.set(2, 2, 2);
+
+                modelMesh = group;
+                modelMesh.scale.set(0.5, 0.5, 0.5);
+                gfxScene.add(modelMesh);
+                updateLabel("PLY");
+            }
+
+            // prepare STL loader and load the model
+            function  loadSTL () {
+                var manager = new THREE.LoadingManager();
+                var loader = new THREE.STLLoader( manager );
+
+                // Launch loading of the STL file, onLoad* will be called when it's ready
+                loader.load( 'models/STL/piano.stl', onLoadSTL);
+            }
+
+            function onLoadSTL ( geometry ) {
+
+                var material = new THREE.MeshNormalMaterial();
+                modelMesh = new THREE.Mesh(geometry, material);
+                modelMesh.rotation.set(-Math.PI / 2, 0, Math.PI / 2);
+                modelMesh.rotateZ(Math.PI);
+                modelMesh.scale.set(0.5, 0.5, 0.5);
+                gfxScene.add(modelMesh);
+                updateLabel("STL");
+            }
             //================= Utilities ==========================
 
             function updateLabel( modelStr ) {

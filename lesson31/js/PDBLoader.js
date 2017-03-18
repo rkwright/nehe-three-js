@@ -16,7 +16,7 @@ THREE.PDBLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
         // specify a CORS handler so the rest of the code doesn't have a cow
         loader.crossOrigin = '';
 

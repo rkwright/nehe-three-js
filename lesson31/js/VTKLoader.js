@@ -16,8 +16,6 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
-        // specify a CORS handler so the rest of the code doesn't have a cow
-        loader.crossOrigin = '';
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function( text ) {
 

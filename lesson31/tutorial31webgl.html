@@ -67,10 +67,10 @@
 
                 switch ( modelType ) {
                     case '0':
-                        loadCollada();
+                        loadOBJ();
                         break;
                     case '1':
-                        loadOBJ();
+                        loadCollada();
                         break;
                     case '2':
                         loadAWD();
@@ -222,7 +222,7 @@
                 var loader = new THREE.PDBLoader( manager );
 
                 // Launch loading of the PDB file, onLoadPDB will be called when it's ready
-                loader.load( 'models/PDB/caf2.pdb', onLoadPDB);
+                loader.load( 'models/PDB/caffeine.pdb', onLoadPDB);
             }
 
             // prepare PDB loader and load the model
@@ -329,7 +329,7 @@
                 modelMesh = new THREE.Mesh(geometry, material);
                 modelMesh.rotation.set(0, Math.PI/2, 0);
                 modelMesh.scale.set(15, 15, 15);
-                modelMesh.position.set(-0.15, -0.275, 0);
+                modelMesh.position.set(-0.15, -0.5, 0);
                 gfxScene.add(modelMesh);
                 updateLabel("VTK");
             }
@@ -380,7 +380,7 @@
 	
 				// Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
-				
+
 				// Map the 3D scene down to the 2D screen (render the frame)
 				gfxScene.renderScene();
 			}

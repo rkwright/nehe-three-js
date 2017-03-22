@@ -34,6 +34,7 @@
             var box;
             var walls = new THREE.Object3D();
             var objects = new THREE.Object3D();
+            var gameOver = false;
             var LOOPS = 16;
             var OBJ_VEL = 0.05;
             var OBJ_SIZE = 1;
@@ -446,8 +447,9 @@
                     }
                 }
 
-                if (objects.children.length == 0) {
+                if (objects.children.length == 0  && gameOver == false) {
                     createText();
+                    gaemOver = true;
                 }
             }
 

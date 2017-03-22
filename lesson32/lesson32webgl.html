@@ -34,7 +34,7 @@
             var box;
             var walls = new THREE.Object3D();
             var objects = new THREE.Object3D();
-            var LOOPS = 8;
+            var LOOPS = 16;
             var OBJ_VEL = 0.025;
             var OBJ_SIZE = 1;
             var OBJ_MASS = 1;
@@ -64,11 +64,12 @@
 
                 for (var n=0; n<LOOPS; n++ ) {
 
-                    createBox();
+                    createSphere();
 
                 }
 
                 gfxScene.add(objects);
+
                 gfxScene.renderScene();
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
@@ -113,7 +114,7 @@
 
             function createSphere() {
 
-                var geom = new THREE.SphereGeometry(OBJ_SIZE, 6, 6);
+                var geom = new THREE.SphereGeometry(OBJ_SIZE, 12, 126);
                 var material = new THREE.MeshLambertMaterial( { color: randColor(), shading: THREE.FlatShading  } );
                 var sphere = new THREE.Mesh( geom, material );
                 sphere.position.set(randPos(), randPosY(), randPos());
@@ -227,6 +228,40 @@
                 gfxScene.add(walls);
             }
 
+            /**
+             * Here we actually create the text.  Not too much to it, actually.
+             */
+            function createText() {
+                var 	size = 4;				// this is actually the HEIGHT of the text. in user-space
+                var 	height = 1;			// this is TOTALLY misnamed.  It is the thickness of the extruded text
+                var		curveSegments = 10;		// number of points on "the curve" - which curve?
+                var 	fontName = "../fonts/gentilis_bold.typeface.json";
+                var     text = "Game Over!!"
+
+                var material = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
+
+                var loader = new THREE.FontLoader();
+                loader.load( fontName, function ( font ) {
+
+                    textGeom = new THREE.TextGeometry(text, {
+                        size: size,						// actually the height of the font, in user-space
+                        height: height,					// THICKNESS of the extruded font, in user-space
+                        curveSegments: curveSegments,
+                        font: font
+                    });
+
+                    //var textMaterial = new THREE.MeshFaceMaterial(material);
+                    var textMesh = new THREE.Mesh(textGeom, material);
+
+                    // get the width of the string so we can center it on the origin
+                    textGeom.computeBoundingBox();
+
+                    var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+
+                    textMesh.position.set(-0.5 * textWidth, 8, 0);
+                    gfxScene.add(textMesh);
+                });
+            }
             /**
              * Just a handler for the keypress event to control parameters of the demo
              */
@@ -408,6 +443,10 @@
                             ball.material.needsUpdate = true;
                         }
                     }
+                }
+
+                if (objects.children.length == 0) {
+                    createText();
                 }
             }
 

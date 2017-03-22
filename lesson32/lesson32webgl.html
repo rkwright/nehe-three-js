@@ -35,7 +35,7 @@
             var walls = new THREE.Object3D();
             var objects = new THREE.Object3D();
             var LOOPS = 16;
-            var OBJ_VEL = 0.025;
+            var OBJ_VEL = 0.05;
             var OBJ_SIZE = 1;
             var OBJ_MASS = 1;
             var OBJ_SPIN = 0.1;
@@ -64,7 +64,7 @@
 
                 for (var n=0; n<LOOPS; n++ ) {
 
-                    createSphere();
+                    createBox();
 
                 }
 
@@ -91,7 +91,7 @@
             }
 
             function randPosY () {
-                return PLANE_SIZE/2 + (PLANE_SIZE-2)/2 * (Math.random() - 0.5);
+                return PLANE_SIZE/2 + (PLANE_SIZE-2)/2 * (Math.random() - 0.5 ) - 10;
             }
 
             function randSpin () {
@@ -177,6 +177,7 @@
                 var planeFloor = new THREE.Mesh( planeGeo, floorMat );
                 planeFloor.name = "floor";
                 planeFloor.rotation.x = -Math.PI / 2.0;
+                planeFloor.position.y = -10;
                 walls.add(planeFloor);
                 //gfxScene.add( planeFloor );
 
@@ -185,7 +186,7 @@
                 var matTop = new THREE.MeshPhongMaterial( { color: 0xffffff, side:THREE.DoubleSide, opacity:0.3, transparent:true } );
                 var planeTop = new THREE.Mesh( planeGeo, matTop );
                 planeTop.name = "top";
-                planeTop.position.y = 20;
+                planeTop.position.y = 10;
                 planeTop.rotateX( Math.PI / 2 );
                 walls.add(planeTop);
                 //gfxScene.add( planeTop );
@@ -194,7 +195,7 @@
                 var planeBack = new THREE.Mesh( planeGeo, matBack );
                 planeBack.name = "back";
                 planeBack.position.z = -10;
-                planeBack.position.y = 10;
+                planeBack.position.y = 0;
                 walls.add(planeBack);
                 //gfxScene.add( planeBack );
 
@@ -202,7 +203,7 @@
                 var planeFront = new THREE.Mesh( planeGeo, matFront );
                 planeFront.name = "front";
                 planeFront.position.z = 10;
-                planeFront.position.y = 10;
+                planeFront.position.y = 0;
                 planeFront.rotateY( Math.PI );
                 walls.add(planeFront);
                 //gfxScene.add( planeFront );
@@ -211,7 +212,7 @@
                 var planeRight = new THREE.Mesh( planeGeo, matRight );
                 planeRight.name = "right";
                 planeRight.position.x = 10;
-                planeRight.position.y = 10;
+                planeRight.position.y = 0;
                 planeRight.rotateY( - Math.PI / 2 );
                 walls.add(planeRight);
                 //gfxScene.add( planeRight );
@@ -220,7 +221,7 @@
                 var planeLeft = new THREE.Mesh( planeGeo, matLeft );
                 planeLeft.name = "left";
                 planeLeft.position.x = -10;
-                planeLeft.position.y = 10;
+                planeLeft.position.y = 0;
                 planeLeft.rotateY( Math.PI / 2 );
                 walls.add(planeLeft);
                 //gfxScene.add( planeLeft );
@@ -236,7 +237,7 @@
                 var 	height = 1;			// this is TOTALLY misnamed.  It is the thickness of the extruded text
                 var		curveSegments = 10;		// number of points on "the curve" - which curve?
                 var 	fontName = "../fonts/gentilis_bold.typeface.json";
-                var     text = "Game Over!!"
+                var     text = "Game Over!!";
 
                 var material = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
 
@@ -258,7 +259,7 @@
 
                     var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
 
-                    textMesh.position.set(-0.5 * textWidth, 8, 0);
+                    textMesh.position.set(-0.5 * textWidth, 0, 0);
                     gfxScene.add(textMesh);
                 });
             }
@@ -282,7 +283,7 @@
                     var originPoint = mesh.position.clone();
                     //console.log(" origin: " + originPoint.x + ", " + originPoint.y + ", " + originPoint.z);
 
-                    if (originPoint.x > 11 || originPoint.x < -11 || originPoint.y > 21 || originPoint.y < -1 || originPoint.z > 11 || originPoint.z < -11)  {
+                    if (originPoint.x > 11 || originPoint.x < -11 || originPoint.y > 11 || originPoint.y < -11 || originPoint.z > 11 || originPoint.z < -11)  {
                         //console.log("Yikes!  The object has escaped!! Velocity is x: " + mesh.velocity.x  + " y: " + mesh.velocity.y  + " z: " + mesh.velocity.z);
                         //debugger;
 
@@ -436,7 +437,7 @@
                     if (ball.material.opacity <= 0.999) {
                         if (ball.material.opacity <= 0) {
                             objects.remove(ball);
-                            gfxScene.remove(ball);
+                            //gfxScene.remove(ball);
                         }
                         else {
                             ball.material.opacity -= 0.025;

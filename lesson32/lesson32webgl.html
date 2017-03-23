@@ -37,12 +37,13 @@
             var memLog = "";
             var memCount = 0;
 
-            var OBJ_COUNT  = 1;
+            var OBJ_COUNT  = 20;
             var OBJ_VEL    = 0.5;
             var OBJ_SIZE   = 1;
             var OBJ_MASS   = 1;
             var OBJ_SPIN   = 0.1;
             var PLANE_SIZE = 20;
+            var WALL_LIMIT = PLANE_SIZE / 2;
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
@@ -103,15 +104,22 @@
 
             function createBox( count ) {
 
-                var geom = new THREE.BoxGeometry( OBJ_SIZE*2,OBJ_SIZE*2,OBJ_SIZE*2 );
-                var material = new THREE.MeshLambertMaterial( { color: randColor(), shading: THREE.FlatShading, transparent: true   } );
-                var box = new THREE.Mesh( geom, material );
-                box.position.set(randPos(), randPosY(), randPos());
+                var geom = new THREE.BoxGeometry(OBJ_SIZE * 2, OBJ_SIZE * 2, OBJ_SIZE * 2);
+                var material = new THREE.MeshLambertMaterial({
+                    color: randColor(),
+                    shading: THREE.FlatShading,
+                    transparent: true
+                });
+                var box = new THREE.Mesh(geom, material);
+                box.position.set(randPos(), randPos(), randPos());
                 box.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
-                box.spin = new THREE.Euler(randSpin(),randSpin(),randSpin());
+                box.spin = new THREE.Euler(randSpin(), randSpin(), randSpin());
                 box.mass = OBJ_MASS;
                 box.name = "Box " + count;
                 objects.add(box);
+
+                var helper = new THREE.BoxHelper(box, 0xff0000);
+                box.limit = WALL_LIMIT - helper.geometry.boundingSphere.radius;
             }
 
             function createSphere() {
@@ -270,25 +278,18 @@
 
             function checkWallCollision ( mesh ) {
 
-                for ( var vertexIndex = 0; vertexIndex < mesh.geometry.vertices.length; vertexIndex++ )
-                {
-                    var localVertex = mesh.geometry.vertices[vertexIndex].clone();
-                    var globalVertex = localVertex.applyMatrix4( mesh.matrix );
-                    var directionVector = globalVertex.sub( mesh.position );
-                    var angle = mesh.velocity.angleTo( directionVector);
-                    memLog += " mesh: " + mesh.position.x.toFixed(3) + ", " + mesh.position.y.toFixed(3) + ", " + mesh.position.z.toFixed(3) +
-                        " vertex: " + globalVertex.x.toFixed(3) + ", " + globalVertex.y.toFixed(3) + ", " + globalVertex.z.toFixed(3) +" angle; " + angle.toFixed(3) + "\n";
-
-                    if ( angle <= Math.PI/2) {
-
-                        raycaster.set( mesh.position, directionVector.clone().normalize() );
-                        var collisionResults = raycaster.intersectObjects( walls.children );
-
-                        if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-                            handleWallCollision( mesh, collisionResults[0].object.name);
-                            break;
-                        }
-                    }
+                if ( mesh.position.x > mesh.limit ) {
+                    mesh.velocity.x = -Math.abs(mesh.velocity.x);
+                } else if (mesh.position.x < -mesh.limit ) {
+                    mesh.velocity.x = Math.abs(mesh.velocity.x);
+                } else if ( mesh.position.y > mesh.limit ) {
+                    mesh.velocity.y = -Math.abs(mesh.velocity.y);
+                } else if (mesh.position.y < -mesh.limit ) {
+                    mesh.velocity.y = Math.abs(mesh.velocity.y);
+                } else if ( mesh.position.z > mesh.limit ) {
+                    mesh.velocity.z = -Math.abs(mesh.velocity.z);
+                } else if (mesh.position.z < -mesh.limit ) {
+                    mesh.velocity.z = Math.abs(mesh.velocity.z);
                 }
 
                 if (mesh.position.x > 10.1 || mesh.position.x < -10.1 || mesh.position.y > 10.1 || mesh.position.y < -10.1 || mesh.position.z > 10.1 || mesh.position.z < -10.1)  {
@@ -296,7 +297,6 @@
                     //window.prompt("Copy to clipboard: Ctrl+C, Enter", memLog);
                     debugger;
                 }
-
             }
 
             /**

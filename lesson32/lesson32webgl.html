@@ -1,4 +1,4 @@
-<!DOCTYPE html>	<!-- Tells the browser that the page uses the HTML5 standard -->
+<!DOCTYPE html>
 <html>
 	<head>
 		<!-- -------------------------------------
@@ -22,7 +22,7 @@
         <script src="../js/gfx-scene.js" type="text/javascript"></script>
 	</head>
 	<body>
-    <!-- Create a DIV element, which will be shown over the WebGL canvas. -->
+
     <div style="position: absolute; top: 10px; left: 10px;color:white">
         <p>Hits: <span id="LogText"></span></p>
 
@@ -34,7 +34,10 @@
             var walls = new THREE.Object3D();
             var objects = new THREE.Object3D();
             var gameOver = false;
-            var OBJ_COUNT  = 6;
+            var memLog = "";
+            var memCount = 0;
+
+            var OBJ_COUNT  = 1;
             var OBJ_VEL    = 0.5;
             var OBJ_SIZE   = 1;
             var OBJ_MASS   = 1;
@@ -64,7 +67,7 @@
 
                 for (var n=0; n<OBJ_COUNT; n++ ) {
 
-                    createSphere();
+                    createBox( n );
 
                 }
 
@@ -98,7 +101,7 @@
                 return OBJ_SPIN * (Math.random()- 0.5);
             }
 
-            function createBox() {
+            function createBox( count ) {
 
                 var geom = new THREE.BoxGeometry( OBJ_SIZE*2,OBJ_SIZE*2,OBJ_SIZE*2 );
                 var material = new THREE.MeshLambertMaterial( { color: randColor(), shading: THREE.FlatShading, transparent: true   } );
@@ -107,7 +110,7 @@
                 box.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
                 box.spin = new THREE.Euler(randSpin(),randSpin(),randSpin());
                 box.mass = OBJ_MASS;
-                box.name = "Box";
+                box.name = "Box " + count;
                 objects.add(box);
             }
 
@@ -265,7 +268,7 @@
                     }
 			}
 
-            function checkObjectWallCollision ( mesh ) {
+            function checkWallCollision ( mesh ) {
 
                 for ( var vertexIndex = 0; vertexIndex < mesh.geometry.vertices.length; vertexIndex++ )
                 {
@@ -273,8 +276,8 @@
                     var globalVertex = localVertex.applyMatrix4( mesh.matrix );
                     var directionVector = globalVertex.sub( mesh.position );
                     var angle = mesh.velocity.angleTo( directionVector);
-                    //console.log(" mesh: " + mesh.position.x + ", " + mesh.position.y + ", " + mesh.position.z +
-                    //    " vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +" angle; " + angle);
+                    memLog += " mesh: " + mesh.position.x.toFixed(3) + ", " + mesh.position.y.toFixed(3) + ", " + mesh.position.z.toFixed(3) +
+                        " vertex: " + globalVertex.x.toFixed(3) + ", " + globalVertex.y.toFixed(3) + ", " + globalVertex.z.toFixed(3) +" angle; " + angle.toFixed(3) + "\n";
 
                     if ( angle <= Math.PI/2) {
 
@@ -287,6 +290,13 @@
                         }
                     }
                 }
+
+                if (mesh.position.x > 10.1 || mesh.position.x < -10.1 || mesh.position.y > 10.1 || mesh.position.y < -10.1 || mesh.position.z > 10.1 || mesh.position.z < -10.1)  {
+                    console.log("Yikes!  The object has escaped!! ");
+                    //window.prompt("Copy to clipboard: Ctrl+C, Enter", memLog);
+                    debugger;
+                }
+
             }
 
             /**
@@ -354,7 +364,7 @@
                 for (var i = 0; i < objects.children.length; i++) {
                     var mesh = objects.children[i];
 
-                    //console.log(" updatePosition: " + mesh.position.x + ", " + mesh.position.y + ", " + mesh.position.z );
+                    memLog += "updatePosition: " + mesh.name + " " + mesh.position.x.toFixed(3) + ", " + mesh.position.y.toFixed(3) + ", " + mesh.position.z.toFixed(3)  + "\n";
 
                     mesh.position.x += mesh.velocity.x;
                     mesh.position.y += mesh.velocity.y;
@@ -364,13 +374,7 @@
                     mesh.rotateZ(mesh.spin.z);
                     mesh.updateMatrixWorld();
 
-                    if (mesh.position.x > 11 || mesh.position.x < -11 || mesh.position.y > 11 || mesh.position.y < -11 || mesh.position.z > 11 || mesh.position.z < -11)  {
-                        console.log("Yikes!  The object has escaped!! ");
-                        debugger;
-                    }
-
-                    //checkWallCollisions();
-                    checkObjectWallCollision (mesh);
+                    checkWallCollision ( mesh );
 
                     checkObjectCollisions( mesh );
                 }
@@ -433,7 +437,11 @@
 
 				updatePositions();
 
-               // console.clear();
+
+                if (memCount++ > 3) {
+                    memLog = "";
+                    memCount = 0;
+                }
            }
 
 		</script>

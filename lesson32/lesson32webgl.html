@@ -31,15 +31,14 @@
     <script type="text/javascript">
             var raycaster = new THREE.Raycaster();
             var pointCaster = new THREE.Raycaster();
-            var box;
             var walls = new THREE.Object3D();
             var objects = new THREE.Object3D();
             var gameOver = false;
-            var LOOPS = 16;
-            var OBJ_VEL = 0.05;
-            var OBJ_SIZE = 1;
-            var OBJ_MASS = 1;
-            var OBJ_SPIN = 0.1;
+            var OBJ_COUNT  = 6;
+            var OBJ_VEL    = 0.5;
+            var OBJ_SIZE   = 1;
+            var OBJ_MASS   = 1;
+            var OBJ_SPIN   = 0.1;
             var PLANE_SIZE = 20;
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
@@ -63,9 +62,9 @@
 
                 createFloorAndWalls();
 
-                for (var n=0; n<LOOPS; n++ ) {
+                for (var n=0; n<OBJ_COUNT; n++ ) {
 
-                    createBox();
+                    createSphere();
 
                 }
 
@@ -110,12 +109,11 @@
                 box.mass = OBJ_MASS;
                 box.name = "Box";
                 objects.add(box);
-                //gfxScene.add(box);
             }
 
             function createSphere() {
 
-                var geom = new THREE.SphereGeometry(OBJ_SIZE, 12, 126);
+                var geom = new THREE.SphereGeometry(OBJ_SIZE, 6, 6);
                 var material = new THREE.MeshLambertMaterial( { color: randColor(), shading: THREE.FlatShading  } );
                 var sphere = new THREE.Mesh( geom, material );
                 sphere.position.set(randPos(), randPosY(), randPos());
@@ -124,7 +122,6 @@
                 sphere.mass = OBJ_MASS;
                 sphere.name = "Sphere";
                 objects.add(sphere);
-                //gfxScene.add(sphere);
             }
 
             /**
@@ -133,8 +130,6 @@
 			function createFloorAndWalls() {
 			    var FLOOR_S = 5;
 			    var FLOOR_T = 5;
-			    var WALL_S  = 2;
-			    var WALL_T  = 2;
 
                 var planeGeo = new THREE.PlaneGeometry( PLANE_SIZE, PLANE_SIZE );
 
@@ -180,9 +175,6 @@
                 planeFloor.rotation.x = -Math.PI / 2.0;
                 planeFloor.position.y = -10;
                 walls.add(planeFloor);
-                //gfxScene.add( planeFloor );
-
-                // walls
 
                 var matTop = new THREE.MeshPhongMaterial( { color: 0xffffff, side:THREE.DoubleSide, opacity:0.3, transparent:true } );
                 var planeTop = new THREE.Mesh( planeGeo, matTop );
@@ -190,7 +182,6 @@
                 planeTop.position.y = 10;
                 planeTop.rotateX( Math.PI / 2 );
                 walls.add(planeTop);
-                //gfxScene.add( planeTop );
 
                 var matBack = new THREE.MeshPhongMaterial( { color: 0x808080, side:THREE.DoubleSide, opacity:0.3, transparent:true });
                 var planeBack = new THREE.Mesh( planeGeo, matBack );
@@ -198,7 +189,6 @@
                 planeBack.position.z = -10;
                 planeBack.position.y = 0;
                 walls.add(planeBack);
-                //gfxScene.add( planeBack );
 
                 var matFront = new THREE.MeshPhongMaterial( { color: 0xffffff, side:THREE.DoubleSide, opacity:0.3, transparent:true  } );
                 var planeFront = new THREE.Mesh( planeGeo, matFront );
@@ -207,7 +197,6 @@
                 planeFront.position.y = 0;
                 planeFront.rotateY( Math.PI );
                 walls.add(planeFront);
-                //gfxScene.add( planeFront );
 
                 var matRight = new THREE.MeshPhongMaterial( { color: 0x00ff00, side:THREE.DoubleSide, opacity:0.3, transparent:true } );
                 var planeRight = new THREE.Mesh( planeGeo, matRight );
@@ -216,7 +205,6 @@
                 planeRight.position.y = 0;
                 planeRight.rotateY( - Math.PI / 2 );
                 walls.add(planeRight);
-                //gfxScene.add( planeRight );
 
                 var matLeft = new THREE.MeshPhongMaterial( { color: 0xff0000, side:THREE.DoubleSide, opacity:0.3, transparent:true  } );
                 var planeLeft = new THREE.Mesh( planeGeo, matLeft );
@@ -225,7 +213,6 @@
                 planeLeft.position.y = 0;
                 planeLeft.rotateY( Math.PI / 2 );
                 walls.add(planeLeft);
-                //gfxScene.add( planeLeft );
 
                 gfxScene.add(walls);
             }
@@ -235,7 +222,7 @@
              */
             function createText() {
                 var 	size = 4;				// this is actually the HEIGHT of the text. in user-space
-                var 	height = 1;			// this is TOTALLY misnamed.  It is the thickness of the extruded text
+                var 	height = 1;			    // this is TOTALLY misnamed.  It is the THICKNESS of the extruded text
                 var		curveSegments = 10;		// number of points on "the curve" - which curve?
                 var 	fontName = "../fonts/gentilis_bold.typeface.json";
                 var     text = "Game Over!!";
@@ -246,7 +233,7 @@
                 loader.load( fontName, function ( font ) {
 
                     textGeom = new THREE.TextGeometry(text, {
-                        size: size,						// actually the height of the font, in user-space
+                        size: size,						// actually the HEIGHT of the font, in user-space
                         height: height,					// THICKNESS of the extruded font, in user-space
                         curveSegments: curveSegments,
                         font: font
@@ -274,49 +261,30 @@
 
 				var renderString = "012";
 
-					if ( renderString.indexOf(keyChar) != -1) {
+					if ( renderString.indexOf(keyChar) !== -1) {
                     }
 			}
 
-			function checkWallCollisions() {
-                for (var i=0; i<objects.children.length; i++) {
-                    var mesh = objects.children[i];
-                    var originPoint = mesh.position.clone();
-                    //console.log(" origin: " + originPoint.x + ", " + originPoint.y + ", " + originPoint.z);
+            function checkObjectWallCollision ( mesh ) {
 
-                    if (originPoint.x > 11 || originPoint.x < -11 || originPoint.y > 11 || originPoint.y < -11 || originPoint.z > 11 || originPoint.z < -11)  {
-                        //console.log("Yikes!  The object has escaped!! Velocity is x: " + mesh.velocity.x  + " y: " + mesh.velocity.y  + " z: " + mesh.velocity.z);
-                        //debugger;
-
-                        objects.remove(mesh);
-                    }
-
-                    if (mesh.AABB == undefined )
-                        checkObjectWallCollision( mesh, originPoint, mesh.geometry.vertices);
-                    else
-                        checkObjectWallCollision( mesh, originPoint, mesh.AABB );
-                }
-            }
-
-            function checkObjectWallCollision ( mesh, originPoint, vertices ) {
-
-                for ( var vertexIndex = 0; vertexIndex < vertices.length; vertexIndex++ )
+                for ( var vertexIndex = 0; vertexIndex < mesh.geometry.vertices.length; vertexIndex++ )
                 {
-                    var localVertex = vertices[vertexIndex].clone();
+                    var localVertex = mesh.geometry.vertices[vertexIndex].clone();
                     var globalVertex = localVertex.applyMatrix4( mesh.matrix );
                     var directionVector = globalVertex.sub( mesh.position );
                     var angle = mesh.velocity.angleTo( directionVector);
-                    //console.log(" vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +" angle; " + angle);
+                    //console.log(" mesh: " + mesh.position.x + ", " + mesh.position.y + ", " + mesh.position.z +
+                    //    " vertex: " + globalVertex.x + ", " + globalVertex.y + ", " + globalVertex.z +" angle; " + angle);
 
                     if ( angle <= Math.PI/2) {
 
-                        raycaster.set( originPoint, directionVector.clone().normalize() );
+                        raycaster.set( mesh.position, directionVector.clone().normalize() );
                         var collisionResults = raycaster.intersectObjects( walls.children );
 
                         if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
                             handleWallCollision( mesh, collisionResults[0].object.name);
                             break;
-                       }
+                        }
                     }
                 }
             }
@@ -326,30 +294,19 @@
              */
             function handleWallCollision( mesh, name ) {
 
-			    if (name == "left" || name == "right")
+			    if (name === "left" || name === "right")
                     mesh.velocity.x = -mesh.velocity.x;
-			    else if (name == "top" || name == "floor")
+			    else if (name === "top" || name === "floor")
 			        mesh.velocity.y = -mesh.velocity.y;
 			    else
 			        mesh.velocity.z = -mesh.velocity.z;
-
             }
 
-            function checkObjectCollisions() {
-                for (var i=0; i<objects.children.length; i++) {
-                    var mesh = objects.children[i];
-                    var originPoint = mesh.position.clone();
-                    //console.log(" origin: " + originPoint.x + ", " + originPoint.y + ", " + originPoint.z);
+            function checkObjectCollisions ( mesh ) {
 
-                    checkObjectsCollision( mesh, originPoint, mesh.geometry.vertices);
-                }
-            }
-
-            function checkObjectsCollision ( mesh, originPoint, vertices ) {
-
-                for ( var vertexIndex = 0; vertexIndex < vertices.length; vertexIndex++ )
+                for ( var vertexIndex = 0; vertexIndex < mesh.geometry.vertices.length; vertexIndex++ )
                 {
-                    var localVertex = vertices[vertexIndex].clone();
+                    var localVertex = mesh.geometry.vertices[vertexIndex].clone();
                     var globalVertex = localVertex.applyMatrix4( mesh.matrix );
                     var directionVector = globalVertex.sub( mesh.position );
                     var angle = mesh.velocity.angleTo( directionVector);
@@ -357,7 +314,7 @@
 
                     if ( angle <= Math.PI/2) {
 
-                        raycaster.set( originPoint, directionVector.clone().normalize() );
+                        raycaster.set( mesh.position, directionVector.clone().normalize() );
                         var collisionResults = raycaster.intersectObjects( objects.children );
 
                         if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
@@ -390,13 +347,15 @@
 
                 meshA.velocity.set(avX, avY, avZ);
                 meshB.velocity.set(bvX, bvY, bvZ);
-           }
-
+            }
 
             function updatePositions() {
 
                 for (var i = 0; i < objects.children.length; i++) {
                     var mesh = objects.children[i];
+
+                    //console.log(" updatePosition: " + mesh.position.x + ", " + mesh.position.y + ", " + mesh.position.z );
+
                     mesh.position.x += mesh.velocity.x;
                     mesh.position.y += mesh.velocity.y;
                     mesh.position.z += mesh.velocity.z;
@@ -405,22 +364,29 @@
                     mesh.rotateZ(mesh.spin.z);
                     mesh.updateMatrixWorld();
 
-                    checkWallCollisions();
+                    if (mesh.position.x > 11 || mesh.position.x < -11 || mesh.position.y > 11 || mesh.position.y < -11 || mesh.position.z > 11 || mesh.position.z < -11)  {
+                        console.log("Yikes!  The object has escaped!! ");
+                        debugger;
+                    }
 
-                    checkObjectCollisions();
+                    //checkWallCollisions();
+                    checkObjectWallCollision (mesh);
+
+                    checkObjectCollisions( mesh );
                 }
             }
 
             function onClick ( e ) {
 
                 var vector = new THREE.Vector2();
-                // set it's position where the user clicked and convert it to a number between -1 & 1
+
+                // set it's position where the user clicked and convert it to a number between -1 and 1
                 vector.set( 2 * (e.clientX / gfxScene.canvasWidth) - 1, 1 - 2 * (e.clientY / gfxScene.canvasHeight ));
 
-                 //We apply two parameters to the 'laser', its origin (where the user clicked) and the direction (what the camera 'sees')
+                 // pass two parameters to RayCaster, where the user clicked and the direction of the camera
                 pointCaster.setFromCamera(vector, gfxScene.camera);
 
-                //We get all the objects the 'laser' find on its way (it returns an array containing the objects)
+                // get all the objects that the ray instersects
                 var intersects = pointCaster.intersectObjects(objects.children);
 
                 // The first object in the array is the closest to the camera
@@ -438,7 +404,6 @@
                     if (ball.material.opacity <= 0.999) {
                         if (ball.material.opacity <= 0) {
                             objects.remove(ball);
-                            //gfxScene.remove(ball);
                         }
                         else {
                             ball.material.opacity -= 0.025;
@@ -447,9 +412,9 @@
                     }
                 }
 
-                if (objects.children.length == 0  && gameOver == false) {
+                if (objects.children.length === 0  && gameOver === false) {
                     createText();
-                    gaemOver = true;
+                    gameOver = true;
                 }
             }
 
@@ -467,6 +432,8 @@
 				gfxScene.renderScene();
 
 				updatePositions();
+
+               // console.clear();
            }
 
 		</script>

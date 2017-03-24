@@ -69,7 +69,6 @@
                 for (var n=0; n<OBJ_COUNT; n++ ) {
 
                     createBox( n );
-
                 }
 
                 gfxScene.add(objects);
@@ -282,17 +281,22 @@
                     mesh.velocity.x = -Math.abs(mesh.velocity.x);
                 } else if (mesh.position.x < -mesh.limit ) {
                     mesh.velocity.x = Math.abs(mesh.velocity.x);
-                } else if ( mesh.position.y > mesh.limit ) {
+                }
+
+                if ( mesh.position.y > mesh.limit ) {
                     mesh.velocity.y = -Math.abs(mesh.velocity.y);
                 } else if (mesh.position.y < -mesh.limit ) {
                     mesh.velocity.y = Math.abs(mesh.velocity.y);
-                } else if ( mesh.position.z > mesh.limit ) {
+                }
+
+                if ( mesh.position.z > mesh.limit ) {
                     mesh.velocity.z = -Math.abs(mesh.velocity.z);
                 } else if (mesh.position.z < -mesh.limit ) {
                     mesh.velocity.z = Math.abs(mesh.velocity.z);
                 }
 
-                if (mesh.position.x > 10.1 || mesh.position.x < -10.1 || mesh.position.y > 10.1 || mesh.position.y < -10.1 || mesh.position.z > 10.1 || mesh.position.z < -10.1)  {
+                if (mesh.position.x > WALL_LIMIT || mesh.position.x < -WALL_LIMIT || mesh.position.y > WALL_LIMIT ||
+                    mesh.position.y < -WALL_LIMIT || mesh.position.z > WALL_LIMIT || mesh.position.z < -WALL_LIMIT)  {
                     console.log("Yikes!  The object has escaped!! ");
                     //window.prompt("Copy to clipboard: Ctrl+C, Enter", memLog);
                     debugger;

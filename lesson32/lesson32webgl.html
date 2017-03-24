@@ -37,8 +37,8 @@
             var memLog = "";
             var memCount = 0;
 
-            var OBJ_COUNT  = 20;
-            var OBJ_VEL    = 0.5;
+            var OBJ_COUNT  = 2;
+            var OBJ_VEL    = 0.125;
             var OBJ_SIZE   = 1;
             var OBJ_MASS   = 1;
             var OBJ_SPIN   = 0.1;
@@ -47,7 +47,7 @@
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( {
-			    cameraPos : [8, -10, 60],
+			    cameraPos : [8, 2, 40],
                 axesHeight: 30,
                 controls:true,
                 displayStats:true
@@ -69,6 +69,9 @@
                 for (var n=0; n<OBJ_COUNT; n++ ) {
 
                     createBox( n );
+                    createCylinder( n );
+                    createSphere( n );
+                    createIcosahedron( n );
                 }
 
                 gfxScene.add(objects);
@@ -121,17 +124,87 @@
                 box.limit = WALL_LIMIT - helper.geometry.boundingSphere.radius;
             }
 
-            function createSphere() {
+            function createSphere( n ) {
 
                 var geom = new THREE.SphereGeometry(OBJ_SIZE, 6, 6);
                 var material = new THREE.MeshLambertMaterial( { color: randColor(), shading: THREE.FlatShading  } );
                 var sphere = new THREE.Mesh( geom, material );
-                sphere.position.set(randPos(), randPosY(), randPos());
+                sphere.position.set(randPos(), randPos(), randPos());
                 sphere.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
                 sphere.spin = new THREE.Euler(0,0,0);
                 sphere.mass = OBJ_MASS;
-                sphere.name = "Sphere";
+                sphere.name = "Sphere" + n;
                 objects.add(sphere);
+
+                var helper = new THREE.BoxHelper(sphere, 0xff0000);
+                sphere.limit = WALL_LIMIT - helper.geometry.boundingSphere.radius;
+            }
+
+            function createCylinder( n ) {
+
+                var geom = new THREE.CylinderGeometry(OBJ_SIZE, OBJ_SIZE, OBJ_SIZE*2, 8);
+                var material = new THREE.MeshLambertMaterial( { color: randColor(), shading: THREE.FlatShading  } );
+                var cylinder = new THREE.Mesh( geom, material );
+                cylinder.position.set(randPos(), randPos(), randPos());
+                cylinder.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
+                cylinder.spin = new THREE.Euler(randSpin(),randSpin(),randSpin());
+                //cylinder.AABB = createAABBVertices( cylinder );
+                cylinder.name = "Cylinder" + n;
+                cylinder.mass = OBJ_MASS;
+                objects.add(cylinder);
+                var helper = new THREE.BoxHelper(cylinder, 0xff0000);
+                cylinder.limit = WALL_LIMIT - helper.geometry.boundingSphere.radius;
+            }
+
+            function createIcosahedron( n ) {
+
+                var geom = new THREE.IcosahedronGeometry(OBJ_SIZE);
+                var material = new THREE.MeshLambertMaterial( { color: randColor(), shading: THREE.FlatShading  } );
+                var icosahedron = new THREE.Mesh( geom, material );
+                icosahedron.position.set(randPos(), randPos(), randPos());
+                icosahedron.velocity = new THREE.Vector3(randVel(), randVel(), randVel());
+                icosahedron.spin = new THREE.Euler(randSpin(),randSpin(),randSpin());
+                icosahedron.mass = OBJ_MASS;
+                name = "Icosahderon" + n;
+                objects.add(icosahedron);
+                var helper = new THREE.BoxHelper(icosahedron, 0xff0000);
+                icosahedron.limit = WALL_LIMIT - helper.geometry.boundingSphere.radius;
+            }
+
+            /**
+             *  Create a set of vertices that represent the AABB box from BoxHelper
+             *
+             *     5____4
+             *   1/___0/|
+             *   | 6__|_7
+             *   2/___3/
+             *
+             *  0: max.x, max.y, max.z
+             *  1: min.x, max.y, max.z
+             *  2: min.x, min.y, max.z
+             *  3: max.x, min.y, max.z
+             *  4: max.x, max.y, min.z
+             *  5: min.x, max.y, min.z
+             *  6: min.x, min.y, min.z
+             *  7: max.x, min.y, min.z
+             */
+            function createAABBVertices ( mesh ) {
+                var vertices = [];
+                var helper = new THREE.BoundingBoxHelper(mesh, 0xff0000);
+                helper.update();
+                var max = helper.box.max;
+                var min = helper.box.min;
+
+                vertices.push(new THREE.Vector3(max.x, max.y, max.z));
+                vertices.push(new THREE.Vector3(min.x, max.y, max.z));
+                vertices.push(new THREE.Vector3(min.x, min.y, max.z));
+                vertices.push(new THREE.Vector3(max.x, min.y, max.z));
+                vertices.push(new THREE.Vector3(max.x, max.y, min.z));
+                vertices.push(new THREE.Vector3(min.x, max.y, min.z));
+                vertices.push(new THREE.Vector3(min.x, min.y, min.z));
+                vertices.push(new THREE.Vector3(max.x, min.y, min.z));
+
+                return vertices;
             }
 
             /**

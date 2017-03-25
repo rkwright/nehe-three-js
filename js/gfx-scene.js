@@ -82,7 +82,7 @@ GFX.setParameters= function( object, values ) {
             else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
                 currentValue.copy( newValue );
             }
-            else if ( key == 'overdraw' ) {
+            else if ( key === 'overdraw' ) {
                 // ensure overdraw is backwards-compatible with legacy boolean type
                 object[ key ] = Number( newValue );
             }
@@ -102,7 +102,7 @@ GFX.setParameters= function( object, values ) {
 GFX.Scene.prototype = {
 
 	initialize: function () {
-		if (this.scene != null) {
+		if (this.scene !== null) {
 			console.error("GFXScene initialize called twice!");
 			return;
 		}
@@ -116,7 +116,7 @@ GFX.Scene.prototype = {
 		
 		// If the user didn't supply a fixed size for the window,
 		// get the size of the inner window (content area)
-		if (this.canvasHeight == 0) {
+		if (this.canvasHeight === 0) {
 			this.canvasWidth = window.innerWidth;
 			this.canvasHeight = window.innerHeight;
 
@@ -128,7 +128,7 @@ GFX.Scene.prototype = {
                 _self.canvasHeight = window.innerHeight;
                 var aspect = _self.canvasWidth / _self.canvasHeight;
 
-                if (_self.perspective == true ) {
+                if (_self.perspective === true ) {
                     _self.camera.aspect = aspect;
                 } else {
                     var w2 = _self.orthoSize * aspect / 2;
@@ -147,11 +147,11 @@ GFX.Scene.prototype = {
 	
 		// if the caller supplied the container elm ID try to find it
 		var container;
-		if (this.containerID != null && typeof this.containerID != 'undefined')
+		if (this.containerID !== null && typeof this.containerID !== 'undefined')
 			container = document.getElementById(this.containerID);
 		
 		// couldn't find it, so create it ourselves
-		if (container == null || typeof container == 'undefined') {
+		if (container === null || typeof container === 'undefined') {
 			container = document.createElement( 'div' );
 			document.body.appendChild( container );
 		}
@@ -171,7 +171,7 @@ GFX.Scene.prototype = {
 		// Set the background color of the renderer to black, with full opacity
 		this.renderer.setClearColor(new THREE.Color( this.clearColor ), 1);
 
-		if (this.shadowMapEnabled == true )
+		if (this.shadowMapEnabled === true )
 		    this.renderer.shadowMap.enabled = true;
 
 		// Set the renderers size to the content areas size
@@ -181,23 +181,23 @@ GFX.Scene.prototype = {
 		container.appendChild(this.renderer.domElement);
 
 		// if the user hasn't set defaultLights to false, then set them up
-		if (this.defaultLights == true)
+		if (this.defaultLights === true)
 		    this.setDefaultLights();
 
 		// request the orbitControls be created and enabled
 		// add the controls
-		if (this.controls == true && this.renderer != null)
+		if (this.controls === true && this.renderer !== null)
 			this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
 		
-		if ( this.axesHeight != 0 )
+		if ( this.axesHeight !== 0 )
 			this.drawAxes(this.axesHeight);
 		
-		if (this.floorRepeat != 0)
+		if (this.floorRepeat !== 0)
 			this.addFloor(this.floorRepeat);
 		
 		//------ STATS --------------------	
 		// displays current and past frames per second attained by scene
-		if (this.displayStats == true) {
+		if (this.displayStats === true) {
 			this.stats = new Stats();
 			this.stats.domElement.style.position = 'absolute';
 			this.stats.domElement.style.bottom = '0px';
@@ -218,10 +218,10 @@ GFX.Scene.prototype = {
 	 * Set up the camera for the scene.  Perspective or Orthographic
 	 */
 	setCamera: function ( jsonObj ) {
-	    if (jsonObj != null)
+	    if (jsonObj !== null)
 	        GFX.setParameters(this, jsonObj);
 
-        if (this.perspective == true)
+        if (this.perspective === true)
 		    this.camera = new THREE.PerspectiveCamera(this.fov, this.canvasWidth / this.canvasHeight, this.near, this.far);
         else {
 
@@ -237,14 +237,14 @@ GFX.Scene.prototype = {
 
         this.camera.updateProjectionMatrix();
 
-        if (this.cameraPos == undefined)
+        if (this.cameraPos === undefined)
 			this.camera.position.set(0, 10, 20);
 		else
 			this.camera.position.set(this.cameraPos[0], this.cameraPos[1], this.cameraPos[2]);
 
 		this.camera.lookAt(this.scene.position);
 
-        if (this.controls == true && this.renderer != null)
+        if (this.controls === true && this.renderer !== null)
             this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
     },
 
@@ -298,7 +298,8 @@ GFX.Scene.prototype = {
      *    penumbra
      *    decay
      *
-     * @param jsonObj
+     * @param type
+     * @param values
      */
     addLight: function ( type, values ) {
 
@@ -307,15 +308,16 @@ GFX.Scene.prototype = {
         var intensity = this.getLightProp ('intensity', values, 1);
         var castShadow = this.getLightProp('castShadow', values, false);
         var debug = this.getLightProp('debug', values, false);
+        var distance, decay;
 
-        if (type == 'ambient') {
+        if (type === 'ambient') {
             light = new THREE.AmbientLight( color, intensity );
             this.ambientLights.push( light );
         }
         else {
             var pos = this.getLightProp('position', values, [0, 10, 0]);
 
-            if (type == 'directional') {
+            if (type === 'directional') {
                 var target = this.getLightProp('target', values, undefined);
                 light = new THREE.DirectionalLight(color, intensity);
                 light.shadow.mapSize.x = 2048;
@@ -327,29 +329,29 @@ GFX.Scene.prototype = {
 
                 this.directionalLights.push(light);
            }
-            else if (type == 'point') {
-                var distance = this.getLightProp('distance', values, 0);
-                var decay = this.getLightProp('decay', values, 1);
+            else if (type === 'point') {
+                distance = this.getLightProp('distance', values, 0);
+                decay = this.getLightProp('decay', values, 1);
                 light = new THREE.PointLight(color, intensity, distance, decay);
                 this.pointLights.push(light);
             }
-            else if (type == 'hemisphere') {
+            else if (type === 'hemisphere') {
                 var groundColor = this.getLightProp('groundColor', values, 0x000000);
                 light = new THREE.HemisphereLight(color, groundColor, intensity);
                 this.hemisphereLights.push(light);
              }
-            else if (type == 'spot') {
+            else if (type === 'spot') {
                 var angle = this.getLightProp('angle', values, Math.PI/3);
                 var penumbra = this.getLightProp('penumbra', values, 0);
-                var distance = this.getLightProp('distance', values, 0);
-                var decay = this.getLightProp('decay', values, 1);
+                distance = this.getLightProp('distance', values, 0);
+                decay = this.getLightProp('decay', values, 1);
                 light = new THREE.SpotLight(color, intensity, distance, angle, penumbra, decay);
                 this.spotLights.push(light);
             }
 
             light.position.set(pos[0], pos[1], pos[2]);
             light.castShadow = castShadow;
-            if (debug == true) {
+            if (debug === true) {
                 var helper = new THREE.CameraHelper( light.shadow.camera );
                 this.scene.add( helper );
                 //light.shadowCameraVisible = true;
@@ -362,7 +364,7 @@ GFX.Scene.prototype = {
     },
 
     getLightProp: function ( prop, values, def ) {
-        value = values[ prop ];
+        var value = values[ prop ];
         return ( value === undefined ) ? def : value;
     },
 
@@ -396,17 +398,17 @@ GFX.Scene.prototype = {
 		this.renderer.render(this.scene, this.camera);
 
 		// the orbit controls, if used, have to be updated as well
-		if (this.orbitControls != null && typeof this.orbitControls != 'undefined') 
+		if (this.orbitControls !== null && typeof this.orbitControls !== 'undefined')
 			this.orbitControls.update();
 
-		if (this.stats != null && typeof this.stats != 'undefined') 
+		if (this.stats !== null && typeof this.stats !== 'undefined')
 			this.stats.update();
 
 	},
 
 	addFog: function( values ) {
 		
-		if ( values != undefined ) {
+		if ( values !== undefined ) {
 
 			for ( var key in values ) {
 				
@@ -417,22 +419,22 @@ GFX.Scene.prototype = {
 					continue;
 				}
 		
-				if ( key == 'fogType' ) 
+				if ( key === 'fogType' )
 					this.fogType = newValue;
-				else if ( key == 'fogDensity' ) 
+				else if ( key === 'fogDensity' )
 					this.fogDensity = newValue;
-				else if ( key == 'fogColor' ) 
+				else if ( key === 'fogColor' )
 					this.fogColor = newValue;
-				else if ( key == 'fogNear' )
+				else if ( key === 'fogNear' )
 					this.fogNear = newValue;
-				else if ( key == 'fogFar' ) 
+				else if ( key === 'fogFar' )
 					this.fogFar = newValue;
 			}
 		}
 				
-		if (this.fogType == 'exponential')
+		if (this.fogType === 'exponential')
 			this.scene.fog = new THREE.FogExp2(this.fogColor, this.fogDensity );
-		else if (this.fogType == 'linear')
+		else if (this.fogType === 'linear')
 			this.scene.fog = new THREE.Fog( this.fogColor, this.fogNear, this.fogFar );
 		else
 			this.scene.fog = null;
@@ -441,15 +443,15 @@ GFX.Scene.prototype = {
 	addFloor: function( floorRepeat ) {
 		
 		// note: 4x4 checker-board pattern scaled so that each square is 25 by 25 pixels.
-        var image = this.floorImage == null ? '../images/checkerboard.jpg' : this.floorImage;
+        var image = this.floorImage === null ? '../images/checkerboard.jpg' : this.floorImage;
 		var texture = new THREE.ImageUtils.loadTexture( image );
 		texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 		texture.repeat.set( this.floorRepeat, this.floorRepeat );
 		
 		// DoubleSide: render texture on both sides of mesh
 		var floorMaterial = new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } );
-        var width = this.floorX == 0 ? 10 : this.floorX;
-        var height = this.floorZ == 0 ? 10 : this.floorZ;
+        var width = this.floorX === 0 ? 10 : this.floorX;
+        var height = this.floorZ === 0 ? 10 : this.floorZ;
 
         var floorGeometry = new THREE.PlaneGeometry(width, height, 1, 1);
 		var floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -474,7 +476,7 @@ GFX.Scene.prototype = {
 			
 			var pos = -AXIS_HEIGHT / 2 + i * AXIS_STEP;
 	
-			if ((i & 1) == 0)
+			if ((i & 1) === 0)
 				curColor = axisColor;
 			else if (pos < 0)
 				curColor = AXIS_GRAY;
@@ -488,12 +490,12 @@ GFX.Scene.prototype = {
 			var cylinder = new THREE.Mesh( geometry, material ); 
 			
 			pos += AXIS_STEP/2.0;
-			if (axis == X_AXIS)
+			if (axis === X_AXIS)
 			{
 				cylinder.position.x = pos;
 				cylinder.rotation.z = Math.PI/2;
 			}
-			else if (axis == Y_AXIS)
+			else if (axis === Y_AXIS)
 			{
 				cylinder.rotation.y = Math.PI/2;
 				cylinder.position.y = pos;

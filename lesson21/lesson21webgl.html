@@ -35,7 +35,7 @@
 			var gfxScene = new GFX.Scene( {
 			    perspective:false,
 				orthoSize: REPEAT_SIZE * 2,
-				cameraPos:[2,5,20],   //2,2,20],
+				cameraPos:[15,10,10],   
 				axisHeight:10,
 				controls:true,
 				displayStats:true,
@@ -82,10 +82,10 @@
 				// Get the key code of the pressed key
 				var keyChar = String.fromCharCode(event.which);
 
-                if (keyChar == 'p')
-                    gfxScene.setCamera({ perspective:true, cameraPos:[2,5,20]  });
-                else if (keyChar == 'o')
-                    gfxScene.setCamera({ perspective:false, cameraPos:[2,5,20] });
+                if (keyChar === 'p')
+                    gfxScene.setCamera({ perspective:true, cameraPos:[15,10,10], fov : 90  });
+                else if (keyChar === 'o')
+                    gfxScene.setCamera({ perspective:false, cameraPos:[15,10,10] });
  			}
 			/**
 			 * Animate the scene and call rendering.

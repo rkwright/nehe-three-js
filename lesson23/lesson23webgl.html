@@ -29,8 +29,10 @@
 			var	quadMaterial;
 			var	materialType = 't';	// texture, paint or wire
 			var	quadType = '2';
-	
-			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+            var backgroundScene;
+            var backgroundCamera;
+
+            // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( { cameraPos : [0, 6, 12],
 				                                        axesHeight:10,
 									                    controls:true,
@@ -56,14 +58,30 @@
 				quadMaterial = makeMaterial(materialType);
 	
 				quadric = makeQuad(quadType);
-				
-				document.addEventListener("keypress", onDocumentKeyPress, false);
+
+                var background = THREE.ImageUtils.loadTexture( 'images/BG.bmp' );
+                var backgroundMesh = new THREE.Mesh(
+                    new THREE.PlaneGeometry(2, 2, 0),
+                    new THREE.MeshBasicMaterial({
+                        map: background
+                    }));
+
+                backgroundMesh .material.depthTest = false;
+                backgroundMesh .material.depthWrite = false;
+
+                // Create your background scene
+                backgroundScene = new THREE.Scene();
+                backgroundCamera = new THREE.Camera();
+                backgroundScene .add(backgroundCamera );
+                backgroundScene .add(backgroundMesh );
+
+                document.addEventListener("keypress", onDocumentKeyPress, false);
 			}
 	
 			function makeMaterial ( matType ) {
 				
 				materialType = matType;
-				if ( materialType == 't')
+				if ( materialType === 't')
 					quadMat = new THREE.MeshPhongMaterial({
 					    map:quadTexture,
                         color: 0xffffff,
@@ -71,7 +89,7 @@
                         shininess: 50
 					});
 
-				else if (materialType == 'w')
+				else if (materialType === 'w')
 					quadMat = new THREE.MeshBasicMaterial({ wireframe:true });
 				else
 					quadMat = new THREE.MeshLambertMaterial({ color: '#00abb1' });
@@ -127,7 +145,7 @@
 
 				var quadString = "012";
 
-					if ( quadString.indexOf(keyChar) != -1) {
+					if ( quadString.indexOf(keyChar) !== -1) {
 					quadric = makeQuad(keyChar);
 				}
 			}
@@ -139,9 +157,13 @@
 	
 				// Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
-				
+
+                gfxScene.renderer.autoClear = false;
+                gfxScene.renderer.clear();
+
 				// Map the 3D scene down to the 2D screen (render the frame)
-				gfxScene.renderScene();
+                gfxScene.renderer.render(backgroundScene , backgroundCamera );
+                gfxScene.renderScene();
 			}
 
 		</script>

@@ -73,8 +73,8 @@
                 //geom.computeVertexNormals();
 
                 var texture = new THREE.ImageUtils.loadTexture("images/" + image + ".jpg");
-                var bump = bumped == true ? new THREE.ImageUtils.loadTexture("images/" + image + "-bump.jpg") : null;
-                var scale = bumped == true ? 0.2 : 0;
+                var bump = bumped === true ? new THREE.ImageUtils.loadTexture("images/" + image + "-bump.jpg") : null;
+                var scale = bumped === true ? 2 : 0;
 
                 var material = new THREE.MeshPhongMaterial( { map:texture, bumpMap:bump, bumpScale:scale } );
 
@@ -91,10 +91,10 @@
                 var keyChar = String.fromCharCode(event.which);
                 keyChar = keyChar.toLowerCase();
 
-                if (keyChar == 'b') {
+                if (keyChar === 'b') {
                     bumped = !bumped;
                 }
-                else if (keyChar == 't') {
+                else if (keyChar === 't') {
                     if ( image.indexOf('f') != -1)
                         image = "stone";
                     else

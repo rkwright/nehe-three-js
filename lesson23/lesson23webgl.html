@@ -50,13 +50,13 @@
 			function initializeDemo() {
 	
 				// Load an image as texture
-				quadTexture = new THREE.ImageUtils.loadTexture("images/ElCapitanSphere.png");
+				quadTexture = new THREE.ImageUtils.loadTexture("images/ElCapitanSphere.jpg");
 
 				quadMaterial = makeMaterial(materialType);
 	
 				quadric = makeQuad(quadType);
 
-                var background = THREE.ImageUtils.loadTexture( 'images/ElCapitanSquare.png' );
+                var background = THREE.ImageUtils.loadTexture( 'images/ElCapitanSquare.jpg' );
                 var backgroundMesh = new THREE.Mesh(
                     new THREE.PlaneGeometry(2, 2, 0),
                     new THREE.MeshBasicMaterial({

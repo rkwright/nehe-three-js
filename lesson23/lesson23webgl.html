@@ -38,9 +38,6 @@
 									                    controls:true,
 									                    displayStats:true });
 
-            var glContext = gfxScene.renderer.getContext();
-            var available_extensions = glContext.getSupportedExtensions();
-
             // then initialize our demo's stuff
 			initializeDemo();
 	
@@ -53,13 +50,13 @@
 			function initializeDemo() {
 	
 				// Load an image as texture
-				quadTexture = new THREE.ImageUtils.loadTexture("images/bg.bmp");
+				quadTexture = new THREE.ImageUtils.loadTexture("images/ElCapitanSphere.png");
 
 				quadMaterial = makeMaterial(materialType);
 	
 				quadric = makeQuad(quadType);
 
-                var background = THREE.ImageUtils.loadTexture( 'images/BG.bmp' );
+                var background = THREE.ImageUtils.loadTexture( 'images/ElCapitanSquare.png' );
                 var backgroundMesh = new THREE.Mesh(
                     new THREE.PlaneGeometry(2, 2, 0),
                     new THREE.MeshBasicMaterial({

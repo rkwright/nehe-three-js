@@ -37,7 +37,7 @@
             var image = "flower";
 
             // allocate the Scene object, and set the camera position
-            var gfxScene = new GFX.Scene( { cameraPos : [3, 5, 10],
+            var gfxScene = new GFX.Scene( { cameraPos : [3, 5, 8],
                                             controls : true,
 											axesHeight:10,
                                             displayStats:true});
@@ -76,10 +76,14 @@
                 var bump = bumped === true ? new THREE.ImageUtils.loadTexture("images/" + image + "-bump.jpg") : null;
                 var scale = bumped === true ? 2 : 0;
 
-                var material = new THREE.MeshPhongMaterial( { map:texture, bumpMap:bump, bumpScale:scale } );
+                var material = new THREE.MeshPhongMaterial( {
+                    map:texture,
+                    minFilter:THREE.LinearFilter,
+                    magFilter:THREE.LinearFilter,
+                    bumpMap:bump,
+                    bumpScale:scale } );
 
                 mesh = new THREE.Mesh( geom, material );
-                mesh.doubleSided = true;
                 gfxScene.add(mesh);
             }
 
@@ -95,7 +99,7 @@
                     bumped = !bumped;
                 }
                 else if (keyChar === 't') {
-                    if ( image.indexOf('f') != -1)
+                    if ( image.indexOf('f') !== -1)
                         image = "stone";
                     else
                         image = "flower";

@@ -222,40 +222,40 @@ function onDocumentKeyDown(event) {
 	// Get the key code of the pressed key
 	var keyCode = event.which;
 
-	if (keyCode == 70) {            // 'F' - Toggle through the texture filters
+	if (keyCode === 70) {            // 'F' - Toggle through the texture filters
 		updateFilter();
 
 	}
-    else if (keyCode == 76) {       // 'L' - Toggle light
+    else if (keyCode === 76) {       // 'L' - Toggle light
 		// Just toggle the intensity to turn lights on and off
         ambientLight.intensity = ambientLight.intensity > 0 ? 0 : 1;
         directionalLight.intensity = directionalLight.intensity > 0 ? 0 : 1;
 	}
-    else if (keyCode == 38) {       // Cursor up
+    else if (keyCode === 38) {       // Cursor up
 		xSpeed -= 0.005;
 
 	}
-    else if (keyCode == 40) {       // Cursor down
+    else if (keyCode === 40) {       // Cursor down
 		xSpeed += 0.005;
 
 	}
-    else if (keyCode == 37) {       // Cursor left
+    else if (keyCode === 37) {       // Cursor left
 		ySpeed -= 0.005;
 
 	}
-    else if (keyCode == 39) {       // Cursor right
+    else if (keyCode === 39) {       // Cursor right
 		ySpeed += 0.005;
 
 	}
-    else if (keyCode == 33) {       // Page up
+    else if (keyCode === 33) {       // Page up
 		zTranslation -= 0.2;
 
 	}
-    else if (keyCode == 34) {       // Page down
+    else if (keyCode === 34) {       // Page down
 		zTranslation += 0.2;
 	}
-	else if (keyCode == 84) {       // 'T' switch textures
-		textureSize = textureSize == 1024 ? 256 : textureSize == 256 ? 64 : 1024;
+	else if (keyCode === 84) {       // 'T' switch textures
+		textureSize = textureSize === 1024 ? 256 : textureSize === 256 ? 64 : 1024;
 
 		cubeMesh.material.map = new THREE.ImageUtils.loadTexture("images/StoneWall-"+textureSize+".png");
 		updateFilter();

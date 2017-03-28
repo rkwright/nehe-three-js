@@ -170,14 +170,14 @@
 		var ty = fontsize / 2.0;
 
 		// then adjust for the justification
-		if ( vAlign == "bottom")
+		if ( vAlign === "bottom")
 			ty = 0;
-		else if (vAlign == "top")
+		else if (vAlign === "top")
 			ty = fontsize;
 
-		if (hAlign == "left")
+		if (hAlign === "left")
 			tx = 0;
-		else if (hAlign == "right")
+		else if (hAlign === "right")
 			tx = textWidth;
 
 		// the DESCENDER_ADJUST is extra height factor for text below baseline: g,j,p,q. since we don't know the true bbox
@@ -218,7 +218,7 @@
 	function roundRect(ctx, x, y, w, h, r, borderThickness, borderColor, fillColor)
 	{
 		// no point in drawing it if it isn't going to be rendered
-		if (fillColor == undefined && borderColor == undefined)
+		if (fillColor === undefined && borderColor === undefined)
 			return;
 
 		x -= borderThickness + r;
@@ -244,12 +244,12 @@
 		// border color
 
 		// if the fill color is defined, then fill it
-		if (fillColor != undefined) {
+		if (fillColor !== undefined) {
 			ctx.fillStyle = getCanvasColor(fillColor);
 			ctx.fill();
 		}
 
-		if (borderThickness > 0 && borderColor != undefined) {
+		if (borderThickness > 0 && borderColor !== undefined) {
 			ctx.strokeStyle = getCanvasColor(borderColor);
 			ctx.stroke();
 		}
@@ -259,7 +259,7 @@
 	 * Just add a little sphere for visual reference
 	 */
 	function addSphere( x, y, z, size ) {
-		if (size == undefined)
+		if (size === undefined)
 			size = 0.01;
 
 		var sphere = new THREE.Mesh( new THREE.SphereGeometry(size, 32, 32), new THREE.MeshNormalMaterial());

@@ -98,8 +98,7 @@
                 var geom = new THREE.BoxGeometry(OBJ_SIZE * 2, OBJ_SIZE * 2, OBJ_SIZE * 2);
                 var material = new THREE.MeshLambertMaterial({
                     color: randColor(),
-                    shading: THREE.FlatShading,
-                    transparent: true
+                    shading: THREE.FlatShading
                 });
                 var box = new THREE.Mesh(geom, material);
                 box.position.set(randPos(), randPos(), randPos());

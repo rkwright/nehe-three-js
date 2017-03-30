@@ -109,8 +109,7 @@
                 var geom = new THREE.BoxGeometry(OBJ_SIZE * 2, OBJ_SIZE * 2, OBJ_SIZE * 2);
                 var material = new THREE.MeshLambertMaterial({
                     color: randColor(),
-                    shading: THREE.FlatShading,
-                    transparent: true
+                    shading: THREE.FlatShading
                 });
                 var box = new THREE.Mesh(geom, material);
                 box.position.set(randPos(), randPos(), randPos());
@@ -475,6 +474,7 @@
                     // Make the object white, and decrease its opacity
                     intersects[0].object.material.color.setHex(0xffffff);
                     intersects[0].object.material.opacity -= 0.025;
+                    intersects[0].object.material.transparent = true;
                 }
             }
 

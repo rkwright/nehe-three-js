@@ -29,7 +29,7 @@
 	        var vertType = 0;
 	        var vertArray = [Sphere, Torus, Tube];
 	        var vertMesh;
-	        var lengthVec = [Sphere.length];
+	        var deltaVec = [Sphere.length];
 	        var srcRay;
 	        var destRay;
 	        var nStep = 200;
@@ -54,8 +54,6 @@
 
                 createVertMesh(vertType);
 
-                //initMorph(vertType);
-
 				document.addEventListener("keypress", onDocumentKeyPress, false);
 			}
 
@@ -73,7 +71,7 @@
                 // Create the vertices and add them to the particles geometry
                 for ( var p = 0; p < destRay.length; p++ ) {
 
-                    lengthVec[p] = new THREE.Vector3();
+                    deltaVec[p] = new THREE.Vector3();
 
                     // Create the vertices and add them to the geometry
                     var vertex = new THREE.Vector3(destRay[p][0], destRay[p][1], destRay[p][2]);
@@ -98,7 +96,7 @@
             /**
              * Morph the mesh from the current shape to the new one
              */
-            function initMorph( newVertType ) {
+            function calcDeltas( newVertType ) {
 
                 srcRay = vertArray[vertType];
                 vertType = newVertType;
@@ -106,9 +104,9 @@
 
                 // initialize the length vector
                 for ( var n = 0; n < destRay.length; n++ ) {
-                    lengthVec[n].x = destRay[n][0] - srcRay[n][0];
-                    lengthVec[n].y = destRay[n][1] - srcRay[n][1];
-                    lengthVec[n].z = destRay[n][2] - srcRay[n][2];
+                    deltaVec[n].x = destRay[n][0] - srcRay[n][0];
+                    deltaVec[n].y = destRay[n][1] - srcRay[n][1];
+                    deltaVec[n].z = destRay[n][2] - srcRay[n][2];
                 }
 
                 // set curStep to 200 to start the morphing
@@ -123,9 +121,9 @@
                 var verts = vertMesh.geometry.vertices;
 
                 for ( var n = 0; n < destRay.length; n++ ) {
-                    verts[n].x = destRay[n][0] - lengthVec[n].x *  (curStep / nStep);
-                    verts[n].y = destRay[n][1] - lengthVec[n].y *  (curStep / nStep);
-                    verts[n].z = destRay[n][2] - lengthVec[n].z *  (curStep / nStep);
+                    verts[n].x = destRay[n][0] - deltaVec[n].x *  (curStep / nStep);
+                    verts[n].y = destRay[n][1] - deltaVec[n].y *  (curStep / nStep);
+                    verts[n].z = destRay[n][2] - deltaVec[n].z *  (curStep / nStep);
                 }
                 curStep--;
                 vertMesh.geometry.verticesNeedUpdate = true;
@@ -141,10 +139,10 @@
 
 				var renderString = "012";
 
-					if ( renderString.indexOf(keyChar) != -1) {
+					if ( renderString.indexOf(keyChar) !== -1) {
 					    var newVertType = keyChar - '0';
-					    if (newVertType != vertType)
-                            initMorph(newVertType);
+					    if (newVertType !== vertType)
+                            calcDeltas(newVertType);
                     }
 			}
 	

@@ -162,8 +162,6 @@ GFX.Scene.prototype = {
 	
 		// set up the camera
 		this.setCamera(null);
-
-		this.scene.add(this.camera);
 	
 		// allocate the THREE.js renderer
 		this.renderer = new THREE.WebGLRenderer({antialias:true});

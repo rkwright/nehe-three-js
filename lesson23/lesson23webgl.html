@@ -64,14 +64,13 @@
                         map: background
                     }));
 
-                backgroundMesh .material.depthTest = false;
-                backgroundMesh .material.depthWrite = false;
+                backgroundMesh.material.depthTest = false;
+                backgroundMesh.material.depthWrite = false;
 
                 // Create your background scene
                 backgroundScene = new THREE.Scene();
                 backgroundCamera = new THREE.Camera();
-                backgroundScene .add(backgroundCamera );
-                backgroundScene .add(backgroundMesh );
+                backgroundScene.add(backgroundMesh );
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
 			}
@@ -160,7 +159,7 @@
                 gfxScene.renderer.clear();
 
 				// Map the 3D scene down to the 2D screen (render the frame)
-                gfxScene.renderer.render(backgroundScene , backgroundCamera );
+                gfxScene.renderer.render(backgroundScene, backgroundCamera );
                 gfxScene.renderScene();
 			}
 

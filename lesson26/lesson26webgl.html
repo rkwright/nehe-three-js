@@ -27,10 +27,11 @@
             var smallSphere;
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
-			var gfxScene = new GFX.Scene( { cameraPos : [2, 4, 20],
-				                                        axesHeight:10,
-									                    controls:true,
-									                    displayStats:true });
+			var gfxScene = new GFX.Scene( {
+				cameraPos : [2, 4, 20],
+				axesHeight:10,
+				controls:true,
+				displayStats:true });
 
             // then initialize our demo's stuff
 			initializeDemo();
@@ -47,7 +48,12 @@
 
                 // MIRROR planes
                 groundMirror = new THREE.Mirror( gfxScene.renderer, gfxScene.camera,
-                    { clipBias: 0.003, textureWidth: gfxScene.canvasWidth, textureHeight: gfxScene.canvasHeight, color: 0x505050, debugMode : true } );
+                    {
+						textureWidth: gfxScene.canvasWidth,
+						textureHeight: gfxScene.canvasHeight,
+						color: 0x5050505,
+						debugMode : true
+                    } );
 
                 var mirrorMesh = new THREE.Mesh( planeGeo, groundMirror.material );
                 mirrorMesh.add( groundMirror );
@@ -75,28 +81,8 @@
                 var material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, shading: THREE.FlatShading } );
                 smallSphere = new THREE.Mesh( geometry, material );
                 gfxScene.add(smallSphere);
+ 			}
 
-                document.addEventListener("keypress", onDocumentKeyPress, false);
-			}
-
-
-            /**
-             * Just a handler for the keypress event to control parameters of the demo
-             */
-			function onDocumentKeyPress(event) {
-				// Get the key code of the pressed key
-				var keyChar = String.fromCharCode(event.which);
-                keyChar = keyChar.toLowerCase();
-
-				var renderString = "012";
-
-					if ( renderString.indexOf(keyChar) != -1) {
-					    var newVertType = keyChar - '0';
-					    if (newVertType != vertType)
-                            initMorph(newVertType);
-                    }
-			}
-	
 			/**
 			 * Animate the scene and call rendering.
 			 */

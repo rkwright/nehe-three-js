@@ -84,7 +84,7 @@
 
                 var map = new THREE.TextureLoader().load( 'images/UV_Grid_Sm.jpg' );
                 map.wrapS = map.wrapT = THREE.RepeatWrapping;
-                map.anisotropy = 16;
+                map.anisotropy = 4;
 
                 getSurfacePoint = function(u, v) {
                     return nurbsSurface.getPoint(u, v);
@@ -93,7 +93,6 @@
                 var geometry = new THREE.ParametricBufferGeometry(getSurfacePoint, 20, 20);
                 var material = new THREE.MeshLambertMaterial({map: map, side: THREE.DoubleSide});
                 var mesh = new THREE.Mesh(geometry, material);
-                mesh.scale.multiplyScalar(1);
 
                 gfxScene.add(mesh);
 

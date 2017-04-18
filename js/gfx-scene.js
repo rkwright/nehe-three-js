@@ -39,7 +39,7 @@ GFX.Scene = function ( parameters ) {
 	this.ambientLights = [];
 	this.directionalLights = [];
 	this.pointLights = [];
-	this.hemisphereLights =[];
+	this.hemisphereLights = [];
 	this.spotLights = [];
 
 	this.axesHeight = 0;

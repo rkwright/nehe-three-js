@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- -------------------------------------
+  			Roughly based (or inspired by) NeHe Tutorial 34
+  			Original:  http://nehe.gamedev.net/tutorial/beautiful_landscapes_by_means_of_height_mapping/16006/
+  
+  			@author: rkwright@geofx.com
+		-------------------------------------- -->
+		<title>NEHE Lesson 34</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+		<!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+		<link rel="stylesheet" type="text/css" href="../css/NEHE.css" /> 
+
+		<!-- Include several libraries from THREE.js and the Scene class  -->
+		<script src="../js/three.js" type="text/javascript"></script>
+		<script src="../js/Detector.js" type="text/javascript"></script>
+		<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
+		<script src="../js/Stats.js" type="text/javascript"></script>
+        <script src="../js/gfx-scene.js" type="text/javascript"></script>
+	</head>
+	<body>
+
+    <div style="position: absolute; top: 10px; left: 10px;color:white">
+        <p></p>
+    </div>
+
+    <script type="text/javascript">
+		var pixelData;
+
+        // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+        var gfxScene = new GFX.Scene( {
+            cameraPos : [8, 2, 40],
+            axesHeight: 30,
+            controls:true,
+            displayStats:true
+        });
+
+        // then initialize our demo's stuff
+        initializeDemo();
+
+        // Animate the scene
+        animateScene();
+
+        /**
+         * Initialize the Demo.
+         */
+        function initializeDemo() {
+
+            getPixelData();
+
+            document.addEventListener("keypress", onDocumentKeyPress, false);
+        }
+
+        function getPixelData()
+        {
+            var loader = new THREE.ImageLoader();
+
+            // load a image resource
+            loader.load('images/terrain.png', function ( image ) {
+                var canvas = document.createElement( 'canvas' );
+                var context = canvas.getContext( '2d' );
+                canvas.width = image.width;
+                canvas.height = image.height;
+                context.drawImage( image, 0, 0, image.width, image.height );
+
+                var data = canvas.getContext('2d').getImageData(0,0, image.height, image.width).data;
+                pixelData = [];
+
+                for (var i = 0, n = data.length; i < n; i += 4) {
+                    // get the average value of R, G and B. Don't care about alpha
+                    pixelData.push((data[i] + data[i+1] + data[i+2]) / 3);
+                }
+
+                // plane
+                var geometry = new THREE.PlaneGeometry(1024, 1024);
+                //var texture = THREE.ImageUtils.loadTexture( 'images/heightmap2.png' );
+                var material = new THREE.MeshLambertMaterial( { color:0xffffff } );
+                plane = new THREE.Mesh( geometry, material );
+
+                //set height of vertices
+                for ( var j = 0; j<plane.geometry.vertices.length; j++ ) {
+                    plane.geometry.vertices[j].z = data[j];
+                }
+
+                gfxScene.add(plane);
+            });
+        }
+
+        /**
+         * Just a handler for the keypress event to control parameters of the demo
+         */
+        function onDocumentKeyPress(event) {
+            // Get the key code of the pressed key
+            var keyChar = String.fromCharCode(event.which);
+            keyChar = keyChar.toLowerCase();
+
+            var renderString = "012";
+
+                if ( renderString.indexOf(keyChar) !== -1) {
+                }
+        }
+
+        /**
+         * Animate the scene and call rendering.
+         */
+        function animateScene() {
+
+            // Tell the browser to call this function when page is visible
+            requestAnimationFrame(animateScene);
+
+            // Map the 3D scene down to the 2D screen (render the frame)
+            gfxScene.renderScene();
+        }
+
+    </script>
+
+	</body>
+</html>

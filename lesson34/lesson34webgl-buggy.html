@@ -93,6 +93,17 @@
             ];
 
             var color = new THREE.Color();
+            for (var i=0; i<SurfaceCover.length; i++ ) {
+                color.setHSL(SurfaceCover[i].hue, SurfaceCover[i].saturation, SurfaceCover[i].brightness);
+                console.log(SurfaceCover[i].name + " hsb: " + SurfaceCover[i].hue + ", " + SurfaceCover[i].saturation + ", " + SurfaceCover[i].brightness
+                    + " rgb: " + color.r + ", " + color.g + ", " + color.b);
+            }
+
+            for ( var j=0; j<SurfaceCover.length; j++ ) {
+                setHSV(color, SurfaceCover[j].hue, SurfaceCover[j].saturation, SurfaceCover[j].brightness);
+                console.log(SurfaceCover[j].name + " hsb: " + SurfaceCover[j].hue + ", " + SurfaceCover[j].saturation + ", " + SurfaceCover[j].brightness
+                    + " rgb: " + color.r + ", " + color.g + ", " + color.b);
+            }
 
             for ( var n=0; n<SurfaceCover.length; n++ ) {
                 color = HSVtoRGB( SurfaceCover[n].hue, SurfaceCover[n].saturation, SurfaceCover[n].brightness);
@@ -106,7 +117,7 @@
                 });
 
                 cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
-                cubeMesh.position.set( 2 * n - 5, -4, 0 );
+                cubeMesh.position.set( 2 * n - 5, 0, 0 );
                 gfxScene.add(cubeMesh);
             }
 
@@ -114,7 +125,7 @@
             var loader = new THREE.TextureLoader();
 			var zScale = 10;
 
-            loader.load('images/terrain-edged.png', function ( texture ) {
+            loader.load('images/terrain.png', function ( texture ) {
                 // use "this." to create global object
                 this.customUniforms = {
                     zTexture:	{ type: "t", value: texture },
@@ -129,13 +140,28 @@
                         side: THREE.DoubleSide
                     });
 
-                var planeGeo = new THREE.PlaneGeometry( 20, 20, 257, 257 );
+                var planeGeo = new THREE.PlaneGeometry( 20, 20, 1023, 1023 );
                 var plane = new THREE.Mesh(	planeGeo, customMaterial );
                 plane.rotation.x = -Math.PI / 2;
-                plane.position.y = 0;
+                plane.position.y = -2;
 
                 gfxScene.add(plane);
             });
+        }
+
+        function setHSV ( color, h, s, v ) {
+
+            // https://gist.github.com/xpansive/1337890#file-index-js
+
+            h = THREE.Math.euclideanModulo( h, 1 );
+            s = THREE.Math.clamp( s, 0, 1 );
+            v = THREE.Math.clamp( v, 0, 1 );
+
+            var sat0 = ( s * v ) / ( ( h = ( 2 - s ) * v )) ;
+            var denom =  ( ( h = ( 2 - s ) * v ) < 1 ? h : ( 2 - h ) );
+            var sat = ( s * v ) / ( ( h = ( 2 - s ) * v ) < 1 ? h : ( 2 - h ) );
+
+            return color.setHSL( h, ( s * v ) / ( ( h = ( 2 - s ) * v ) < 1 ? h : ( 2 - h ) ), h * 0.5 );
         }
 
         /******************************************************************************

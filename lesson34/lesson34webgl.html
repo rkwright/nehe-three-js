@@ -88,37 +88,23 @@
         function initializeDemo() {
 
             var SurfaceCover = [
-                { name : "border", hue: 0.0, saturation: 0.0, brightness: 0, limit: 1 },
-                // { name : "water", hue: 0.667, saturation: 1.0, brightness: 1, limit: 0 },
-                { name : "grass", hue: 0.167, saturation: 0.5, brightness: 1, limit: 37 },
-                { name : "chapparal", hue: 0.2, saturation: 0.67, brightness: 1, limit: 74  },
-                { name : "hardwood", hue: 0.27, saturation: 0.75, brightness: 1, limit: 112  },
-                { name : "conifer", hue: 0.39, saturation: 0.46, brightness: 1, limit: 149  },
-                { name : "tundra", hue: 0.44, saturation: 0.33, brightness: 1, limit: 186  },
-                { name : "rock", hue: 0.5, saturation: 0.1, brightness: 1, limit: 224  },
-                { name : "snow", hue: 0.5, saturation: 0.0, brightness: 1, limit: 256  }
+                { name : "border", r: 0, g: 0, b: 0, limit: 1  },
+                // { name : "water", r: 0.667, g: 1.0, b: 1, limit: 0 },
+                { name : "grass", r: 230, g: 223, b: 115, limit: 37 },
+                { name : "chapparal", r: 196, g: 191, b: 110, limit: 74 },
+                { name : "hardwood", r: 89, g: 133, b: 39, limit: 112  },
+                { name : "conifer", r: 37, g: 130, b: 96, limit: 149  },
+                { name : "tundra", r: 185, g: 211, b: 156, limit: 186  },
+                { name : "rock", r: 196, g: 204, b: 204, limit: 224  },
+                { name : "snow", r:248, g: 251, b: 252, limit: 256  }
             ];
 
-            var color = new THREE.Color();
             var k = 0;
             var lut = [];
             for ( var n=0; n<SurfaceCover.length; n++ ) {
-                color = HSVtoRGB( SurfaceCover[n].hue, SurfaceCover[n].saturation, SurfaceCover[n].brightness);
-                console.log(SurfaceCover[n].name + " hsb: " + SurfaceCover[n].hue + ", " + SurfaceCover[n].saturation + ", " + SurfaceCover[n].brightness
-                   + " rgb: " + color.r*255 + ", " + color.g*255 + ", " + color.b*255);
-
-                var cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
-                var cubeMaterial = new THREE.MeshBasicMaterial({
-                    color: color,
-                    side: THREE.DoubleSide
-                });
-
-                cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
-                cubeMesh.position.set( 2 * n - 5, -4, 0 );
-                gfxScene.add(cubeMesh);
 
                 while (k < SurfaceCover[n].limit) {
-                    lut.push(new THREE.Vector3(color.r, color.g, color.b));
+                    lut.push(new THREE.Vector3(SurfaceCover[n].r/255.0, SurfaceCover[n].g/255.0, SurfaceCover[n].b/255.0));
                     k++;
                 }
             }
@@ -142,7 +128,7 @@
                         side: THREE.DoubleSide
                     });
 
-                var planeGeo = new THREE.PlaneGeometry( 20, 20, 1023, 1023 );
+                var planeGeo = new THREE.PlaneGeometry( 20, 20, 257, 257 );
                 plane = new THREE.Mesh(	planeGeo, customMaterial );
                 plane.rotation.x = -Math.PI / 2;
                 plane.position.y = 0;

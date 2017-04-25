@@ -23,41 +23,36 @@
 
         <!-- ---------------- Custom Shader Code ------------------------ -->
         <script id="vertexShader" type="x-shader/x-vertex">
-            uniform sampler2D   zTexture;
-            uniform float       zScale;
-            uniform vec3        zLut[ 256 ];
+            uniform sampler2D   vTexture;
+            uniform float       vScale;
+            uniform vec3        vLut[ 256 ];
 
-            varying float vAmount;
-            varying vec3  vColor;
+            varying vec3        vColor;
 
-            void main()
-            {
-	            vec4 heightData = texture2D( zTexture, uv );
+            void main() {
 
-	            vAmount = heightData.r; // assuming map is grayscale it doesn't matter if you use r, g, or b.
+	            vec4 heightData = texture2D( vTexture, uv );
 
-                // test
+                // if the map is grayscale it doesn't matter if you use r, g, or b.
+	            float vAmount = heightData.r;
+
+                // fetch the color from the lookup table so it gets passed to the fragment shader
                 int index = int(heightData.r * 255.0);
-	            vColor = zLut[index];
+	            vColor = vLut[index];
 
 	            // move the position along the normal
-                vec3 newPosition = position + normal * zScale * vAmount;
+                vec3 newPosition = position + normal * vScale * vAmount;
 
 	            gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
             }
         </script>
 
         <script id="fragmentShader" type="x-shader/x-vertex">
-            //uniform vec3        zLut[ 256 ];
 
-            //varying float vAmount;
             varying vec3  vColor;
 
-            void main()
-            {
-                //int index = int(vAmount) * 255;
-	            //vec3 vColor = vec3(vAmount, vAmount, vAmount);
-	            //gl_FragColor = vec4(zLut[32], 1.0);
+            void main() {
+
                 gl_FragColor = vec4(vColor, 1.0);
             }
         </script>
@@ -71,6 +66,7 @@
 
 
     <script type="text/javascript">
+        var plane;
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
@@ -92,7 +88,7 @@
         function initializeDemo() {
 
             var SurfaceCover = [
-                { name : "border", hue: 0.667, saturation: 1.0, brightness: 1, limit: 1 },
+                { name : "border", hue: 0.0, saturation: 0.0, brightness: 0, limit: 1 },
                 // { name : "water", hue: 0.667, saturation: 1.0, brightness: 1, limit: 0 },
                 { name : "grass", hue: 0.167, saturation: 0.5, brightness: 1, limit: 37 },
                 { name : "chapparal", hue: 0.2, saturation: 0.67, brightness: 1, limit: 74  },
@@ -109,7 +105,7 @@
             for ( var n=0; n<SurfaceCover.length; n++ ) {
                 color = HSVtoRGB( SurfaceCover[n].hue, SurfaceCover[n].saturation, SurfaceCover[n].brightness);
                 console.log(SurfaceCover[n].name + " hsb: " + SurfaceCover[n].hue + ", " + SurfaceCover[n].saturation + ", " + SurfaceCover[n].brightness
-                    + " rgb: " + color.r + ", " + color.g + ", " + color.b);
+                   + " rgb: " + color.r*255 + ", " + color.g*255 + ", " + color.b*255);
 
                 var cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
                 var cubeMaterial = new THREE.MeshBasicMaterial({
@@ -127,16 +123,15 @@
                 }
             }
 
-
             var loader = new THREE.TextureLoader();
-			var zScale = 10;
+			var vScale = 10;
 
             loader.load('images/terrain-edged.png', function ( texture ) {
                 // use "this." to create global object
                 this.customUniforms = {
-                    zTexture:	{ type: "t", value: texture },
-                    zScale:	    { type: "f", value: zScale },
-                    zLut:       { type: "v3v", value: lut }
+                    vTexture:	{ type: "t", value: texture },
+                    vScale:	    { type: "f", value: vScale },
+                    vLut:       { type: "v3v", value: lut }
                 };
 
                 var customMaterial = new THREE.ShaderMaterial(
@@ -147,8 +142,8 @@
                         side: THREE.DoubleSide
                     });
 
-                var planeGeo = new THREE.PlaneGeometry( 20, 20, 257, 257 );
-                var plane = new THREE.Mesh(	planeGeo, customMaterial );
+                var planeGeo = new THREE.PlaneGeometry( 20, 20, 1023, 1023 );
+                plane = new THREE.Mesh(	planeGeo, customMaterial );
                 plane.rotation.x = -Math.PI / 2;
                 plane.position.y = 0;
 
@@ -156,16 +151,14 @@
             });
         }
 
-        /******************************************************************************
-
-         Converts from the HSV color model to the RGB color model.
-         All input values [0, 1]., while the function returniing doubleing
-         point values for each of the Red, Green, and Blue components.
-
-         Reference:  Fundamentals of interactive computer graphics,
-         J.D. Foley, A. Van Dam, p.614-616.
-
-         -----------------------------------------------------------------------------*/
+        /**
+         * Converts from the HSV color model to the RGB color model.
+         * All input values [0, 1]., while the function returniing doubleing
+         * point values for each of the Red, Green, and Blue components.
+         *
+         * Reference:  Fundamentals of interactive computer graphics,
+         * J.D. Foley, A. Van Dam, p.614-616.
+         */
         function HSVtoRGB ( hue, sat, value ) {
             var hInt;    /* integer part of 6*hue */
             var p, q, t;

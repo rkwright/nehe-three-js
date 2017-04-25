@@ -23,16 +23,22 @@
 
         <!-- ---------------- Custom Shader Code ------------------------ -->
         <script id="vertexShader" type="x-shader/x-vertex">
-            uniform sampler2D zTexture;
-            uniform float zScale;
+            uniform sampler2D   zTexture;
+            uniform float       zScale;
+            uniform vec3        zLut[ 256 ];
 
             varying float vAmount;
+            varying vec3  vColor;
 
             void main()
             {
 	            vec4 heightData = texture2D( zTexture, uv );
 
 	            vAmount = heightData.r; // assuming map is grayscale it doesn't matter if you use r, g, or b.
+
+                // test
+                int index = int(heightData.r * 255.0);
+	            vColor = zLut[index];
 
 	            // move the position along the normal
                 vec3 newPosition = position + normal * zScale * vAmount;
@@ -42,13 +48,17 @@
         </script>
 
         <script id="fragmentShader" type="x-shader/x-vertex">
+            //uniform vec3        zLut[ 256 ];
 
-            varying float vAmount;
+            //varying float vAmount;
+            varying vec3  vColor;
 
             void main()
             {
-	            vec3 vColor = vec3(vAmount, vAmount, vAmount);
-	            gl_FragColor = vec4(vColor, 1.0);
+                //int index = int(vAmount) * 255;
+	            //vec3 vColor = vec3(vAmount, vAmount, vAmount);
+	            //gl_FragColor = vec4(zLut[32], 1.0);
+                gl_FragColor = vec4(vColor, 1.0);
             }
         </script>
 	</head>
@@ -82,18 +92,20 @@
         function initializeDemo() {
 
             var SurfaceCover = [
-                { name : "water", hue: 0.667, saturation: 1.0, brightness: 1 },
-                { name : "grass", hue: 0.167, saturation: 0.5, brightness: 1 },
-                { name : "chapparal", hue: 0.2, saturation: 0.67, brightness: 1 },
-                { name : "hardwood", hue: 0.27, saturation: 0.75, brightness: 1 },
-                { name : "conifer", hue: 0.39, saturation: 0.46, brightness: 1 },
-                { name : "tundra", hue: 0.44, saturation: 0.33, brightness: 1 },
-                { name : "rock", hue: 0.5, saturation: 0.1, brightness: 1 },
-                { name : "snow", hue: 0.5, saturation: 0.0, brightness: 1 }
+                { name : "border", hue: 0.667, saturation: 1.0, brightness: 1, limit: 1 },
+                // { name : "water", hue: 0.667, saturation: 1.0, brightness: 1, limit: 0 },
+                { name : "grass", hue: 0.167, saturation: 0.5, brightness: 1, limit: 37 },
+                { name : "chapparal", hue: 0.2, saturation: 0.67, brightness: 1, limit: 74  },
+                { name : "hardwood", hue: 0.27, saturation: 0.75, brightness: 1, limit: 112  },
+                { name : "conifer", hue: 0.39, saturation: 0.46, brightness: 1, limit: 149  },
+                { name : "tundra", hue: 0.44, saturation: 0.33, brightness: 1, limit: 186  },
+                { name : "rock", hue: 0.5, saturation: 0.1, brightness: 1, limit: 224  },
+                { name : "snow", hue: 0.5, saturation: 0.0, brightness: 1, limit: 256  }
             ];
 
             var color = new THREE.Color();
-
+            var k = 0;
+            var lut = [];
             for ( var n=0; n<SurfaceCover.length; n++ ) {
                 color = HSVtoRGB( SurfaceCover[n].hue, SurfaceCover[n].saturation, SurfaceCover[n].brightness);
                 console.log(SurfaceCover[n].name + " hsb: " + SurfaceCover[n].hue + ", " + SurfaceCover[n].saturation + ", " + SurfaceCover[n].brightness
@@ -108,6 +120,11 @@
                 cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
                 cubeMesh.position.set( 2 * n - 5, -4, 0 );
                 gfxScene.add(cubeMesh);
+
+                while (k < SurfaceCover[n].limit) {
+                    lut.push(new THREE.Vector3(color.r, color.g, color.b));
+                    k++;
+                }
             }
 
 
@@ -119,6 +136,7 @@
                 this.customUniforms = {
                     zTexture:	{ type: "t", value: texture },
                     zScale:	    { type: "f", value: zScale },
+                    zLut:       { type: "v3v", value: lut }
                 };
 
                 var customMaterial = new THREE.ShaderMaterial(

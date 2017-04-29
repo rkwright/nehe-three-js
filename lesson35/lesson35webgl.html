@@ -29,10 +29,7 @@
     </div>
 
     <script type="text/javascript">
-        var cubeMesh;
-        var xRotation = 0.0;
         var yRotation = 0.0;
-        var zRotation = 0.0;
         var movieScreen;
         var video, videoImage, videoImageContext, videoTexture;
 
@@ -41,7 +38,7 @@
             cameraPos : [0, 0, 30],
             controls:true,
             displayStats:true,
-            clearColor:0x808080
+            clearColor:0x202020
         });
 
         // then initialize our demo's stuff
@@ -57,15 +54,15 @@
 
             // create the video element
             video = document.createElement( 'video' );
-            // video.id = 'video';
             // video.type = ' video/ogg; codecs="theora, vorbis" ';
-            video.src = "videos/sintel.ogv";
-            video.load(); // must call after setting/changing source
+            video.src = "videos/Big_Buck_Bunny_Trailer_400p.ogv";
+            video.load();
             video.play();
+            video.loop = true;
 
             videoImage = document.createElement( 'canvas' );
-            videoImage.width = 480;
-            videoImage.height = 204;
+            videoImage.width = 720;
+            videoImage.height = 400;
 
             videoImageContext = videoImage.getContext( '2d' );
             // background color if no video present
@@ -76,15 +73,10 @@
             videoTexture.minFilter = THREE.LinearFilter;
             videoTexture.magFilter = THREE.LinearFilter;
 
-            var material = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
+            var videoMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
 
-            //var cubeMaterial = new THREE.MeshBasicMaterial( { color:0xffff00 } );
-            //var geometry = new THREE.BoxGeometry(4.8, 2.0, 4.8);
-            //cubeMesh = new THREE.Mesh( geometry, material);
-            //gfxScene.add(cubeMesh);
-
-            var movieGeometry = new THREE.PlaneGeometry( 24, 10, 4, 4 );
-            movieScreen = new THREE.Mesh( movieGeometry, material );
+            var movieGeometry = new THREE.PlaneGeometry( 21.6, 12, 4, 4 );
+            movieScreen = new THREE.Mesh( movieGeometry, videoMaterial );
             movieScreen.position.set(0,0,0);
             gfxScene.add(movieScreen);
         }
@@ -97,17 +89,16 @@
             // Tell the browser to call this function when page is visible
             requestAnimationFrame(animateScene);
 
+            // we have to redraw the context and refresh the texture each frame
             if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
                 videoImageContext.drawImage( video, 0, 0 );
                 if ( videoTexture )
                     videoTexture.needsUpdate = true;
             }
 
-            // Increase the x, y and z rotation of the cube
-            //xRotation += 0.003;
+            // Rotate the movie screen around the Y axis
             yRotation += 0.01;
-            //zRotation += 0.004;
-            movieScreen.rotation.set(xRotation, yRotation, zRotation);
+            movieScreen.rotation.set(0, yRotation, 0);
 
             // Map the 3D scene down to the 2D screen (render the frame)
             gfxScene.renderScene();

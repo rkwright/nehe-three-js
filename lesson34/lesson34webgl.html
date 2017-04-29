@@ -47,7 +47,7 @@
             }
         </script>
 
-        <script id="fragmentShader" type="x-shader/x-vertex">
+        <script id="fragmentShader" type="x-shader/x-fragment">
 
             varying vec3  vColor;
 
@@ -66,12 +66,16 @@
 
 
     <script type="text/javascript">
+        var REPEAT_SIZE = 10;
         var plane;
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
             cameraPos : [8, 10, 30],
-            axesHeight: 30,
+            floorX:REPEAT_SIZE*3,
+            floorZ:REPEAT_SIZE*3,
+            floorRepeat:REPEAT_SIZE,
+            floorImage: "images/grey_checkerboard.jpg",
             controls:true,
             displayStats:true
         });
@@ -87,49 +91,42 @@
          */
         function initializeDemo() {
 
-            var SurfaceCover = [
-                { name : "border", r: 0, g: 0, b: 0, limit: 1  },
-                // { name : "water", r: 0.667, g: 1.0, b: 1, limit: 0 },
-                { name : "grass", r: 230, g: 223, b: 115, limit: 37 },
-                { name : "chapparal", r: 196, g: 191, b: 110, limit: 74 },
-                { name : "hardwood", r: 89, g: 133, b: 39, limit: 112  },
-                { name : "conifer", r: 37, g: 130, b: 96, limit: 149  },
-                { name : "tundra", r: 185, g: 211, b: 156, limit: 186  },
-                { name : "rock", r: 196, g: 204, b: 204, limit: 224  },
-                { name : "snow", r:248, g: 251, b: 252, limit: 256  }
-            ];
-
-            var k = 0;
-            var lut = [];
-            for ( var n=0; n<SurfaceCover.length; n++ ) {
-
-                while (k < SurfaceCover[n].limit) {
-                    lut.push(new THREE.Vector3(SurfaceCover[n].r/255.0, SurfaceCover[n].g/255.0, SurfaceCover[n].b/255.0));
-                    k++;
-                }
-            }
+            var lut = buildLut();
 
             var loader = new THREE.TextureLoader();
-			var vScale = 10;
+			var vScale = 5;
 
             loader.load('images/terrain-edged.png', function ( texture ) {
                 // use "this." to create global object
-                this.customUniforms = {
+                this.uniforms = {
                     vTexture:	{ type: "t", value: texture },
                     vScale:	    { type: "f", value: vScale },
                     vLut:       { type: "v3v", value: lut }
                 };
 
-                var customMaterial = new THREE.ShaderMaterial(
-                    {
-                        uniforms: customUniforms,
+                gfxScene.clearAllLights();
+
+                /*
+                var shaderMaterial = new THREE.ShaderMaterial({
+                    uniforms: THREE.UniformsUtils.merge([
+                        THREE.UniformsLib['lights'],
+                        this.customUniforms
+                    ]),
+                    vertexShader: document.getElementById('vertexShader').text,
+                    fragmentShader: document.getElementById('fragmentShader').text,
+                    lights: true
+                });
+				*/
+
+                var shaderMaterial = new THREE.ShaderMaterial({
+                        uniforms: uniforms,
                         vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
                         fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
                         side: THREE.DoubleSide
                     });
 
-                var planeGeo = new THREE.PlaneGeometry( 20, 20, 257, 257 );
-                plane = new THREE.Mesh(	planeGeo, customMaterial );
+                var planeGeo = new THREE.PlaneGeometry( 20, 20, 513, 513 );
+                plane = new THREE.Mesh(	planeGeo, shaderMaterial );
                 plane.rotation.x = -Math.PI / 2;
                 plane.position.y = 0;
 
@@ -137,55 +134,31 @@
             });
         }
 
-        /**
-         * Converts from the HSV color model to the RGB color model.
-         * All input values [0, 1]., while the function returniing doubleing
-         * point values for each of the Red, Green, and Blue components.
-         *
-         * Reference:  Fundamentals of interactive computer graphics,
-         * J.D. Foley, A. Van Dam, p.614-616.
-         */
-        function HSVtoRGB ( hue, sat, value ) {
-            var hInt;    /* integer part of 6*hue */
-            var p, q, t;
-            var hFrac;   /* fractional part of 6*hue */
+        function buildLut() {
 
-            var color = new THREE.Color();
+            var SurfaceCover = [
+                {name: "border", r: 0, g: 0, b: 0, limit: 1},
+                {name: "water", r: 0, g: 0, b: 128, limit: 1},
+                {name: "grass", r: 230, g: 223, b: 115, limit: 37},
+                {name: "chapparal", r: 196, g: 191, b: 110, limit: 74},
+                {name: "hardwood", r: 89, g: 133, b: 39, limit: 112},
+                {name: "conifer", r: 37, g: 130, b: 96, limit: 149},
+                {name: "tundra", r: 185, g: 211, b: 156, limit: 186},
+                {name: "rock", r: 196, g: 204, b: 204, limit: 224},
+                {name: "snow", r: 248, g: 251, b: 252, limit: 256}
+            ];
 
-            /* no saturation, so just return shade of grey */
-            if (sat === 0.0) {
-                color.setRGB(value, value, value);
-                return color;
+            var k = 0;
+            var lut = [];
+            for (var n = 0; n < SurfaceCover.length; n++) {
+
+                while (k < SurfaceCover[n].limit) {
+                    lut.push(new THREE.Vector3(SurfaceCover[n].r / 255.0, SurfaceCover[n].g / 255.0, SurfaceCover[n].b / 255.0));
+                    k++;
+                }
             }
 
-            hInt = Math.floor(6.0 * hue);
-            hFrac = 6.0 * hue - hInt;
-            p = value * (1.0 - sat);
-            q = value * (1.0 - sat * hFrac);
-            t = value * (1.0 - sat * (1.0 - hFrac));
-
-            switch (hInt) {
-                case 6:
-                case 0:
-                    color.setRGB(value, t, p);
-                    break;
-                case 1:
-                    color.setRGB(q, value, p);
-                    break;
-                case 2:
-                    color.setRGB(p, value, t);
-                    break;
-                case 3:
-                    color.setRGB(p, q, value);
-                    break;
-                case 4:
-                    color.setRGB(t, p, value);
-                    break;
-                case 5:
-                    color.setRGB(value, p, q);
-            }
-
-            return color;
+            return lut;
         }
 
         /**

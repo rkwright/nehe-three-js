@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- -------------------------------------
+  			Roughly based (or inspired by) NeHe Tutorial 34
+  			Original:  http://nehe.gamedev.net/tutorial/playing_avi_files_in_opengl/23001/
+  
+  			@author: rkwright@geofx.com
+		-------------------------------------- -->
+		<title>NEHE Lesson 35</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+		<!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+		<link rel="stylesheet" type="text/css" href="../css/NEHE.css" /> 
+
+		<!-- Include several libraries from THREE.js and the Scene class  -->
+		<script src="../js/three.js" type="text/javascript"></script>
+		<script src="../js/Detector.js" type="text/javascript"></script>
+		<script src="../js/OrbitControls-Touch.js" type="text/javascript"></script>
+		<script src="../js/Stats.js" type="text/javascript"></script>
+        <script src="../js/gfx-scene.js" type="text/javascript"></script>
+
+	</head>
+	<body>
+
+    <div style="position: absolute; top: 10px; left: 10px;color:white">
+        <p></p>
+    </div>
+
+    <script type="text/javascript">
+        var cubeMesh;
+        var xRotation = 0.0;
+        var yRotation = 0.0;
+        var zRotation = 0.0;
+        var movieScreen;
+        var video, videoImage, videoImageContext, videoTexture;
+
+        // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+        var gfxScene = new GFX.Scene( {
+            cameraPos : [0, 0, 30],
+            controls:true,
+            displayStats:true,
+            clearColor:0x808080
+        });
+
+        // then initialize our demo's stuff
+        initializeDemo();
+
+        // Animate the scene
+        animateScene();
+
+        /**
+         * Initialize the Demo.
+         */
+        function initializeDemo() {
+
+            // create the video element
+            video = document.createElement( 'video' );
+            // video.id = 'video';
+            // video.type = ' video/ogg; codecs="theora, vorbis" ';
+            video.src = "videos/sintel.ogv";
+            video.load(); // must call after setting/changing source
+            video.play();
+
+            videoImage = document.createElement( 'canvas' );
+            videoImage.width = 480;
+            videoImage.height = 204;
+
+            videoImageContext = videoImage.getContext( '2d' );
+            // background color if no video present
+            videoImageContext.fillStyle = '#000000';
+            videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
+
+            videoTexture = new THREE.Texture( videoImage );
+            videoTexture.minFilter = THREE.LinearFilter;
+            videoTexture.magFilter = THREE.LinearFilter;
+
+            var material = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
+
+            //var cubeMaterial = new THREE.MeshBasicMaterial( { color:0xffff00 } );
+            //var geometry = new THREE.BoxGeometry(4.8, 2.0, 4.8);
+            //cubeMesh = new THREE.Mesh( geometry, material);
+            //gfxScene.add(cubeMesh);
+
+            var movieGeometry = new THREE.PlaneGeometry( 24, 10, 4, 4 );
+            movieScreen = new THREE.Mesh( movieGeometry, material );
+            movieScreen.position.set(0,0,0);
+            gfxScene.add(movieScreen);
+        }
+
+        /**
+         * Animate the scene and call rendering.
+         */
+        function animateScene() {
+
+            // Tell the browser to call this function when page is visible
+            requestAnimationFrame(animateScene);
+
+            if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
+                videoImageContext.drawImage( video, 0, 0 );
+                if ( videoTexture )
+                    videoTexture.needsUpdate = true;
+            }
+
+            // Increase the x, y and z rotation of the cube
+            //xRotation += 0.003;
+            yRotation += 0.01;
+            //zRotation += 0.004;
+            movieScreen.rotation.set(xRotation, yRotation, zRotation);
+
+            // Map the 3D scene down to the 2D screen (render the frame)
+            gfxScene.renderScene();
+        }
+
+    </script>
+
+	</body>
+</html>

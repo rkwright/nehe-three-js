@@ -439,7 +439,10 @@ GFX.Scene.prototype = {
 	},
 	
 	addFloor: function( floorRepeat ) {
-		
+
+		if (this.floorRepeat === 0)
+			this.floorRepeat = floorRepeat;
+
 		// note: 4x4 checker-board pattern scaled so that each square is 25 by 25 pixels.
         var image = this.floorImage === null ? '../images/checkerboard.jpg' : this.floorImage;
 		var texture = new THREE.ImageUtils.loadTexture( image );

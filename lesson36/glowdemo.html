@@ -7,7 +7,7 @@
 
     <script src="../js/three.js" type="text/javascript"></script>
     <script src="../js/shaders/CopyShader.js" type="text/javascript"></script>
-    <script src="../js/shaders/AdditiveBlendShader.js"></script>    
+    <script src="../js/shaders/AdditiveBlendShader.js"></script>
     <script src="../js/shaders/HorizontalBlurShader.js"></script>
     <script src="../js/shaders/VerticalBlurShader.js"></script>
     <script src="../js/postprocess/EffectComposer.js" type="text/javascript"></script>
@@ -59,7 +59,7 @@
         var sphere2 = scene2.getObjectByName("Sphere");
         sphere2.material.transparent = true;
         sphere2.material.opacity = 0.5;
-        sphere2.material.color = 0xff0000;
+        sphere2.material.color.setHex(0xff0000);
         scene2.add(sphere2);
 
         var blackMaterial = new THREE.MeshBasicMaterial( {color: 0x000000} );
@@ -109,7 +109,7 @@
         // Tell the browser to call this function when page is visible
         requestAnimationFrame(animateScene);
 
-        blurComposer.render();
+        //blurComposer.render();
         finalComposer.render();
     }
 

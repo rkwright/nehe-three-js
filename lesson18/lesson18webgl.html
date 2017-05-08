@@ -60,9 +60,9 @@
 			function makeMaterial ( matType ) {
 				
 				materialType = matType;
-				if ( materialType == 't')
+				if ( materialType === 't')
 					quadMat = new THREE.MeshPhongMaterial({ map:quadTexture, side:THREE.DoubleSide });
-				else if (materialType == 'w')
+				else if (materialType === 'w')
 					quadMat = new THREE.MeshBasicMaterial({ wireframe:true });
 				else
 					quadMat = new THREE.MeshLambertMaterial({ color: '#00abb1' });

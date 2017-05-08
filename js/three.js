@@ -4660,7 +4660,6 @@
 		UniformContainer.call( this ); // mix-in
 
 	}
-
 	StructuredUniform.prototype.setValue = function ( gl, value ) {
 
 		// Note: Don't need an extra 'renderer' parameter, since samplers

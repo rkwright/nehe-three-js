@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>NEHE Lesson 36</title>
+    <title>Glow Demo</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
 
@@ -13,13 +13,18 @@
     <script src="../js/postprocess/EffectComposer.js" type="text/javascript"></script>
     <script src="../js/postprocess/ShaderPass.js" type="text/javascript"></script>
     <script src="../js/postprocess/RenderPass.js" type="text/javascript"></script>
+    <script src="../js/postprocess/TexturePass.js" type="text/javascript"></script>
     <script src="../js/postprocess/MaskPass.js" type="text/javascript"></script>
+    <script src="../js/postprocess/ClearPass.js" type="text/javascript"></script>
     <script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
 </head>
 <body>
 <script>
-    var blurComposer, finalComposer;
+    var composer;
     var controls;
+    var renderer;
+    var clock;
+    var mask;
 
     // then initialize our demo's stuff
     initializeDemo();
@@ -31,6 +36,16 @@
      * Initialize the Demo.
      */
     function initializeDemo() {
+        renderer = new THREE.WebGLRenderer( {antialias:true} );
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild( renderer.domElement );
+
+        renderer.setClearColor(new THREE.Color( 0xcccccc ), 1);
+        renderer.autoClear = false;
+
+        clock = new THREE.Clock();
+
         var scene = new THREE.Scene();
 
         var camera = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHeight, 0.1, 10000);
@@ -38,70 +53,96 @@
         camera.position.set(10,10,20);
         camera.lookAt(scene.position);
 
-        var renderer = new THREE.WebGLRenderer( {antialias:true} );
-
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild( renderer.domElement );
-
         controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-        renderer.setClearColor(new THREE.Color( 0xcccccc ), 1);
-
-        var light = new THREE.PointLight(0xffffff);
-        light.position.set(10,25,10);
+        var light = new THREE.DirectionalLight(0xffffff, 0.5);
+        light.position.set(20,25,10);
         scene.add(light);
 
-        var scene2 = scene.clone();
-        var camera2 = camera.clone();
+        var ambiLight = new THREE.AmbientLight(0xcccccc);
+        scene.add(ambiLight);
 
-        var sphereGeometry = new THREE.SphereGeometry( 2, 32, 16 );
-        var sphereMaterial = new THREE.MeshLambertMaterial( {color: 0x888888} );
-        var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-        sphere.position.set(0, 2, 0);
-        scene.add(sphere);
+        var maskScene = new THREE.Scene();
 
-        var sphereMaterial2 = new THREE.MeshLambertMaterial( {color: 0xffff00, transparent:true, opacity:0.5} );
-        var sphere2 = new THREE.Mesh(sphereGeometry, sphereMaterial2);
-        sphere2.position.set(2, 2, 0);
-        scene2.add(sphere2);
+        var maskCamera = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHeight, 0.1, 10000);
+        maskScene.add(maskCamera);
+        maskCamera.position.set(10,10,20);
+        maskCamera.lookAt(maskScene.position);
 
-        var blackMaterial = new THREE.MeshBasicMaterial( {color: 0x000000} );
-        var blackSphere = new THREE.Mesh(sphereGeometry, blackMaterial);
-        blackSphere.position.set(-2, 2, 0);
-        scene2.add(blackSphere);
+        //var maskLight = new THREE.PointLight(0xffffff);
+        //maskLight.position.set(10,25,10);
+        //maskScene.add(maskLight);
 
-        var renderTargetParameters = {
+        var haloScene = new THREE.Scene();
+
+        var haloCamera = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHeight, 0.1, 10000);
+        haloScene.add(haloCamera);
+        haloCamera.position.set(10,10,20);
+        haloCamera.lookAt(haloScene.position);
+
+        var haloLight = new THREE.DirectionalLight(0xffffff,0.5);
+        haloLight.position.set(10,25,10);
+        haloScene.add(haloLight);
+
+        var haloGeom = new THREE.SphereGeometry( 4, 32, 16 );
+        var haloMat= new THREE.MeshLambertMaterial( {color: 0xffff00, transparent:true, opacity:0.15} );
+        var halo = new THREE.Mesh(haloGeom, haloMat);
+        halo.position.set(0, 0, 0);
+        haloScene.add(halo);
+
+        mask = new THREE.Mesh(new THREE.SphereGeometry( 3, 32, 16 ));
+        mask.position.set(0, 0, 0);
+        maskScene.add(mask);
+
+        var moonGeom = new THREE.SphereGeometry( 2, 32, 16 );
+        var textureLoader = new THREE.TextureLoader();
+        var moonMat = new THREE.MeshStandardMaterial( { color: 0xffffff });
+
+        textureLoader.load( "images/moon.jpg", function( texture ) {
+            moonMat.map = texture;
+            moonMat.needsUpdate = true;
+            var moon = new THREE.Mesh(moonGeom, moonMat);
+            moon.position.set(0, 0, 0);
+            scene.add(moon);
+        });
+
+        var clearPass = new THREE.ClearPass();
+
+        var haloPass = new THREE.RenderPass(haloScene, haloCamera);
+
+        var maskPass = new THREE.MaskPass(maskScene, maskCamera);
+        //maskPass.inverse = true;
+
+        var clearMaskPass = new THREE.ClearMaskPass();
+
+        var renderPass = new THREE.RenderPass(scene, camera);
+        renderPass.clear = false;
+
+        var copyPass = new THREE.ShaderPass(THREE.CopyShader);
+        copyPass.renderToScreen = true;
+
+        var texture = new THREE.TextureLoader().load( 'images/moon.jpg' );
+        var texturePass = new THREE.TexturePass( texture );
+
+        var parameters = {
             minFilter: THREE.LinearFilter,
             magFilter: THREE.LinearFilter,
             format: THREE.RGBFormat,
-            stencilBuffer: false
+            stencilBuffer: true
         };
 
-        var renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
-        blurComposer = new THREE.EffectComposer( renderer, renderTarget );
+        var renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, parameters );
 
-        // prepare the secondary render's passes
-        var render2Pass = new THREE.RenderPass( scene2, camera2 );
-        blurComposer.addPass( render2Pass );
+        composer = new THREE.EffectComposer(renderer, renderTarget);
+        //composer.renderTarget1.stencilBuffer = true;
+        //composer.renderTarget2.stencilBuffer = true;
 
-        // special effects to be applied to secondary render:
-        var effectHorizBlur = new THREE.ShaderPass( THREE.HorizontalBlurShader );
-        var effectVertiBlur = new THREE.ShaderPass( THREE.VerticalBlurShader );
-        effectHorizBlur.uniforms[ "h" ].value = 2 / window.innerWidth;
-        effectVertiBlur.uniforms[ "v" ].value = 2 / window.innerHeight;
-        blurComposer.addPass( effectHorizBlur );
-        blurComposer.addPass( effectVertiBlur );
-
-        finalComposer = new THREE.EffectComposer( renderer, renderTarget );
-
-        // prepare the final render's passes
-        var renderModel = new THREE.RenderPass( scene, camera );
-        finalComposer.addPass( renderModel );
-
-        var effectBlend = new THREE.ShaderPass( THREE.AdditiveBlendShader, "tDiffuse1" );
-        effectBlend.uniforms[ 'tDiffuse2' ].value = blurComposer.renderTarget2.texture;
-        effectBlend.renderToScreen = true;
-        finalComposer.addPass( effectBlend );
+        composer.addPass( clearPass );
+        composer.addPass( maskPass );
+        composer.addPass( texturePass );
+        composer.addPass( clearMaskPass );
+        composer.addPass( renderPass );
+        composer.addPass( copyPass );
     }
 
     /**
@@ -109,12 +150,18 @@
      */
     function animateScene() {
 
-        controls.update();
-        // Tell the browser to call this function when page is visible
-        requestAnimationFrame(animateScene);
+        var delta = clock.getDelta();
+        controls.update(delta);
 
-        blurComposer.render();
-        finalComposer.render();
+        var time = performance.now() * 0.001;
+
+        mask.position.x = Math.cos( time ) * 2;
+        mask.position.y = Math.sin( time / 1.5 ) * 2;
+
+        renderer.clear();
+        composer.render(delta);
+
+        requestAnimationFrame(animateScene);
     }
 
 </script>

@@ -18,6 +18,7 @@ GFX.Scene = function ( parameters ) {
     this.shadowMapEnabled = false;
 
     this.clearColor = 0x000000;
+    this.autoClear = true;
 
 	this.canvasWidth = 0;
 	this.canvasHeight = 0;

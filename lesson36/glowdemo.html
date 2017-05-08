@@ -19,18 +19,22 @@
     <script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
 
     <script id="vertexShader" type="x-shader/x-vertex">
+        uniform vec3 vColor;
         varying vec3 vNormal;
+
         void main() {
             vNormal = normalize( normalMatrix * normal );
             gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
         }
     </script>
 
-    <script id="fragmentShader" type="x-shader/x-fragement">
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        uniform vec3 vColor;
         varying vec3 vNormal;
+
         void main() {
 	        float intensity = pow( 0.3 - dot( vNormal, vec3( 0.0, 0.0, 1.0 ) ), 0.5 );
-            gl_FragColor = vec4( 0.8, 1.0, 1.0, 0.5 ) * intensity;
+            gl_FragColor = vec4( vColor, 0.5 ) * intensity;
         }
     </script>
 </head>
@@ -80,8 +84,9 @@
         var torus = new THREE.Mesh(torusGeom, torusMat);
         scene.add(torus);
 
+        var haloColor = new THREE.Vector3(212 / 255.0, 175 / 255.0, 55 / 255.0);
         var haloMat = new THREE.ShaderMaterial({
-                uniforms: {  },
+                uniforms: { vColor: { type: "v3", value: haloColor } },
                 vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
                 fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
                 side: THREE.BackSide,

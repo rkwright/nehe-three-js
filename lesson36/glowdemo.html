@@ -17,6 +17,22 @@
     <script src="../js/postprocess/MaskPass.js" type="text/javascript"></script>
     <script src="../js/postprocess/ClearPass.js" type="text/javascript"></script>
     <script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
+
+    <script id="vertexShader" type="x-shader/x-vertex">
+        varying vec3 vNormal;
+        void main() {
+            vNormal = normalize( normalMatrix * normal );
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        }
+    </script>
+
+    <script id="fragmentShader" type="x-shader/x-fragement">
+        varying vec3 vNormal;
+        void main() {
+	        float intensity = pow( 0.3 - dot( vNormal, vec3( 0.0, 0.0, 1.0 ) ), 0.5 );
+            gl_FragColor = vec4( 0.8, 1.0, 1.0, 0.5 ) * intensity;
+        }
+    </script>
 </head>
 <body>
 <script>
@@ -50,97 +66,47 @@
 
         var camera = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHeight, 0.1, 10000);
         scene.add(camera);
-        camera.position.set(10,10,20);
+        camera.position.set(10,10,10);
         camera.lookAt(scene.position);
 
         controls = new THREE.OrbitControls( camera, renderer.domElement );
 
         var light = new THREE.DirectionalLight(0xffffff, 0.5);
-        light.position.set(20,25,10);
+        light.position.set(20,25,8);
         scene.add(light);
 
-        var ambiLight = new THREE.AmbientLight(0xcccccc);
-        scene.add(ambiLight);
+        var torusGeom = new THREE.TorusKnotGeometry(2.0, 0.5, 100, 16);
+        var torusMat = new THREE.MeshPhongMaterial({ color: '#cccccc', specular: '#111111', shininess: 50 });
+        var torus = new THREE.Mesh(torusGeom, torusMat);
+        scene.add(torus);
 
-        var maskScene = new THREE.Scene();
+        var haloMat = new THREE.ShaderMaterial({
+                uniforms: {  },
+                vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
+                fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+                side: THREE.BackSide,
+                blending: THREE.AdditiveBlending,
+                transparent: true
+            });
 
-        var maskCamera = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHeight, 0.1, 10000);
-        maskScene.add(maskCamera);
-        maskCamera.position.set(10,10,20);
-        maskCamera.lookAt(maskScene.position);
-
-        //var maskLight = new THREE.PointLight(0xffffff);
-        //maskLight.position.set(10,25,10);
-        //maskScene.add(maskLight);
-
-        var haloScene = new THREE.Scene();
-
-        var haloCamera = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHeight, 0.1, 10000);
-        haloScene.add(haloCamera);
-        haloCamera.position.set(10,10,20);
-        haloCamera.lookAt(haloScene.position);
-
-        var haloLight = new THREE.DirectionalLight(0xffffff,0.5);
-        haloLight.position.set(10,25,10);
-        haloScene.add(haloLight);
-
-        var haloGeom = new THREE.SphereGeometry( 4, 32, 16 );
-        var haloMat= new THREE.MeshLambertMaterial( {color: 0xffff00, transparent:true, opacity:0.15} );
-        var halo = new THREE.Mesh(haloGeom, haloMat);
-        halo.position.set(0, 0, 0);
-        haloScene.add(halo);
-
-        mask = new THREE.Mesh(new THREE.SphereGeometry( 3, 32, 16 ));
-        mask.position.set(0, 0, 0);
-        maskScene.add(mask);
-
-        var moonGeom = new THREE.SphereGeometry( 2, 32, 16 );
-        var textureLoader = new THREE.TextureLoader();
-        var moonMat = new THREE.MeshStandardMaterial( { color: 0xffffff });
-
-        textureLoader.load( "images/moon.jpg", function( texture ) {
-            moonMat.map = texture;
-            moonMat.needsUpdate = true;
-            var moon = new THREE.Mesh(moonGeom, moonMat);
-            moon.position.set(0, 0, 0);
-            scene.add(moon);
-        });
+        var haloGeom = new THREE.TorusKnotGeometry(2.2, 0.55, 100, 16);
+        var halo = new THREE.Mesh( haloGeom, haloMat );
+        scene.add( halo );
 
         var clearPass = new THREE.ClearPass();
-
-        var haloPass = new THREE.RenderPass(haloScene, haloCamera);
-
-        var maskPass = new THREE.MaskPass(maskScene, maskCamera);
-        //maskPass.inverse = true;
-
-        var clearMaskPass = new THREE.ClearMaskPass();
-
         var renderPass = new THREE.RenderPass(scene, camera);
         renderPass.clear = false;
 
         var copyPass = new THREE.ShaderPass(THREE.CopyShader);
         copyPass.renderToScreen = true;
 
-        var texture = new THREE.TextureLoader().load( 'images/moon.jpg' );
+        var texture = new THREE.TextureLoader().load( 'images/deathvalleysky.jpg' );
         var texturePass = new THREE.TexturePass( texture );
 
-        var parameters = {
-            minFilter: THREE.LinearFilter,
-            magFilter: THREE.LinearFilter,
-            format: THREE.RGBFormat,
-            stencilBuffer: true
-        };
-
-        var renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, parameters );
-
-        composer = new THREE.EffectComposer(renderer, renderTarget);
-        //composer.renderTarget1.stencilBuffer = true;
-        //composer.renderTarget2.stencilBuffer = true;
+        composer = new THREE.EffectComposer(renderer);
 
         composer.addPass( clearPass );
-        composer.addPass( maskPass );
         composer.addPass( texturePass );
-        composer.addPass( clearMaskPass );
         composer.addPass( renderPass );
         composer.addPass( copyPass );
     }
@@ -155,8 +121,8 @@
 
         var time = performance.now() * 0.001;
 
-        mask.position.x = Math.cos( time ) * 2;
-        mask.position.y = Math.sin( time / 1.5 ) * 2;
+        //mask.position.x = Math.cos( time ) * 2;
+        //mask.position.y = Math.sin( time / 1.5 ) * 2;
 
         renderer.clear();
         composer.render(delta);

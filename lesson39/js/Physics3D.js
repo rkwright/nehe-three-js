@@ -28,212 +28,224 @@ GFX.Physics3D = function () {
 
     this.start = 0;
 
-    this.previous = new GFX.State();		// previous physics state.
-    this.current = new GFX.State();		// current physics state.
+    this.previous = new GFX.State3D();	// previous physics state.
+    this.current = new GFX.State3D();		// current physics state.
 
     this.t = 0;
-    this.dt = TIME_STEP;
+    this.dt = this.TIME_STEP;
 
     this.currentTime = time();
     this.accumulator = 0;
 
-    this.tmpState = new GFX.State();
+    this.tmpState = new GFX.State3D();
     this.tmpVec = new THREE.Vector3();
 
     this.renderFunc = null;
 };
 
 GFX.Physics3D.prototype = {
-    
-	initState: function( renderFunc ) {
+
+    initState: function (renderFunc) {
 
         this.renderFunc = renderFunc;
 
-		this.current = new GFX.State3D();
+        this.current = new GFX.State3D();
         this.current.size = 1.0;
         this.current.mass = 1;
         this.current.inverseMass = 1.0 / this.current.mass;
-        this.current.position = new THREE.Vector3(2,0,0);
-        this.current.momentum = new THREE.Vector3(0,0,-10);
+        this.current.position = new THREE.Vector3(2, 0, 0);
+        this.current.momentum = new THREE.Vector3(0, 0, -10);
         this.current.orientation.identity();
-        this.current.angularMomentum = new THREE.Vector3(0,0,0);
+        this.current.angularMomentum = new THREE.Vector3(0, 0, 0);
         this.current.inertiaTensor = this.current.mass * this.current.size * this.current.size / 6.0;
         this.current.inverseInertiaTensor = 1.0 / this.current.inertiaTensor;
         this.current.recalculate();
-		
-		previous = new State();
-	}
 
-	/**
-	 * Simple time function that wraps the nanosecond precision timer
-	 */
-	time: function() {
-	    if (start === 0) {
-	        start = Performance.now();
-	        return 0.0;
-	    }
-	    
-	    return  (Performance.now() - start) / 1e09;
-	},
-		
-	timeStep: function () {
-		var newTime = time();
-		var deltaTime = newTime - currentTime;
-		this.currentTime = newTime;
+        this.previous = new GFX.State3D();
+    },
 
-		if (deltaTime > this.TIME_CLAMP)
-			deltaTime = this.TIME_CLAMP;
+    /**
+     * Simple time function that wraps the nanosecond precision timer
+     */
+    time: function () {
+        if (this.start === 0) {
+            this.start = performance.now();
+            return 0.0;
+        }
 
-		this.accumulator += deltaTime;
+        return (performance.now() - this.start) / 1e09;
+    },
 
-		// console.log("Accum:" + String.format("%6.2f", accumulator) + " t: " + String.format("%6.2f", t) );
-		
-		while (this.accumulator >= this.dt) {
-			this.accumulator -= this.dt;
-			
-			this.update();
-			
-			this.t += this.dt;
-		}
+    timeStep: function () {
+        var newTime = time();
+        var deltaTime = newTime - currentTime;
+        this.currentTime = newTime;
 
-		var alpha = this.accumulator / this.dt;
-        var state = interpolate(this.previous, this.current, alpha);
+        if (deltaTime > this.TIME_CLAMP)
+            deltaTime = this.TIME_CLAMP;
 
-        this.renderFunc( state );
+        this.accumulator += deltaTime;
+
+        // console.log("Accum:" + String.format("%6.2f", accumulator) + " t: " + String.format("%6.2f", t) );
+
+        while (this.accumulator >= this.dt) {
+            this.accumulator -= this.dt;
+
+            this.update();
+
+            this.t += this.dt;
+        }
+
+        var alpha = this.accumulator / this.dt;
+        var state = this.interpolate(this.previous, this.current, alpha);
+
+        this.renderFunc(state);
 
         return 0;
-	}
-	
-    // Update physics state.
-	update: function () {
-        this.previous.set(this.current);
-        this.integrate( this.current, this.t, this.dt );
     },
-    
+
+    // Update physics state.
+    update: function () {
+        this.previous.set(this.current);
+        this.integrate(this.current, this.t, this.dt);
+    },
+
     // Interpolate between two physics states.
-	protected State interpolate( State prev, State curr, double alpha)
-	{
-		State state = new State(curr);
+    interpolate: function (prev, curr, alpha) {
+        var state = new GFX.State3D(curr);
 
-		state.position.interpolate(prev.position, curr.position, alpha);
-		state.momentum.interpolate(prev.momentum,curr.momentum,alpha);
-		state.orientation.slerp(prev.orientation, curr.orientation, alpha);
-		state.angularMomentum.interpolate(prev.angularMomentum, curr.angularMomentum ,alpha);
-		
-		state.recalculate();
-		
-		return state;
-	}
+        state.position.interpolate(prev.position, curr.position, alpha);
+        state.momentum.interpolate(prev.momentum, curr.momentum, alpha);
+        state.orientation.slerp(prev.orientation, curr.orientation, alpha);
+        state.angularMomentum.interpolate(prev.angularMomentum, curr.angularMomentum, alpha);
 
+        state.recalculate();
 
-  
+        return state;
+    },
+
     // Evaluate all derivative values for the physics state at time t.
     // @param state the physics state of the cube.
-	Derivative evaluate( State state, double t)
-	{
-		Derivative output = new Derivative();
-		output.velocity.set(state.velocity);
-		output.spin.set(state.spin);
-		
-		forces(state, t, output.force, output.torque);
-		
-		return output;
-	}
-	
+    evaluate: function (state, t) {
+        var output = new GFX.Derivative();
+        output.velocity.set(state.velocity);
+        output.spin.set(state.spin);
+
+        this.forces(state, t, output.force, output.torque);
+
+        return output;
+    },
+
     // Evaluate derivative values for the physics state at future time t+dt 
     // using the specified set of derivatives to advance dt seconds from the 
     // specified physics state.
-	protected Derivative evaluate(State state, double t, double dt,  Derivative derivative)
-	{
-		state.position.scaleAdd(dt, derivative.velocity, state.position);
-		state.momentum.scaleAdd(dt, derivative.force, state.momentum);
-		state.orientation.add(derivative.spin.scale(dt));
-		state.angularMomentum.scaleAdd( dt, derivative.torque, state.angularMomentum);
-		
-		state.recalculate();
-		
-		Derivative output = new Derivative();
-		output.velocity.set(state.velocity);
-		output.spin.set(state.spin);
-		
-		forces(state, t+dt, output.force, output.torque);
-		
-		return output;
-	}
+    evaluate_dt: function (state, t, dt, derivative) {
+
+        state.position.copy( state.position);
+        state.position.addScaledVector( derivative.velocity, dt);
+        state.momentum.copy( state.momentum );
+        state.momentum.addScaledVector(derivative.force, dt );
+        state.orientation.add(derivative.spin.scale(dt));
+        state.angularMomentum.copy(state.angularMomentum);
+        state.angularMomentum.addScaledVector( derivative.torque, dt );
+
+        state.recalculate();
+
+        var output = new GFX.Derivative();
+        output.velocity.set(state.velocity);
+        output.spin.set(state.spin);
+
+        this.forces(state, t + dt, output.force, output.torque);
+
+        return output;
+    },
 
     // Integrate physics state forward by dt seconds.
     // Uses an RK4 integrator to numerically integrate with error O(5).
-	
-	
-	protected void integrate( State state, double t, double dt )
-	{
-		Derivative a = evaluate(state, t);
-		tmpState.set(state);
-		Derivative b = evaluate(tmpState, t, dt*0.5f, a);
-		tmpState.set(state);
-		Derivative c = evaluate(tmpState, t, dt*0.5f, b);
-		tmpState.set(state);
-		Derivative d = evaluate(tmpState, t, dt, c);
-			
-		rkVector(state.position, a.velocity, b.velocity,c.velocity, d.velocity, dt);
-		rkVector(state.momentum, a.force, b.force, c.force, d.force, dt);
-		state.orientation.rkIntegrateAdd(a.spin, b.spin, c.spin, d.spin, dt);
-		rkVector(state.angularMomentum, a.torque, b.torque, c.torque, d.torque, dt);
+    integrate: function (state, t, dt) {
 
-		state.recalculate();
-		
-		try
-		{
-			Thread.sleep(0,0);
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
+        var a = this.evaluate(state, t);
+        this.tmpState.set(state);
+        var b = this.evaluate_dt( this.tmpState, t, dt * 0.5, a);
+        this.tmpState.set(state);
+        var c = this.evaluate_dt( this.tmpState, t, dt * 0.5, b);
+        this.tmpState.set(state);
+        var d = this.evaluate_dt( this.tmpState, t, dt, c);
 
-	}	
+        this.rkVector(state.position, a.velocity, b.velocity, c.velocity, d.velocity, dt);
+        this.rkVector(state.momentum, a.force, b.force, c.force, d.force, dt);
+        this.rkIntegrateAdd(state.orientation, a.spin, b.spin, c.spin, d.spin, dt);
+        this.rkVector(state.angularMomentum, a.torque, b.torque, c.torque, d.torque, dt);
 
-	
-	protected void rkVector( THREE.Vector3 state, THREE.Vector3 a, THREE.Vector3 b, THREE.Vector3 c, THREE.Vector3 d, double dt )
-	{
-		tmpVec.set(0.0, 0.0, 0.0);
-		tmpVec.add(b,c);
-		tmpVec.scale(2.0);
-		tmpVec.add(a);
-		tmpVec.add(d);
-		tmpVec.scale(dt/6.0);
-		state.add(tmpVec);		
-	}
-	
+        state.recalculate();
+    },
+
+    rkVector: function (state, a, b, c, d, dt) {
+        this.tmpVec.set(0.0, 0.0, 0.0);
+        this.tmpVec.add(b, c);
+        this.tmpVec.scale(2.0);
+        this.tmpVec.add(a);
+        this.tmpVec.add(d);
+        this.tmpVec.scale(dt / 6.0);
+        state.add(this.tmpVec);
+    },
+
+    // from eberly =============
+    addQuaternion: function ( tmp, q ) {
+        tmp.w += q.w;
+        tmp.x += q.x;
+        tmp.y += q.y;
+        tmp.z += q.z;
+        return tmp;
+    },
+
+    // multiply this quaternion by a scalar.
+    multiplyQuaternion: function( tmp, s ) {
+        tmp.w *= s;
+        tmp.x *= s;
+        tmp.y *= s;
+        tmp.z *= s;
+        return tmp;
+    },
+
+    rkIntegrateAdd: function ( orient, a, b, c, d, dt ) {
+        var  tmp = new THREE.Quaternion(b.x, b.y, b.z, b.w);
+        tmp = this.addQuaternion(tmp, c);
+        tmp = this.multiplyQuaternion(tmp, 2.0);
+        tmp = this.addQuaternion(tmp, a);
+        tmp = this.addQuaternion(tmp, d);
+        tmp = this.multiplyQuaternion(tmp, dt / 6.0);
+        this.addQuaternion(orient, tmp);
+    },
+    //====================== eberly
+
     // Calculate force and torque for physics state at time t.
     // Due to the way that the RK4 integrator works we need to calculate
     // force implicitly from state rather than explicitly applying forces
     // to the rigid body once per update. This is because the RK4 achieves
     // its accuracy by detecting curvature in derivative values over the 
     // timestep so we need our force values to supply the curvature.
+    forces: function (state, t, force, torque) {
 
-	void forces( State state, double t, THREE.Vector3 force, THREE.Vector3 torque)
-	{
-		// attract towards origin
+        // attract towards origin
+        force.set(state.position);
+        force.scale(this.FORCE_SCALE);
 
-		force.set(state.position);
-		force.scale(FORCE_SCALE);
-	
-		// sine force to add some randomness to the motion
+        // sine force to add some randomness to the motion
+        force.x += this.FORCE_X * Math.sin(t * 0.9 + 0.5);
+        force.y += this.FORCE_Y * Math.sin(t * 0.5 + 0.4);
+        force.z += this.FORCE_Z * Math.sin(t * 0.5 + 0.4);
 
-		force.x += FORCE_X * Math.sin(t*0.9f + 0.5f);
-		force.y += FORCE_Y * Math.sin(t*0.5f + 0.4f);
-		force.z += FORCE_Z * Math.sin(t*0.5f + 0.4f);
+        // sine torque to get some spinning action
 
-		// sine torque to get some spinning action
+        torque.x = this.TORQUE_X * Math.sin(t * 0.9 + 0.5);
+        torque.y = this.TORQUE_Y * Math.sin(t * 0.5 + 0.4);
+        torque.z = this.TORQUE_Z * Math.sin(t * 0.7 + 0.9);
 
-		torque.x = TORQUE_X * Math.sin(t*0.9f + 0.5f);
-		torque.y = TORQUE_Y * Math.sin(t*0.5f + 0.4f);
-		torque.z = TORQUE_Z * Math.sin(t*0.7f + 0.9f);
-
-		// damping torque so we don't spin too fast
-
-		torque.scaleAdd(DAMPING_TORQUE, state.angularVelocity, torque);
-	}
+        // damping torque so we don't spin too fast
+        //torque.copy( torque );
+        torque.addScaledVector( state.angularVelocity, this.DAMPING_TORQUE );
+    }
+};
 
 	

@@ -1,5 +1,5 @@
 
-GFX.State3D = function () {
+GFX.State3D = function ( state ) {
 
     this.position = new THREE.Vector3();         // the position of the cube center of mass in world coordinates (meters).
     this.momentum = new THREE.Vector3();         // the momentum of the cube in kilogram meters per second.
@@ -21,6 +21,9 @@ GFX.State3D = function () {
     this.inverseMass = 0;                        // inverse of the mass used to convert momentum to velocity.
     this.inertiaTensor = 0;                      // inertia tensor of the cube (it is simplified it to a single value due to the mass properties a cube).
     this.inverseInertiaTensor = 0;               // inverse inertia tensor used to convert angular momentum to angular velocity.
+
+    if (state !== null)
+        this.set( state );
 };
 
 GFX.State3D.prototype = {

@@ -25,9 +25,6 @@ GFX.State3D = function () {
 
 GFX.State3D.prototype = {
 
-    /**
-     * Copy constructor
-     */
     copy: function ( state ) {
         set( state );
     },
@@ -70,7 +67,7 @@ GFX.State3D.prototype = {
     
     getMatrix: function ( q ) {
 
-        // from david eberly's sources used with permission.
+        // from david eberly's sources used with permission. https://www.geometrictools.com/
 
         var fTx = 2.0 * q.x;
         var fTy = 2.0 * q.y;

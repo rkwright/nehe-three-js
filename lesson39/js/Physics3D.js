@@ -1,182 +1,115 @@
+/* Code from Game Physics by Glen Fielder
+*
+* http://gafferongames.com/game-physics/physics-in-3d/
+*
+* A cube with self contained physics simulation.
+*
+* This class is responsible for maintaining and integrating its
+* physics state using an RK4 integrator. The nature of the
+* integrator requires that we structure this class in such a
+* way that all forces can be calculated from the current physics
+* state at any time. See Cube::integrate for details.
+*
+*  @author:  Ric Wright - May 2017 - Ported from Java version
+*/
 
-	//======================= Time Step Section ========================================
+GFX.Physics3D = function () {
 
-	var	TIME_CLAMP = 0.250;
-	var TIME_STEP = 0.01;
-	var DAMPING_TORQUE = -0.5;
-	var FORCE_X = 10;
-	var FORCE_Y = 11;
-	var FORCE_Z = 12;
-	var FORCE_SCALE = -10.0;
-	var TORQUE_X = 1.0;
-	var TORQUE_Y = 1.1;
-	var TORQUE_Z = 1.2;
-	
-	protected State 	previous;		// previous physics state.
-	protected State 	current;		// current physics state.
+    this.TIME_CLAMP = 0.250;
+    this.TIME_STEP = 0.01;
+    this.DAMPING_TORQUE = -0.5;
+    this.FORCE_X = 10;
+    this.FORCE_Y = 11;
+    this.FORCE_Z = 12;
+    this.FORCE_SCALE = -10.0;
+    this.TORQUE_X = 1.0;
+    this.TORQUE_Y = 1.1;
+    this.TORQUE_Z = 1.2;
 
-	protected double 	t = 0;
-	protected double 	dt = TIME_STEP;
-	
-	protected double 	currentTime = time();
-	protected double 	accumulator = 0;
+    this.start = 0;
 
-	private State 		tmpState = new State();
-	private Vector3d	tmpVec = new Vector3d();
+    this.previous = new GFX.State();		// previous physics state.
+    this.current = new GFX.State();		// current physics state.
 
-    /**
-     *  Default constructor
-     */	
-	protected void initState()
-	{
-		current = new State();
+    this.t = 0;
+    this.dt = TIME_STEP;
+
+    this.currentTime = time();
+    this.accumulator = 0;
+
+    this.tmpState = new GFX.State();
+    this.tmpVec = new THREE.Vector3();
+
+    this.renderFunc = null;
+};
+
+GFX.Physics3D.prototype = {
+    
+	initState: function( renderFunc ) {
+
+        this.renderFunc = renderFunc;
+
+		this.current = new GFX.State3D();
+        this.current.size = 1.0;
+        this.current.mass = 1;
+        this.current.inverseMass = 1.0 / this.current.mass;
+        this.current.position = new THREE.Vector3(2,0,0);
+        this.current.momentum = new THREE.Vector3(0,0,-10);
+        this.current.orientation.identity();
+        this.current.angularMomentum = new THREE.Vector3(0,0,0);
+        this.current.inertiaTensor = this.current.mass * this.current.size * this.current.size / 6.0;
+        this.current.inverseInertiaTensor = 1.0 / this.current.inertiaTensor;
+        this.current.recalculate();
 		
-		current.size = 1.0;
-		current.mass = 1;
-		current.inverseMass = 1.0f / current.mass;
-		current.position = new Vector3d(2,0,0);
-		current.momentum = new Vector3d(0,0,-10);
-		current.orientation.identity();
-		current.angularMomentum = new Vector3d(0,0,0);
-		current.inertiaTensor = current.mass * current.size * current.size * 1.0f / 6.0f;
-		current.inverseInertiaTensor = 1.0f / current.inertiaTensor;
-		current.recalculate();
-		
-		previous = new State(current);
+		previous = new State();
 	}
 
 	/**
 	 * Simple time function that wraps the nanosecond precision timer
 	 */
-	static long	start     = 0;
-
-	protected double time()
-	{
-	    if (start == 0)
-	    {
-	        start = System.nanoTime();
+	time: function() {
+	    if (start === 0) {
+	        start = Performance.now();
 	        return 0.0;
 	    }
 	    
-	    return (double) (System.nanoTime() - start) / 1e09;
-	}
+	    return  (Performance.now() - start) / 1e09;
+	},
 		
-	protected int timeStep( GL gl )
-	{				
-		double newTime = time();
-		double deltaTime = newTime - currentTime;
-		currentTime = newTime;
+	timeStep: function () {
+		var newTime = time();
+		var deltaTime = newTime - currentTime;
+		this.currentTime = newTime;
 
-		if (deltaTime > TIME_CLAMP)
-			deltaTime = TIME_CLAMP;
+		if (deltaTime > this.TIME_CLAMP)
+			deltaTime = this.TIME_CLAMP;
 
-		accumulator += deltaTime;
+		this.accumulator += deltaTime;
 
-		// System.out.println("Accum:" + String.format("%6.2f", accumulator) + " t: " + String.format("%6.2f", t) );
+		// console.log("Accum:" + String.format("%6.2f", accumulator) + " t: " + String.format("%6.2f", t) );
 		
-		while (accumulator >= dt)
-		{
-			accumulator -= dt;
+		while (this.accumulator >= this.dt) {
+			this.accumulator -= this.dt;
 			
-			update(t, dt);
+			this.update();
 			
-			t += dt;
+			this.t += this.dt;
 		}
 
-		render(gl, accumulator / dt);			
-	
-		return 0;
+		var alpha = this.accumulator / this.dt;
+        var state = interpolate(this.previous, this.current, alpha);
+
+        this.renderFunc( state );
+
+        return 0;
 	}
 	
     // Update physics state.
-	protected void update(double t, double dt)
-    {
-        previous.set(current);
-        integrate(current, t, dt);
-    }
-
-    /** 
-     * Render cube at interpolated state.
-     * Calculates interpolated state then renders cube at the interpolated 
-	 * position and orientation using OpenGL.
-	 * @param alpha interpolation alpha in [0,1]
-     */
-    protected void render( GL gl, double alpha )
-	{	
-		gl.glPushMatrix();
-
-		// interpolate state with alpha for smooth animation
-
-		State state = interpolate(previous, current, alpha);
-
-		// use position and orientation quaternion to build OpenGL body to world
-
-		gl.glTranslated(state.position.x, state.position.y, state.position.z); 
-		
-		Vector3d axis = new Vector3d();		
-		double angle = state.orientation.angleAxis(axis);
-		gl.glRotated(angle/Math.PI*180.0, axis.x, axis.y, axis.z);
-		
-        // render cube
-				
-		drawCube(gl, (float)state.size * 0.5f);
-		
-        gl.glPopMatrix();
-	}
-	
-	private void drawCube(GL gl, float faceSize )
-	{
-		// Six faces of cube
-		// Top face
-		gl.glPushMatrix();
-		gl.glRotatef(-90, 1, 0, 0);
-		drawFace(gl, faceSize, 0.2f, 0.2f, 0.8f, "Top");
-		gl.glPopMatrix();
-		// Front face
-		drawFace(gl, faceSize, 0.8f, 0.2f, 0.2f, "Front");
-		// Right face
-		gl.glPushMatrix();
-		gl.glRotatef(90, 0, 1, 0);
-		drawFace(gl, faceSize, 0.2f, 0.8f, 0.2f, "Right");
-		// Back face
-		gl.glRotatef(90, 0, 1, 0);
-		drawFace(gl, faceSize, 0.8f, 0.8f, 0.2f, "Back");
-		// Left face
-		gl.glRotatef(90, 0, 1, 0);
-		drawFace(gl, faceSize, 0.2f, 0.8f, 0.8f, "Left");
-		gl.glPopMatrix();
-		// Bottom face
-		gl.glPushMatrix();
-		gl.glRotatef(90, 1, 0, 0);
-		drawFace(gl, faceSize, 0.8f, 0.2f, 0.8f, "Bottom");
-		gl.glPopMatrix();
-	}
-
-	private void drawFace(GL gl, float faceSize, float r, float g, float b, String text)
-	{
-		float halfFaceSize = faceSize / 2;
-		
-		Vector3f vecA = new Vector3f( halfFaceSize, 0.0f, 0.0f);
-		Vector3f vecB = new Vector3f( 0.0f, halfFaceSize, 0.0f);
-		Vector3f normal = new Vector3f();
-		normal.cross( vecA, vecB );
-		normal.normalize();
-		gl.glNormal3f( normal.x, normal.y, normal.z ); 
-
-		// Face is centered around the local coordinate system's z axis,
-		// at a z depth of faceSize / 2
-		
-
-		gl.glColor3f(r,g,b);
-		
-		gl.glBegin(GL.GL_QUADS);
-		gl.glVertex3f(-halfFaceSize, -halfFaceSize, halfFaceSize);
-		gl.glVertex3f(halfFaceSize, -halfFaceSize, halfFaceSize);
-		gl.glVertex3f(halfFaceSize, halfFaceSize, halfFaceSize);
-		gl.glVertex3f(-halfFaceSize, halfFaceSize, halfFaceSize);
-		gl.glEnd();
-	}
-	
+	update: function () {
+        this.previous.set(this.current);
+        this.integrate( this.current, this.t, this.dt );
+    },
+    
     // Interpolate between two physics states.
 	protected State interpolate( State prev, State curr, double alpha)
 	{
@@ -261,7 +194,7 @@
 	}	
 
 	
-	protected void rkVector( Vector3d state, Vector3d a, Vector3d b, Vector3d c, Vector3d d, double dt )
+	protected void rkVector( THREE.Vector3 state, THREE.Vector3 a, THREE.Vector3 b, THREE.Vector3 c, THREE.Vector3 d, double dt )
 	{
 		tmpVec.set(0.0, 0.0, 0.0);
 		tmpVec.add(b,c);
@@ -279,7 +212,7 @@
     // its accuracy by detecting curvature in derivative values over the 
     // timestep so we need our force values to supply the curvature.
 
-	void forces( State state, double t, Vector3d force, Vector3d torque)
+	void forces( State state, double t, THREE.Vector3 force, THREE.Vector3 torque)
 	{
 		// attract towards origin
 

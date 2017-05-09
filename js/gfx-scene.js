@@ -2,7 +2,7 @@
  *  @author rkwright   /  http://www.geofx.com
  */
 
-var GFX = { revision: '02' };
+var GFX = { revision: '03' };
 
 //some constants
 	var    	X_AXIS = 0;

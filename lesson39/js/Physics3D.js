@@ -34,7 +34,7 @@ GFX.Physics3D = function ( renderfunc ) {
     this.t = 0;
     this.dt = this.TIME_STEP;
 
-    this.currentTime = time();
+    this.currentTime = this.time();
     this.accumulator = 0;
 
     this.tmpState = new GFX.State3D();
@@ -57,7 +57,7 @@ GFX.Physics3D.prototype = {
         this.current.inverseMass = 1.0 / this.current.mass;
         this.current.position = new THREE.Vector3(2, 0, 0);
         this.current.momentum = new THREE.Vector3(0, 0, -10);
-        this.current.orientation.identity();
+        //this.current.orientation.identity();
         this.current.angularMomentum = new THREE.Vector3(0, 0, 0);
         this.current.inertiaTensor = this.current.mass * this.current.size * this.current.size / 6.0;
         this.current.inverseInertiaTensor = 1.0 / this.current.inertiaTensor;
@@ -79,8 +79,8 @@ GFX.Physics3D.prototype = {
     },
 
     timeStep: function () {
-        var newTime = time();
-        var deltaTime = newTime - currentTime;
+        var newTime = this.time();
+        var deltaTime = newTime - this.currentTime;
         this.currentTime = newTime;
 
         if (deltaTime > this.TIME_CLAMP)
@@ -88,7 +88,7 @@ GFX.Physics3D.prototype = {
 
         this.accumulator += deltaTime;
 
-        // console.log("Accum:" + String.format("%6.2f", accumulator) + " t: " + String.format("%6.2f", t) );
+        console.log("Accum:" + this.accumulator.toFixed(2) + " t: " + this.t.toFixed(2) );
 
         while (this.accumulator >= this.dt) {
             this.accumulator -= this.dt;
@@ -116,10 +116,10 @@ GFX.Physics3D.prototype = {
     interpolate: function (prev, curr, alpha) {
         var state = new GFX.State3D(curr);
 
-        state.position.interpolate(prev.position, curr.position, alpha);
-        state.momentum.interpolate(prev.momentum, curr.momentum, alpha);
+        state.position.lerpVectors(prev.position, curr.position, alpha);
+        state.momentum.lerpVectors(prev.momentum, curr.momentum, alpha);
         state.orientation.slerp(prev.orientation, curr.orientation, alpha);
-        state.angularMomentum.interpolate(prev.angularMomentum, curr.angularMomentum, alpha);
+        state.angularMomentum.lerpVectors(prev.angularMomentum, curr.angularMomentum, alpha);
 
         state.recalculate();
 

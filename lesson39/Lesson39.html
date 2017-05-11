@@ -33,8 +33,9 @@
 	</div>
 
 	<script type="text/javascript">
-        var REPEAT_SIZE = 10;
-        var plane;
+
+        var physics3D;
+        var cubeMesh;
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
@@ -54,9 +55,21 @@
          * Initialize the Demo.
          */
         function initializeDemo() {
+            physics3D = new GFX.Physics3D( render );
 
+            var cubeGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+            cubeMesh = new THREE.Mesh(cubeGeometry, new THREE.MeshBasicMaterial({color:0xFF0000}));
+            gfxScene.add(cubeMesh);
         }
 
+        function render( state ) {
+
+            cubeMesh.position.set(state.position.x, state.position.y, state.position.z);
+
+            //var axis = new THREE.Vector3();
+            //var angle = state.orientation.angleAxis(axis);
+            //cubeMesh.rotation.set(angle / Math.PI * 180.0, axis.x, axis.y, axis.z);
+        }
         /**
          * Animate the scene and call rendering.
          */
@@ -64,6 +77,8 @@
 
             // Tell the browser to call this function when page is visible
             requestAnimationFrame(animateScene);
+
+            physics3D.timeStep();
 
             // Map the 3D scene down to the 2D screen (render the frame)
             gfxScene.renderScene();

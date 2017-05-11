@@ -22,7 +22,9 @@ GFX.State3D = function ( state ) {
     this.inertiaTensor = 0;                      // inertia tensor of the cube (it is simplified it to a single value due to the mass properties a cube).
     this.inverseInertiaTensor = 0;               // inverse inertia tensor used to convert angular momentum to angular velocity.
 
-    if (state !== null)
+    this.quat05 = new THREE.Quaternion( 0.5, 0.5, 0.5, 0.5 );
+
+    if (state !== undefined)
         this.set( state );
 };
 
@@ -53,17 +55,19 @@ GFX.State3D.prototype = {
 
      // Recalculate secondary state values from primary values.
     recalculate: function () {
-        this.velocity.scale(this.inverseMass, this.momentum);
-        this.angularVelocity.scale(this.inverseInertiaTensor, this.angularMomentum);
+        this.velocity.copy( this.momentum );
+        this.velocity.multiplyScalar(this.inverseMass);
+        this.angularVelocity.copy( this.angularMomentum  );
+        this.angularVelocity.multiplyScalar( this.inverseInertiaTensor );
         this.orientation.normalize();
 
         this.spin.set(0, this.angularVelocity.x, this.angularVelocity.y, this.angularVelocity.z);
-        spin.multiply(0.5);
-        spin.multiply(this.orientation);
+        this.spin.multiply(this.quat05);
+        this.spin.multiply(this.orientation);
 
         var translation = new THREE.Matrix4();
-        translation.identity();
-        translation.setPosition(position);
+        //translation.identity();
+        translation.setPosition(this.position);
         this.bodyToWorld.multiplyMatrices( translation, this.getMatrix(this.orientation) );
         this.worldToBody.getInverse( this.bodyToWorld );
     },
@@ -85,10 +89,12 @@ GFX.State3D.prototype = {
         var fTyz = fTz * q.y;
         var fTzz = fTz * q.z;
 
-        return new THREE.Matrix4( 1.0 - (fTyy + fTzz), fTxy - fTwz, fTxz + fTwy, 0.0,
-                                  fTxy + fTwz, 1.0 - (fTxx + fTzz), fTyz - fTwx,
-                                  0.0, fTxz - fTwy, fTyz + fTwx, 1.0 - (fTxx + fTyy),
-                                  0.0, 0.0, 0.0, 0.0, 1.0);
+        var mat =  new THREE.Matrix4();
+        mat.set( 1.0 - (fTyy + fTzz), fTxy - fTwz, fTxz + fTwy, 0.0,
+            fTxy + fTwz, 1.0 - (fTxx + fTzz), fTyz - fTwx,
+            0.0, fTxz - fTwy, fTyz + fTwx, 1.0 - (fTxx + fTyy),
+            0.0, 0.0, 0.0, 0.0, 1.0);
+        return mat;
     }
 };
 

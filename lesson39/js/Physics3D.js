@@ -13,7 +13,7 @@
 *  @author:  Ric Wright - May 2017 - Ported from Java version
 */
 
-GFX.Physics3D = function () {
+GFX.Physics3D = function ( renderfunc ) {
 
     this.TIME_CLAMP = 0.250;
     this.TIME_STEP = 0.01;
@@ -41,6 +41,8 @@ GFX.Physics3D = function () {
     this.tmpVec = new THREE.Vector3();
 
     this.renderFunc = null;
+
+    this.initState( renderfunc );
 };
 
 GFX.Physics3D.prototype = {

@@ -35,16 +35,16 @@ GFX.State3D.prototype = {
     },
 
     set: function ( state )	{
-        this.position = new THREE.Vector3(state.position);
-        this.momentum = new THREE.Vector3(state.momentum);
-        this.orientation = new THREE.Quaternion(state.orientation);
-        this.angularMomentum = new THREE.Vector3(state.angularMomentum);
+        this.position.copy(state.position);
+        this.momentum.copy(state.momentum);
+        this.orientation.copy(state.orientation);
+        this.angularMomentum.copy(state.angularMomentum);
 
-        this.velocity = new THREE.Vector3(state.velocity);
-        this.spin = new THREE.Quaternion(state.spin);
-        this.angularVelocity = new THREE.Vector3(state.angularVelocity);
-        this.bodyToWorld = new THREE.Matrix4(state.bodyToWorld);
-        this.worldToBody = new THREE.Matrix4(state.worldToBody);
+        this.velocity.copy(state.velocity);
+        this.spin.copy(state.spin);
+        this.angularVelocity.copy(state.angularVelocity);
+        this.bodyToWorld.copy(state.bodyToWorld);
+        this.worldToBody.copy(state.worldToBody);
 
         this.size = state.size;
         this.mass = state.mass;

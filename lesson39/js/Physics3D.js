@@ -75,7 +75,7 @@ GFX.Physics3D.prototype = {
             return 0.0;
         }
 
-        return (performance.now() - this.start) / 1e09;
+        return (performance.now() - this.start) / 1e03;
     },
 
     timeStep: function () {
@@ -130,8 +130,8 @@ GFX.Physics3D.prototype = {
     // @param state the physics state of the cube.
     evaluate: function (state, t) {
         var output = new GFX.Derivative();
-        output.velocity.set(state.velocity);
-        output.spin.set(state.spin);
+        output.velocity.copy(state.velocity);
+        output.spin.copy(state.spin);
 
         this.forces(state, t, output.force, output.torque);
 
@@ -145,17 +145,24 @@ GFX.Physics3D.prototype = {
 
         state.position.copy( state.position);
         state.position.addScaledVector( derivative.velocity, dt);
+
         state.momentum.copy( state.momentum );
         state.momentum.addScaledVector(derivative.force, dt );
-        state.orientation.add(derivative.spin.scale(dt));
+
+        state.orientation.w += derivative.spin.w * dt;
+        state.orientation.x += derivative.spin.x * dt;
+        state.orientation.y += derivative.spin.y * dt;
+        state.orientation.z += derivative.spin.z * dt;
+        //state.orientation.add(derivative.spin.multiplyScalar(dt));
+
         state.angularMomentum.copy(state.angularMomentum);
         state.angularMomentum.addScaledVector( derivative.torque, dt );
 
         state.recalculate();
 
         var output = new GFX.Derivative();
-        output.velocity.set(state.velocity);
-        output.spin.set(state.spin);
+        output.velocity.copy(state.velocity);
+        output.spin.copy(state.spin);
 
         this.forces(state, t + dt, output.force, output.torque);
 
@@ -182,14 +189,14 @@ GFX.Physics3D.prototype = {
         state.recalculate();
     },
 
-    rkVector: function (state, a, b, c, d, dt) {
+    rkVector: function (vec3, a, b, c, d, dt) {
         this.tmpVec.set(0.0, 0.0, 0.0);
-        this.tmpVec.add(b, c);
-        this.tmpVec.scale(2.0);
+        this.tmpVec.addVectors(b, c);
+        this.tmpVec.multiplyScalar(2.0);
         this.tmpVec.add(a);
         this.tmpVec.add(d);
-        this.tmpVec.scale(dt / 6.0);
-        state.add(this.tmpVec);
+        this.tmpVec.multiplyScalar(dt / 6.0);
+        vec3.add(this.tmpVec);
     },
 
     // from eberly =============
@@ -230,8 +237,8 @@ GFX.Physics3D.prototype = {
     forces: function (state, t, force, torque) {
 
         // attract towards origin
-        force.set(state.position);
-        force.scale(this.FORCE_SCALE);
+        force.copy(state.position);
+        force.multiplyScalar(this.FORCE_SCALE);
 
         // sine force to add some randomness to the motion
         force.x += this.FORCE_X * Math.sin(t * 0.9 + 0.5);

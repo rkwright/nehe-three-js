@@ -18,13 +18,13 @@ GFX.Physics3D = function ( renderfunc ) {
     this.TIME_CLAMP = 0.250;
     this.TIME_STEP = 0.01;
     this.DAMPING_TORQUE = -0.5;
-    this.FORCE_X = 10;
-    this.FORCE_Y = 11;
-    this.FORCE_Z = 12;
-    this.FORCE_SCALE = -10.0;
+    this.FORCE_X = 0;
+    this.FORCE_Y = 2;
+    this.FORCE_Z = 0;
+    this.FORCE_SCALE = -5.0;
     this.TORQUE_X = 1.0;
-    this.TORQUE_Y = 1.1;
-    this.TORQUE_Z = 1.2;
+    this.TORQUE_Y = 1.0;
+    this.TORQUE_Z = 1.0;
 
     this.start = 0;
 
@@ -55,8 +55,8 @@ GFX.Physics3D.prototype = {
         this.current.size = 1.0;
         this.current.mass = 1;
         this.current.inverseMass = 1.0 / this.current.mass;
-        this.current.position = new THREE.Vector3(2, 0, 0);
-        this.current.momentum = new THREE.Vector3(0, 0, -10);
+        this.current.position = new THREE.Vector3(0, 5, 0);
+        this.current.momentum = new THREE.Vector3(0, 0, 0);
         //this.current.orientation.identity();
         this.current.angularMomentum = new THREE.Vector3(0, 0, 0);
         this.current.inertiaTensor = this.current.mass * this.current.size * this.current.size / 6.0;
@@ -64,6 +64,7 @@ GFX.Physics3D.prototype = {
         this.current.recalculate();
 
         this.previous = new GFX.State3D();
+        this.previous.set(this.current);
     },
 
     /**
@@ -88,7 +89,7 @@ GFX.Physics3D.prototype = {
 
         this.accumulator += deltaTime;
 
-        console.log("Accum:" + this.accumulator.toFixed(2) + " t: " + this.t.toFixed(2) );
+        //console.log("Accum:" + this.accumulator.toFixed(2) + " t: " + this.t.toFixed(2) );
 
         while (this.accumulator >= this.dt) {
             this.accumulator -= this.dt;
@@ -241,9 +242,9 @@ GFX.Physics3D.prototype = {
         force.multiplyScalar(this.FORCE_SCALE);
 
         // sine force to add some randomness to the motion
-        force.x += this.FORCE_X * Math.sin(t * 0.9 + 0.5);
-        force.y += this.FORCE_Y * Math.sin(t * 0.5 + 0.4);
-        force.z += this.FORCE_Z * Math.sin(t * 0.5 + 0.4);
+        force.x += this.FORCE_X; // * Math.sin(t * 0.9 + 0.5);
+        force.y += this.FORCE_Y; // * Math.sin(t * 0.5 + 0.4);
+        force.z += this.FORCE_Z; // * Math.sin(t * 0.5 + 0.4);
 
         // sine torque to get some spinning action
 

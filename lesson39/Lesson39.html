@@ -36,11 +36,12 @@
 
         var physics3D;
         var cubeMesh;
+        var plateMesh;
+        var springMesh;
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
             cameraPos : [8, 10, 30],
-            axesHeight:10,
             controls:true,
             displayStats:true
         });
@@ -57,18 +58,38 @@
         function initializeDemo() {
             physics3D = new GFX.Physics3D( render );
 
-            var cubeGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-            cubeMesh = new THREE.Mesh(cubeGeometry, new THREE.MeshBasicMaterial({color:0xFF0000}));
+            var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+            cubeMesh = new THREE.Mesh(cubeGeometry, new THREE.MeshLambertMaterial({color:0xFF0000}));
+            cubeMesh.position.set(0,10,0);
             gfxScene.add(cubeMesh);
+
+            var plateGeometry = new THREE.BoxGeometry(3, 0.25, 3);
+            plateMesh = new THREE.Mesh(plateGeometry, new THREE.MeshLambertMaterial({color:0x888888}));
+            plateMesh.position.set(0,5.5,0);
+            gfxScene.add(plateMesh);
         }
 
         function render( state ) {
 
+            //console.log("x,y,z: " + state.position.x.toFixed(2) + ", " + state.position.y.toFixed(2) + ", " + state.position.z.toFixed(2));
             cubeMesh.position.set(state.position.x, state.position.y, state.position.z);
 
+            createSpring( state.position.y );
             //var axis = new THREE.Vector3();
             //var angle = state.orientation.angleAxis(axis);
             //cubeMesh.rotation.set(angle / Math.PI * 180.0, axis.x, axis.y, axis.z);
+        }
+
+        function createSpring( posY ) {
+            var h = 6 - posY;
+            var cylY = 5.5 - h * 0.5;
+
+            gfxScene.remove( springMesh );
+
+            var springGeometry = new THREE.CylinderGeometry(0.1, 0.1, h, 32);
+            springMesh = new THREE.Mesh(springGeometry, new THREE.MeshLambertMaterial({color:0x888888}));
+            springMesh.position.set(0,cylY,0);
+            gfxScene.add(springMesh);
         }
         /**
          * Animate the scene and call rendering.

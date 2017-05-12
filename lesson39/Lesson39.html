@@ -71,16 +71,10 @@
 
         function render( state ) {
 
-            //console.log("x,y,z: " + state.position.x.toFixed(2) + ", " + state.position.y.toFixed(2) + ", " + state.position.z.toFixed(2));
             cubeMesh.position.set(state.position.x, state.position.y, state.position.z);
+            cubeMesh.rotation.y = 2.0 *  Math.acos(state.orientation.w);
 
             createSpring( state.position.y );
-            var axis = new THREE.Vector3();
-            axis.set(0,0,0);
-            //axis.applyQuaternion( state.orientation );
-            var angle = 2.0 *  Math.acos(state.orientation.w);
-            //var angle = state.orientation.angleAxis(axis);
-            cubeMesh.rotation.y = angle; //, axis.x, axis.y, axis.z);
         }
 
         function createSpring( posY ) {

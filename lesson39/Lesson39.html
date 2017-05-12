@@ -41,7 +41,7 @@
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [8, 10, 30],
+            cameraPos : [8, 6, 15],
             controls:true,
             displayStats:true
         });
@@ -75,9 +75,12 @@
             cubeMesh.position.set(state.position.x, state.position.y, state.position.z);
 
             createSpring( state.position.y );
-            //var axis = new THREE.Vector3();
+            var axis = new THREE.Vector3();
+            axis.set(0,0,0);
+            //axis.applyQuaternion( state.orientation );
+            var angle = 2.0 *  Math.acos(state.orientation.w);
             //var angle = state.orientation.angleAxis(axis);
-            //cubeMesh.rotation.set(angle / Math.PI * 180.0, axis.x, axis.y, axis.z);
+            cubeMesh.rotation.y = angle; //, axis.x, axis.y, axis.z);
         }
 
         function createSpring( posY ) {

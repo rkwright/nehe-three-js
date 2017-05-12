@@ -22,9 +22,9 @@ GFX.Physics3D = function ( renderfunc ) {
     this.FORCE_Y = 2;
     this.FORCE_Z = 0;
     this.FORCE_SCALE = -5.0;
-    this.TORQUE_X = 1.0;
+    this.TORQUE_X = 0.0;
     this.TORQUE_Y = 1.0;
-    this.TORQUE_Z = 1.0;
+    this.TORQUE_Z = 0.0;
 
     this.start = 0;
 
@@ -119,7 +119,8 @@ GFX.Physics3D.prototype = {
 
         state.position.lerpVectors(prev.position, curr.position, alpha);
         state.momentum.lerpVectors(prev.momentum, curr.momentum, alpha);
-        state.orientation.slerp(prev.orientation, curr.orientation, alpha);
+        //state.orientation.slerp(prev.orientation, curr.orientation, alpha);
+        THREE.Quaternion.slerp( prev.orientation, curr.orientation, state.orientation, alpha );
         state.angularMomentum.lerpVectors(prev.angularMomentum, curr.angularMomentum, alpha);
 
         state.recalculate();
@@ -248,9 +249,9 @@ GFX.Physics3D.prototype = {
 
         // sine torque to get some spinning action
 
-        torque.x = this.TORQUE_X * Math.sin(t * 0.9 + 0.5);
-        torque.y = this.TORQUE_Y * Math.sin(t * 0.5 + 0.4);
-        torque.z = this.TORQUE_Z * Math.sin(t * 0.7 + 0.9);
+        torque.x = this.TORQUE_X; //  * Math.sin(t * 0.9 + 0.5);
+        torque.y = this.TORQUE_Y; // * Math.sin(t * 0.5 + 0.4);
+        torque.z = this.TORQUE_Z; // * Math.sin(t * 0.7 + 0.9);
 
         // damping torque so we don't spin too fast
         //torque.copy( torque );

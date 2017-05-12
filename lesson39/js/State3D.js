@@ -7,7 +7,6 @@ GFX.State3D = function ( state ) {
     this.angularMomentum = new THREE.Vector3();  // angular momentum vector.
 
     // secondary state
-
     this.velocity = new THREE.Vector3();         // velocity in meters per second (calculated from momentum).
     this.spin = new THREE.Quaternion();    // Quaternion rate of change in orientation.
     this.angularVelocity = new THREE.Vector3();  // angular velocity (calculated from angularMomentum).
@@ -15,7 +14,6 @@ GFX.State3D = function ( state ) {
     this.worldToBody = new THREE.Matrix4();      // world to body coordinates matrix.
 
     // constant state
-
     this.size = 0;                               // length of the cube sides in meters.
     this.mass = 0;                               // mass of the cube in kilograms.
     this.inverseMass = 0;                        // inverse of the mass used to convert momentum to velocity.

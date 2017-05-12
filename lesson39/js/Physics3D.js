@@ -65,6 +65,8 @@ GFX.Physics3D.prototype = {
 
         this.previous = new GFX.State3D();
         this.previous.set(this.current);
+
+        this.interpState = new GFX.State3D();
     },
 
     /**
@@ -100,9 +102,9 @@ GFX.Physics3D.prototype = {
         }
 
         var alpha = this.accumulator / this.dt;
-        var state = this.interpolate(this.previous, this.current, alpha);
+        this.interpState = this.interpolate(this.previous, this.current, alpha);
 
-        this.renderFunc(state);
+        this.renderFunc(this.interpState);
 
         return 0;
     },
@@ -115,17 +117,17 @@ GFX.Physics3D.prototype = {
 
     // Interpolate between two physics states.
     interpolate: function (prev, curr, alpha) {
-        var state = new GFX.State3D(curr);
+        this.interpState.set(curr);
 
-        state.position.lerpVectors(prev.position, curr.position, alpha);
-        state.momentum.lerpVectors(prev.momentum, curr.momentum, alpha);
+        this.interpState.position.lerpVectors(prev.position, curr.position, alpha);
+        this.interpState.momentum.lerpVectors(prev.momentum, curr.momentum, alpha);
         //state.orientation.slerp(prev.orientation, curr.orientation, alpha);
-        THREE.Quaternion.slerp( prev.orientation, curr.orientation, state.orientation, alpha );
-        state.angularMomentum.lerpVectors(prev.angularMomentum, curr.angularMomentum, alpha);
+        THREE.Quaternion.slerp( prev.orientation, curr.orientation, this.interpState.orientation, alpha );
+        this.interpState.angularMomentum.lerpVectors(prev.angularMomentum, curr.angularMomentum, alpha);
 
-        state.recalculate();
+        this.interpState.recalculate();
 
-        return state;
+        return this.interpState;
     },
 
     // Evaluate all derivative values for the physics state at time t.

@@ -36,7 +36,8 @@
   pointLight.position.set(0, 10, 20);
   scene.add(pointLight);
 
-  floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 10, 1, 1), new THREE.MeshBasicMaterial({ color: 0xdddddd }));
+  floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 10, 1, 1),
+          new THREE.MeshBasicMaterial({ color: 0xdddddd }));
   floor.rotation.x = Math.PI / -2;
   floor.position.y = -0.04;
   scene.add(floor);
@@ -131,9 +132,8 @@
 
   Rope = (function() {
     function Rope(args) {
-      var i, lineGeom, lineMat, particle, pos, shadowGeom, shadowMat, _i, _j, _k, _l,
-          _len, _len1, mass, numParticles, _ref, _ref1, _ref2, springConstant,
-          springFriction, springLen;
+      var i, lineGeom, lineMat, particle, pos, shadowGeom, shadowMat, mass, numParticles;
+      var springConstant, springFriction, springLen;
 
       numParticles = args.numOfParticles || 30;
       mass = args.mass || 0.05;
@@ -184,10 +184,8 @@
     }
 
     Rope.prototype.update = function(dt) {
-      var force, i, particle, spring, vec, _i, _j, _k, _l, _len, _len1, _len2,
-          _len3, _m, _ref, _ref1, _ref2, _ref3, _ref4, _results;
-
-
+      var force, i, particle, spring, vec, results;
+        
       for (i = 0; i<this.particles.length; i++ ) {
         particle = this.particles[i];
         particle.forces.set_s(0, 0, 0);

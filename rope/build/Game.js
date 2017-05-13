@@ -252,12 +252,9 @@
   })();
 
 
-  /*
-      SIMULATION VARIABLES
-  */
+  /* SIMULATION VARIABLES */
 
   PHYSICS_DT = 2;
-
   MAX_RENDER_DT = 1000 / 30;
 
   t = 0;
@@ -281,12 +278,10 @@
     groundAbsorption: 2
   });
 
-  /*
-      GAME LOOP
-  */
+  /* GAME LOOP */
 
   gameLoop = function() {
-    var blending, frameTime, newTime, particle, _i, _len, _ref;
+    var blending, frameTime, newTime;
 
     fpsStats.begin();
     msStats.begin();
@@ -299,11 +294,14 @@
       t += PHYSICS_DT;
       accumulator -= PHYSICS_DT;
     }
+
     blending = accumulator / PHYSICS_DT;
     rope.render(blending);
+
     renderer.render(scene, camera);
     fpsStats.end();
     msStats.end();
+
     requestAnimationFrame(gameLoop);
   };
 

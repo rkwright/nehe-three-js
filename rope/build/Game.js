@@ -99,11 +99,11 @@
   })();
 
   Spring = (function() {
-    function Spring( particle1, particle2, springConstant, springLength, friction ) {
+    function Spring( particle1, particle2, springConstant, springLen, friction ) {
       this.particle1 = particle1;
       this.particle2 = particle2;
       this.springConstant = springConstant;
-      this.springLength = springLength;
+      this.springLen = springLen;
       this.friction = friction;
     }
 
@@ -114,7 +114,7 @@
       len = springVector.length();
       force = new NH.Vec3(0, 0, 0);
       if (len !== 0) {
-        force.add(springVector.unit().times_s(len - this.springLength).times_s(this.springConstant));
+        force.add(springVector.unit().times_s(len - this.springLen).times_s(this.springConstant));
       }
 
       force.add(this.particle1.curState.vel.minus(this.particle2.curState.vel).times_s(-this.friction));
@@ -133,20 +133,20 @@
     function Rope(args) {
       var i, lineGeom, lineMat, particle, pos, shadowGeom, shadowMat, _i, _j, _k, _l,
           _len, _len1, mass, numParticles, _ref, _ref1, _ref2, springConstant,
-          springFriction, springLength;
+          springFriction, springLen;
 
       numParticles = args.numOfParticles || 30;
       mass = args.mass || 0.05;
       springConstant = args.springConstant || 1000;
-      springLength = args.springLength || 0.05;
+      springLen = args.springLen || 0.05;
       springFriction = args.springFriction || 0.5;
       this.gravitation = args.gravitation || 9.82;
       this.airFriction = args.airFriction || 0.04;
-      this.groundRepulsionConstant = args.groundRepulsionConstant || 100;
+      this.groundRepulsion = args.groundRepulsion || 100;
       this.groundFriction = args.groundFriction || 0.2;
-      this.groundAbsorptionConstant = args.groundAbsorptionConstant || 2;
+      this.groundAbsorption = args.groundAbsorption || 2;
 
-      this.particles = new Array();
+      this.particles = [];
 
       for (i = 0; i <= numParticles; i++ ) {
         this.particles[i] = new Particle(mass);
@@ -154,16 +154,16 @@
 
       for (i = 0; i<this.particles.length;  i++ ) {
         particle = this.particles[i];
-        particle.curState.pos.x = i * springLength;
-        particle.curState.pos.y = this.particles.length * springLength * (2 / 3);
+        particle.curState.pos.x = i * springLen;
+        particle.curState.pos.y = this.particles.length * springLen * (2 / 3);
       }
 
       this.particles[0].head = true;
-      this.springs = new Array();
+      this.springs = [];
 
       for ( i = 0; i<(numParticles - 1); i++ ) {
         this.springs[i] = new Spring(this.particles[i], this.particles[i + 1],
-        springConstant, springLength, springFriction);
+        springConstant, springLen, springFriction);
       }
 
       lineMat = new THREE.LineBasicMaterial({ color: 0x005cd9, linewidth: 1 });
@@ -171,9 +171,8 @@
       shadowMat = new THREE.LineBasicMaterial({ color: 0xbbbbbb, linewidth: 1 });
       shadowGeom = new THREE.Geometry();
 
-      _ref2 = this.particles;
       for ( i=0; i<this.particles.length; i++ ) {
-        particle = _ref2[_l];
+        particle = this.particles[i];
         pos = particle.curState.pos;
         lineGeom.vertices.push(new THREE.Vector3(pos.x, pos.y, pos.z));
         shadowGeom.vertices.push(new THREE.Vector3(pos.x, -0.02, pos.z));
@@ -188,27 +187,26 @@
       var force, i, particle, spring, vec, _i, _j, _k, _l, _len, _len1, _len2,
           _len3, _m, _ref, _ref1, _ref2, _ref3, _ref4, _results;
 
-      _ref = this.particles;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        particle = _ref[_i];
+
+      for (i = 0; i<this.particles.length; i++ ) {
+        particle = this.particles[i];
         particle.forces.set_s(0, 0, 0);
       }
-      _ref1 = this.springs;
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        spring = _ref1[_j];
+
+      for ( i = 0; i<this.springs.length; i++ ) {
+        spring = this.springs[i];
         spring.solve();
       }
-      for (i = _k = 0, _ref2 = this.particles.length - 1; 0 <= _ref2 ? _k <= _ref2 :
-          _k >= _ref2; i = 0 <= _ref2 ? ++_k : --_k) {
+
+      for ( i = 0; i<=this.particles.length - 1; i++ ) {
         if (i !== 0) {
           this.particles[i].applyForce(this.gravitation.times_s(this.particles[i].mass));
-          this.particles[i].applyForce(this.particles[i].curState.vel.
-              times_s(-this.airFriction));
+          this.particles[i].applyForce(this.particles[i].curState.vel.times_s(-this.airFriction));
         }
       }
-      _ref3 = this.particles;
-      for (_l = 0, _len2 = _ref3.length; _l < _len2; _l++) {
-        particle = _ref3[_l];
+
+      for ( i = 0; i<this.particles.length; i++ ) {
+        particle = this.particles[i];
         if (particle.curState.pos.y < 0) {
           vec = new NH.Vec3(0, 0, 0);
           vec.set_v(particle.curState.vel);
@@ -218,20 +216,20 @@
           vec.x = 0;
           vec.z = 0;
           if (vec.y < 0) {
-            particle.applyForce(vec.times_s(-this.groundAbsorptionConstant));
+            particle.applyForce(vec.times_s(-this.groundAbsorption));
           }
-          force = new NH.Vec3(0, this.groundRepulsionConstant, 0).times_s(0 -
-              particle.curState.pos.y);
+
+          force = new NH.Vec3(0, this.groundRepulsion, 0).times_s(0 - particle.curState.pos.y);
           particle.applyForce(force);
         }
       }
-      _ref4 = this.particles;
-      _results = [];
-      for (_m = 0, _len3 = _ref4.length; _m < _len3; _m++) {
-        particle = _ref4[_m];
-        _results.push(particle.update(dt));
+
+      results = [];
+      for ( i = 0; i<this.particles.length; i++ ) {
+        particle = this.particles[i];
+        results.push(particle.update(dt));
       }
-      return _results;
+      return results;
     };
 
     Rope.prototype.render = function(blending) {
@@ -274,13 +272,13 @@
     numOfParticles: 50,
     mass: 0.05,
     springConstant: 12000,
-    springLength: 0.05,
+    springLen: 0.05,
     springFriction: 0.5,
     gravitation: gravity,
     airFriction: 0.04,
-    groundRepulsionConstant: 100,
+    groundRepulsion: 100,
     groundFriction: 0.2,
-    groundAbsorptionConstant: 2
+    groundAbsorption: 2
   });
 
   /*

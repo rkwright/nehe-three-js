@@ -123,7 +123,7 @@
         this.particle1.applyForce(force);
       }
 
-      return this.particle2.applyForce(force.times_s(-1));
+      this.particle2.applyForce(force.times_s(-1));
     };
 
     return Spring;

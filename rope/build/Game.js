@@ -221,13 +221,11 @@
           particle.applyForce(force);
         }
       }
-
-      results = [];
+        
       for ( i = 0; i<this.particles.length; i++ ) {
-        particle = this.particles[i];
-        results.push(particle.update(dt));
+        this.particles[i].update(dt);
       }
-      return results;
+
     };
 
     Rope.prototype.render = function(blending) {

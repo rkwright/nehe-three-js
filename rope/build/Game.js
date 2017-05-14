@@ -148,7 +148,7 @@
 
       this.particles = [];
 
-      for (i = 0; i <= numParticles; i++ ) {
+      for (i = 0; i < numParticles; i++ ) {
         this.particles[i] = new Particle(mass);
       }
 

@@ -161,9 +161,9 @@
       this.particles[0].head = true;
       this.springs = [];
 
-      for ( i = 0; i<(numParticles - 1); i++ ) {
+      for ( i = 0; i<numParticles - 1; i++ ) {
         this.springs[i] = new Spring(this.particles[i], this.particles[i + 1],
-        springConstant, springLen, springFriction);
+            springConstant, springLen, springFriction);
       }
 
       lineMat = new THREE.LineBasicMaterial({ color: 0x005cd9, linewidth: 1 });
@@ -184,16 +184,14 @@
     }
 
     Rope.prototype.update = function(dt) {
-      var force, i, particle, spring, vec, results;
+      var force, i, particle, spring, vec;
         
       for (i = 0; i<this.particles.length; i++ ) {
-        particle = this.particles[i];
-        particle.forces.set_s(0, 0, 0);
+        this.particles[i].forces.set_s(0, 0, 0);
       }
 
       for ( i = 0; i<this.springs.length; i++ ) {
-        spring = this.springs[i];
-        spring.solve();
+        this.springs[i].solve();
       }
 
       for ( i = 0; i<=this.particles.length - 1; i++ ) {
@@ -221,7 +219,7 @@
           particle.applyForce(force);
         }
       }
-        
+
       for ( i = 0; i<this.particles.length; i++ ) {
         this.particles[i].update(dt);
       }
@@ -229,7 +227,7 @@
     };
 
     Rope.prototype.render = function(blending) {
-      var currPos, i, prevPos, renderPos, _i, _ref;
+      var currPos, i, prevPos, renderPos;
 
       for (i =  0; i<this.particles.length; i++ ) {
         prevPos = this.particles[i].prevState.pos;
@@ -286,7 +284,9 @@
     currentTime = newTime;
     accumulator += frameTime;
     while (accumulator >= PHYSICS_DT) {
+
       rope.update(PHYSICS_DT / 1000);
+
       t += PHYSICS_DT;
       accumulator -= PHYSICS_DT;
     }

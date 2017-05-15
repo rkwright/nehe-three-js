@@ -34,7 +34,9 @@ GFX.Scene = function ( parameters ) {
 	this.orbitControls = null;
 
 	this.displayStats = false;
-	this.stats = null;
+	this.fpStats = null;
+    this.msStats = null;
+    this.mbStats = null;
 
 	this.defaultLights = true;
 	this.ambientLights = [];
@@ -193,16 +195,9 @@ GFX.Scene.prototype = {
 		
 		if (this.floorRepeat !== 0)
 			this.addFloor(this.floorRepeat);
-		
-		//------ STATS --------------------	
-		// displays current and past frames per second attained by scene
-		if (this.displayStats === true) {
-			this.stats = new Stats();
-			this.stats.domElement.style.position = 'absolute';
-			this.stats.domElement.style.bottom = '0px';
-			this.stats.domElement.style.zIndex = 100;
-			container.appendChild( this.stats.domElement );
-		}
+
+        // set up the stats window(s) if reqquested
+		this.setupStats( container );
 	},
 
 	add: function ( obj ) {
@@ -389,6 +384,40 @@ GFX.Scene.prototype = {
         }
     },
 
+    setupStats: function( container ) {
+        var pos = 0;
+        if (this.displayStats === true || this.displayStats.indexOf("fps") !== -1) {
+            this.fpStats = new Stats();
+            this.fpStats.showPanel(0);
+            this.fpStats.domElement.style.position = 'absolute';
+            this.fpStats.domElement.style.bottom = pos + 'px';
+            pos += 80;
+            this.fpStats.domElement.style.zIndex = 100;
+            child = container.appendChild( this.fpStats.dom );
+        }
+
+        if (this.displayStats.indexOf("ms") !== -1) {
+            this.msStats = new Stats();
+            this.msStats.showPanel(1);
+            this.msStats.domElement.style.position = 'absolute';
+            this.msStats.domElement.style.bottom = '0px';
+            this.msStats.domElement.style.left = pos + 'px';
+            pos += 80;
+            this.msStats.domElement.style.zIndex = 100;
+            container.appendChild( this.msStats.dom );
+        }
+
+        if (this.displayStats.indexOf("mb") !== -1) {
+            this.mbStats = new Stats();
+            this.mbStats.showPanel(2);
+            this.mbStats.domElement.style.position = 'absolute';
+            this.mbStats.domElement.style.bottom = '0px';
+            this.mbStats.domElement.style.left = pos + '80px';
+            this.mbStats.domElement.style.zIndex = 100;
+            container.appendChild( this.mbStats.dom );
+        }
+    },
+
     /**
 	 * Render the scene. Map the 3D world to the 2D screen.
      */
@@ -400,9 +429,12 @@ GFX.Scene.prototype = {
 		if (this.orbitControls !== null && typeof this.orbitControls !== 'undefined')
 			this.orbitControls.update();
 
-		if (this.stats !== null && typeof this.stats !== 'undefined')
-			this.stats.update();
-
+		if (this.fpStats !== null && typeof this.fpStats !== 'undefined')
+			this.fpStats.update();
+        if (this.msStats !== null && typeof this.msStats !== 'undefined')
+            this.msStats.update();
+        if (this.mbStats !== null && typeof this.mbStats !== 'undefined')
+            this.mbStats.update();
 	},
 
 	addFog: function( values ) {

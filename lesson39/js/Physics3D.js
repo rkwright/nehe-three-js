@@ -13,64 +13,39 @@
 *  @author:  Ric Wright - May 2017 - Ported from Java version
 */
 
-GFX.Physics3D = function ( renderfunc ) {
+GFX.Physics3D = function ( renderFunc,
+                           forceFunc,
+                           position,
+                           momentum,
+                           mass,
+                           size ) {
 
     this.TIME_CLAMP = 0.250;
     this.TIME_STEP = 0.01;
-    this.DAMPING_TORQUE = -0.5;
-    this.FORCE_X = 0;
-    this.FORCE_Y = 2;
-    this.FORCE_Z = 0;
-    this.FORCE_SCALE = -5.0;
-    this.TORQUE_X = 0.0;
-    this.TORQUE_Y = 1.0;
-    this.TORQUE_Z = 0.0;
 
     this.start = 0;
-
-    this.previous = new GFX.State3D();	// previous physics state.
-    this.current = new GFX.State3D();		// current physics state.
-
     this.t = 0;
     this.dt = this.TIME_STEP;
-
     this.currentTime = this.time();
     this.accumulator = 0;
 
-    this.tmpState = new GFX.State3D();
+    this.previous = new GFX.State3D( position, momentum, mass, size  );	    // previous physics state.
+    this.current  = new GFX.State3D( position, momentum, mass, size );		// current physics state.
+
+    // temp variable states (args are dummies)
+    this.interpState = new GFX.State3D( position, momentum, mass, size );
+    this.tmpState = new GFX.State3D( position, momentum, mass, size );
+
     this.tmpVec = new THREE.Vector3();
 
-    this.renderFunc = null;
-
-    this.initState( renderfunc );
+    this.renderFunc = renderFunc;
+    this.forceFunc = forceFunc;
 };
 
 GFX.Physics3D.prototype = {
 
-    initState: function (renderFunc) {
-
-        this.renderFunc = renderFunc;
-
-        this.current = new GFX.State3D();
-        this.current.size = 1.0;
-        this.current.mass = 1;
-        this.current.inverseMass = 1.0 / this.current.mass;
-        this.current.position = new THREE.Vector3(0, 5, 0);
-        this.current.momentum = new THREE.Vector3(0, 0, 0);
-        //this.current.orientation.identity();
-        this.current.angularMomentum = new THREE.Vector3(0, 0, 0);
-        this.current.inertiaTensor = this.current.mass * this.current.size * this.current.size / 6.0;
-        this.current.inverseInertiaTensor = 1.0 / this.current.inertiaTensor;
-        this.current.recalculate();
-
-        this.previous = new GFX.State3D();
-        this.previous.set(this.current);
-
-        this.interpState = new GFX.State3D();
-    },
-
     /**
-     * Simple time function that wraps the nanosecond precision timer
+     * Simple time function that wraps the millisecond precision timer
      */
     time: function () {
         if (this.start === 0) {
@@ -109,15 +84,9 @@ GFX.Physics3D.prototype = {
         return 0;
     },
 
-    // Update physics state.
-    update: function () {
-        this.previous.set(this.current);
-        this.integrate(this.current, this.t, this.dt);
-    },
-
     // Interpolate between two physics states.
     interpolate: function (prev, curr, alpha) {
-        this.interpState.set(curr);
+        this.interpState.copy(curr);
 
         this.interpState.position.lerpVectors(prev.position, curr.position, alpha);
         this.interpState.momentum.lerpVectors(prev.momentum, curr.momentum, alpha);
@@ -130,6 +99,32 @@ GFX.Physics3D.prototype = {
         return this.interpState;
     },
 
+    // Update physics state.
+    update: function () {
+        this.previous.copy(this.current);
+        this.integrate(this.current, this.t, this.dt);
+    },
+
+    // Integrate physics state forward by dt seconds.
+    // Uses an RK4 integrator to numerically integrate with error O(5).
+    integrate: function (state, t, dt) {
+
+        var a = this.evaluate(state, t);
+        this.tmpState.copy(state);
+        var b = this.evaluate_dt( this.tmpState, t, dt * 0.5, a);
+        this.tmpState.copy(state);
+        var c = this.evaluate_dt( this.tmpState, t, dt * 0.5, b);
+        this.tmpState.copy(state);
+        var d = this.evaluate_dt( this.tmpState, t, dt, c);
+
+        this.rkVector(state.position, a.velocity, b.velocity, c.velocity, d.velocity, dt);
+        this.rkVector(state.momentum, a.force, b.force, c.force, d.force, dt);
+        this.rkIntegrateAdd(state.orientation, a.spin, b.spin, c.spin, d.spin, dt);
+        this.rkVector(state.angularMomentum, a.torque, b.torque, c.torque, d.torque, dt);
+
+        state.recalculate();
+    },
+
     // Evaluate all derivative values for the physics state at time t.
     // @param state the physics state of the cube.
     evaluate: function (state, t) {
@@ -137,7 +132,7 @@ GFX.Physics3D.prototype = {
         output.velocity.copy(state.velocity);
         output.spin.copy(state.spin);
 
-        this.forces(state, t, output.force, output.torque);
+        this.forceFunc( state, t, output );
 
         return output;
     },
@@ -168,29 +163,9 @@ GFX.Physics3D.prototype = {
         output.velocity.copy(state.velocity);
         output.spin.copy(state.spin);
 
-        this.forces(state, t + dt, output.force, output.torque);
+        this.forceFunc( state, t + dt, output );
 
         return output;
-    },
-
-    // Integrate physics state forward by dt seconds.
-    // Uses an RK4 integrator to numerically integrate with error O(5).
-    integrate: function (state, t, dt) {
-
-        var a = this.evaluate(state, t);
-        this.tmpState.set(state);
-        var b = this.evaluate_dt( this.tmpState, t, dt * 0.5, a);
-        this.tmpState.set(state);
-        var c = this.evaluate_dt( this.tmpState, t, dt * 0.5, b);
-        this.tmpState.set(state);
-        var d = this.evaluate_dt( this.tmpState, t, dt, c);
-
-        this.rkVector(state.position, a.velocity, b.velocity, c.velocity, d.velocity, dt);
-        this.rkVector(state.momentum, a.force, b.force, c.force, d.force, dt);
-        this.rkIntegrateAdd(state.orientation, a.spin, b.spin, c.spin, d.spin, dt);
-        this.rkVector(state.angularMomentum, a.torque, b.torque, c.torque, d.torque, dt);
-
-        state.recalculate();
     },
 
     rkVector: function (vec3, a, b, c, d, dt) {
@@ -229,36 +204,10 @@ GFX.Physics3D.prototype = {
         tmp = this.addQuaternion(tmp, d);
         tmp = this.multiplyQuaternion(tmp, dt / 6.0);
         this.addQuaternion(orient, tmp);
-    },
+    }
     //====================== eberly
 
-    // Calculate force and torque for physics state at time t.
-    // Due to the way that the RK4 integrator works we need to calculate
-    // force implicitly from state rather than explicitly applying forces
-    // to the rigid body once per update. This is because the RK4 achieves
-    // its accuracy by detecting curvature in derivative values over the 
-    // timestep so we need our force values to supply the curvature.
-    forces: function (state, t, force, torque) {
 
-        // attract towards origin
-        force.copy(state.position);
-        force.multiplyScalar(this.FORCE_SCALE);
-
-        // sine force to add some randomness to the motion
-        force.x += this.FORCE_X; // * Math.sin(t * 0.9 + 0.5);
-        force.y += this.FORCE_Y; // * Math.sin(t * 0.5 + 0.4);
-        force.z += this.FORCE_Z; // * Math.sin(t * 0.5 + 0.4);
-
-        // sine torque to get some spinning action
-
-        torque.x = this.TORQUE_X; //  * Math.sin(t * 0.9 + 0.5);
-        torque.y = this.TORQUE_Y; // * Math.sin(t * 0.5 + 0.4);
-        torque.z = this.TORQUE_Z; // * Math.sin(t * 0.7 + 0.9);
-
-        // damping torque so we don't spin too fast
-        //torque.copy( torque );
-        torque.addScaledVector( state.angularVelocity, this.DAMPING_TORQUE );
-    }
 };
 
 	

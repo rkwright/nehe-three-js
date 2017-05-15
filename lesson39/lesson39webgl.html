@@ -38,6 +38,14 @@
         var cubeMesh;
         var plateMesh;
         var springMesh;
+        var DAMPING_TORQUE = -0.5;
+        var FORCE_X = 0;
+        var FORCE_Y = 2;
+        var FORCE_Z = 0;
+        var FORCE_SCALE = -5.0;
+        var TORQUE_X = 0.0;
+        var TORQUE_Y = 1.0;
+        var TORQUE_Z = 0.0;
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
@@ -56,7 +64,13 @@
          * Initialize the Demo.
          */
         function initializeDemo() {
-            physics3D = new GFX.Physics3D( render );
+
+            var initialPos = new THREE.Vector3(0, 5, 0);
+            var initialMom = new THREE.Vector3(0, 0, 0);
+            var mass = 1.0;
+            var size = 1.0;
+
+            physics3D = new GFX.Physics3D( render, forces, initialPos, initialMom, mass, size );
 
             var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
             cubeMesh = new THREE.Mesh(cubeGeometry, new THREE.MeshLambertMaterial({color:0xFF0000}));
@@ -70,6 +84,8 @@
         }
 
         function render( state ) {
+
+            //console.log("x,y,z: " + state.position.x.toFixed(2) + " " + state.position.y.toFixed(2) + " " +  state.position.z.toFixed(2));
 
             cubeMesh.position.set(state.position.x, state.position.y, state.position.z);
             cubeMesh.rotation.y = 2.0 *  Math.acos(state.orientation.w);
@@ -88,6 +104,34 @@
             springMesh.position.set(0,cylY,0);
             gfxScene.add(springMesh);
         }
+
+        // Calculate force and torque for physics state at time t.
+        // Due to the way that the RK4 integrator works we need to calculate
+        // force implicitly from state rather than explicitly applying forces
+        // to the rigid body once per update. This is because the RK4 achieves
+        // its accuracy by detecting curvature in derivative values over the
+        // timestep so we need our force values to supply the curvature.
+        function forces (state, t, derivative ) {
+
+            // attract towards origin
+            derivative.force.copy(state.position);
+            derivative.force.multiplyScalar(FORCE_SCALE);
+
+            // sine force to add some randomness to the motion
+            derivative.force.x += FORCE_X; // * Math.sin(t * 0.9 + 0.5);
+            derivative.force.y += FORCE_Y; // * Math.sin(t * 0.5 + 0.4);
+            derivative.force.z += FORCE_Z; // * Math.sin(t * 0.5 + 0.4);
+
+            // sine torque to get some spinning action
+
+            derivative.torque.x = TORQUE_X; //  * Math.sin(t * 0.9 + 0.5);
+            derivative.torque.y = TORQUE_Y; // * Math.sin(t * 0.5 + 0.4);
+            derivative.torque.z = TORQUE_Z; // * Math.sin(t * 0.7 + 0.9);
+
+            // damping torque so we don't spin too fast
+            derivative.torque.addScaledVector( state.angularVelocity, DAMPING_TORQUE );
+        }
+
         /**
          * Animate the scene and call rendering.
          */

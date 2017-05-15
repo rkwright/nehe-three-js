@@ -1,38 +1,39 @@
 
-GFX.State3D = function ( state ) {
+GFX.State3D = function ( position, momentum, mass, size ) {
 
-    this.position = new THREE.Vector3();         // the position of the cube center of mass in world coordinates (meters).
-    this.momentum = new THREE.Vector3();         // the momentum of the cube in kilogram meters per second.
-    this.orientation = new THREE.Quaternion();   // the orientation of the cube represented by a unit THREE.Quaternion.
+    this.position = new THREE.Vector3();         // the position of the center of mass in world coordinates (meters)
+    this.position.copy(position);
+    this.momentum = new THREE.Vector3();         // the momentum of the object in kilogram meters per second.
+    this.momentum.copy(momentum);
+    this.orientation = new THREE.Quaternion();   // the orientation of the object represented by a unit THREE.Quaternion.
     this.angularMomentum = new THREE.Vector3();  // angular momentum vector.
 
     // secondary state
     this.velocity = new THREE.Vector3();         // velocity in meters per second (calculated from momentum).
-    this.spin = new THREE.Quaternion();    // Quaternion rate of change in orientation.
-    this.angularVelocity = new THREE.Vector3();  // angular velocity (calculated from angularMomentum).
-    this.bodyToWorld = new THREE.Matrix4();      // body to world coordinates matrix.
-    this.worldToBody = new THREE.Matrix4();      // world to body coordinates matrix.
+    this.spin = new THREE.Quaternion();          // Quaternion rate of change in orientation
+    this.angularVelocity = new THREE.Vector3();  // angular velocity (calculated from angularMomentum)
+    this.bodyToWorld = new THREE.Matrix4();      // body to world coordinates matrix
+    this.worldToBody = new THREE.Matrix4();      // world to body coordinates matrix
 
     // constant state
-    this.size = 0;                               // length of the cube sides in meters.
-    this.mass = 0;                               // mass of the cube in kilograms.
-    this.inverseMass = 0;                        // inverse of the mass used to convert momentum to velocity.
-    this.inertiaTensor = 0;                      // inertia tensor of the cube (it is simplified it to a single value due to the mass properties a cube).
-    this.inverseInertiaTensor = 0;               // inverse inertia tensor used to convert angular momentum to angular velocity.
+    this.size = size;                            // length of the cube sides in meters
+    this.mass = mass;                            // mass of the cube in kilograms
+    this.inverseMass = 1.0 / mass;               // inverse of the mass used to convert momentum to velocity
+
+    // inertia tensor of a cube (it is simplified it to a single value due to the mass properties a cube).
+    this.inertiaTensor = mass * size * size / 6.0;
+    // inverse inertia tensor used to convert angular momentum to angular velocity
+    this.inverseInertiaTensor = 1.0 / this.inertiaTensor;
 
     this.quat05 = new THREE.Quaternion( 0.5, 0.5, 0.5, 0.5 );
 
-    if (state !== undefined)
-        this.set( state );
+    this.recalculate();
 };
 
 GFX.State3D.prototype = {
 
-    copy: function ( state ) {
-        set( state );
-    },
-
-    set: function ( state )	{
+    // just copies the contents from one state to the other
+    copy: function ( state )	{
         this.position.copy(state.position);
         this.momentum.copy(state.momentum);
         this.orientation.copy(state.orientation);
@@ -64,7 +65,6 @@ GFX.State3D.prototype = {
         this.spin.multiply(this.orientation);
 
         var translation = new THREE.Matrix4();
-        //translation.identity();
         translation.setPosition(this.position);
         this.bodyToWorld.multiplyMatrices( translation, this.getMatrix(this.orientation) );
         this.worldToBody.getInverse( this.bodyToWorld );

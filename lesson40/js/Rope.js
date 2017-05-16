@@ -148,7 +148,7 @@ GFX.Rope.prototype = {
             particle = this.particles[i];
             if (particle.curState.pos.y < 0) {
                 vec = new THREE.Vector3(0, 0, 0);
-                vec.set(particle.curState.vel);
+                vec.copy(particle.curState.vel);
                 vec.y = 0;
                 particle.applyForce(vec.multiplyScalar(-this.groundFriction));
                 vec.y = particle.curState.vel.y;

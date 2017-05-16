@@ -35,8 +35,9 @@
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [8, 6, 15],
+            cameraPos : [0, 12, 30],
             controls:true,
+            clearColor:0x888888,
             displayStats:"fps ms"
         });
 
@@ -51,7 +52,9 @@
          */
         function initializeDemo() {
 
-            rope = new Rope({
+            var gravity = new THREE.Vector3(0, -9.82, 0);
+
+            rope = new GFX.Rope({
                 numOfParticles: 50,
                 mass: 0.05,
                 springConstant: 12000,
@@ -69,11 +72,13 @@
         }
 
         function createRope( particles ) {
-            var lineMat = new THREE.LineBasicMaterial({ color: 0x005cd9, linewidth: 1 });
+            var lineMat = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 2 });
             var lineGeom = new THREE.Geometry();
+            var pos;
 
             for ( i=0; i<particles.length; i++ ) {
                 pos = particles[i].curState.pos;
+
                 lineGeom.vertices.push(new THREE.Vector3(pos.x, pos.y, pos.z));
              }
             ropeLine = new THREE.Line(lineGeom, lineMat);
@@ -137,12 +142,16 @@
                 createRope( particles );
 
             for ( var i =  0; i<particles.length; i++ ) {
-                renderPos.lerpVectors(this.particles[i].prevState.pos, this.particles[i].curState.pos, blending);
+                renderPos.lerpVectors(particles[i].prevState.pos, particles[i].curState.pos, blending);
 
-                this.line.geometry.vertices[i].set(renderPos.x, renderPos.y, renderPos.z);
+                //console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2));
+
+                ropeLine.geometry.vertices[i].set(renderPos.x, renderPos.y, renderPos.z);
             }
 
-            this.line.geometry.verticesNeedUpdate = true;
+            console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2));
+
+            ropeLine.geometry.verticesNeedUpdate = true;
         }
 
         /**

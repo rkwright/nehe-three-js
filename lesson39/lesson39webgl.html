@@ -85,7 +85,8 @@
 
         function render( state ) {
 
-            //console.log("x,y,z: " + state.position.x.toFixed(2) + " " + state.position.y.toFixed(2) + " " +  state.position.z.toFixed(2));
+            //console.log("x,y,z: " + state.position.x.toFixed(2) + " " + state.position.y.toFixed(2) + " " +
+            //       state.position.z.toFixed(2));
 
             cubeMesh.position.set(state.position.x, state.position.y, state.position.z);
             cubeMesh.rotation.y = 2.0 *  Math.acos(state.orientation.w);
@@ -117,16 +118,15 @@
             derivative.force.copy(state.position);
             derivative.force.multiplyScalar(FORCE_SCALE);
 
-            // sine force to add some randomness to the motion
-            derivative.force.x += FORCE_X; // * Math.sin(t * 0.9 + 0.5);
-            derivative.force.y += FORCE_Y; // * Math.sin(t * 0.5 + 0.4);
-            derivative.force.z += FORCE_Z; // * Math.sin(t * 0.5 + 0.4);
+            // add forces to the calculated derivative
+            derivative.force.x += FORCE_X;
+            derivative.force.y += FORCE_Y;
+            derivative.force.z += FORCE_Z;
 
-            // sine torque to get some spinning action
-
-            derivative.torque.x = TORQUE_X; //  * Math.sin(t * 0.9 + 0.5);
-            derivative.torque.y = TORQUE_Y; // * Math.sin(t * 0.5 + 0.4);
-            derivative.torque.z = TORQUE_Z; // * Math.sin(t * 0.7 + 0.9);
+            // add torque to the calculated derivative
+            derivative.torque.x = TORQUE_X;
+            derivative.torque.y = TORQUE_Y;
+            derivative.torque.z = TORQUE_Z;
 
             // damping torque so we don't spin too fast
             derivative.torque.addScaledVector( state.angularVelocity, DAMPING_TORQUE );

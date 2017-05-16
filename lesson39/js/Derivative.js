@@ -7,8 +7,6 @@
 
 GFX.Derivative = function () {
 
-
-
 	this.velocity = new THREE.Vector3();        // velocity is the derivative of position.
 	this.force    = new THREE.Vector3();        // force in the derivative of momentum.
     this.spin     = new THREE.Quaternion();     // spin is the derivative of the orientation quaternion.

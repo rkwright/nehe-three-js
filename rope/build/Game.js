@@ -194,7 +194,7 @@
         this.springs[i].solve();
       }
 
-      for ( i = 0; i<=this.particles.length - 1; i++ ) {
+      for ( i = 0; i<this.particles.length; i++ ) {
         if (i !== 0) {
           this.particles[i].applyForce(this.gravitation.times_s(this.particles[i].mass));
           this.particles[i].applyForce(this.particles[i].curState.vel.times_s(-this.airFriction));

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- -------------------------------------
+        Very roughly based (or inspired by) NeHe Tutorial 36
+	Original:  http://nehe.gamedev.net/tutorial/playing_avi_files_in_opengl/23001/
+    Largely cloned from https://medium.com/@andrew_b_berg/volumetric-light-scattering-in-three-js-6e1850680a41
+
+    @author: rkwright@geofx.com
+	-------------------------------------- -->
+	<title>NEHE Lesson 40</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+    <!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="../css/NEHE.css" />
+
+    <!-- Include several libraries from THREE.js and the Scene class  -->
+	<script src="../js/three.js" type="text/javascript"></script>
+    <script src="../js/Detector.js" type="text/javascript"></script>
+    <script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
+    <script src="../js/stats.js" type="text/javascript"></script>
+    <script src="../js/gfx-scene.js" type="text/javascript"></script>
+    <script src="js/Rope.js" type="text/javascript"></script>
+</head>
+<body>
+
+	<div style="position: absolute; top: 10px; left: 10px;color:white">
+		<p></p>
+	</div>
+
+	<script type="text/javascript">
+        var rope;
+        var ropeLine;
+
+        // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+        var gfxScene = new GFX.Scene( {
+            cameraPos : [8, 6, 15],
+            controls:true,
+            displayStats:"fps ms"
+        });
+
+        // then initialize our demo's stuff
+        initializeDemo();
+
+        // Animate the scene
+        animateScene();
+
+        /**
+         * Initialize the Demo.
+         */
+        function initializeDemo() {
+
+            rope = new Rope({
+                numOfParticles: 50,
+                mass: 0.05,
+                springConstant: 12000,
+                springLen: 0.05,
+                springFriction: 0.5,
+                gravitation: gravity,
+                airFriction: 0.04,
+                groundRepulsion: 100,
+                groundFriction: 0.2,
+                groundAbsorption: 2,
+                renderFunc: render
+            });
+
+            createFloor();
+        }
+
+        function createRope( particles ) {
+            var lineMat = new THREE.LineBasicMaterial({ color: 0x005cd9, linewidth: 1 });
+            var lineGeom = new THREE.Geometry();
+
+            for ( i=0; i<particles.length; i++ ) {
+                pos = particles[i].curState.pos;
+                lineGeom.vertices.push(new THREE.Vector3(pos.x, pos.y, pos.z));
+             }
+            ropeLine = new THREE.Line(lineGeom, lineMat);
+            gfxScene.add(ropeLine);
+        }
+
+        function createFloor() {
+            var FLOOR_S = 5;
+            var FLOOR_T = 5;
+            var PLANE_SIZE = 20;
+
+            var planeGeo = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE);
+
+            var floorMat = new THREE.MeshStandardMaterial({
+                roughness: 0.8,
+                color: 0xffffff,
+                bumpScale: 0.0005
+            });
+
+            var textureLoader = new THREE.TextureLoader();
+            textureLoader.load("images/hardwood2_diffuse.jpg", function (texture) {
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.anisotropy = 4;
+                texture.repeat.set(FLOOR_S, FLOOR_T);
+                floorMat.side = THREE.DoubleSide;
+                floorMat.map = texture;
+                floorMat.needsUpdate = true;
+            });
+
+            textureLoader.load("images/hardwood2_bump.jpg", function (texture) {
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.anisotropy = 4;
+                texture.repeat.set(FLOOR_S, FLOOR_T);
+                floorMat.side = THREE.DoubleSide;
+                floorMat.bumpMap = texture;
+                floorMat.needsUpdate = true;
+            });
+
+            textureLoader.load("images/hardwood2_roughness.jpg", function (texture) {
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.anisotropy = 4;
+                texture.repeat.set(FLOOR_S, FLOOR_T);
+                floorMat.side = THREE.DoubleSide;
+                floorMat.roughnessMap = texture;
+                floorMat.needsUpdate = true;
+            });
+
+            var planeFloor = new THREE.Mesh(planeGeo, floorMat);
+            planeFloor.rotation.x = -Math.PI / 2.0;
+            planeFloor.position.y = -10;
+            gfxScene.add(planeFloor);
+        }
+
+        function render( particles, blending ) {
+            var renderPos = new THREE.Vector3();
+
+            if (ropeLine === undefined)
+                createRope( particles );
+
+            for ( var i =  0; i<particles.length; i++ ) {
+                renderPos.lerpVectors(this.particles[i].prevState.pos, this.particles[i].curState.pos, blending);
+
+                this.line.geometry.vertices[i].set(renderPos.x, renderPos.y, renderPos.z);
+            }
+
+            this.line.geometry.verticesNeedUpdate = true;
+        }
+
+        /**
+         * Animate the scene and call rendering.
+         */
+        function animateScene() {
+
+            // Tell the browser to call this function when page is visible
+            requestAnimationFrame(animateScene);
+
+            rope.timeStep();
+
+            // Map the 3D scene down to the 2D screen (render the frame)
+            gfxScene.renderScene();
+        }
+    </script>
+</body>
+</html>

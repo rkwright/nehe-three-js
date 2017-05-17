@@ -230,11 +230,17 @@
       var currPos, i, prevPos, renderPos;
 
       for (i =  0; i<this.particles.length; i++ ) {
+          var particle = this.particles[i];
+
         prevPos = this.particles[i].prevState.pos;
         currPos = this.particles[i].curState.pos;
         renderPos = currPos.times_s(blending).plus(prevPos.times_s(1 - blending));
 
-        this.line.geometry.vertices[i].set(renderPos.x, renderPos.y, renderPos.z);
+          console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2)
+              + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
+              + " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
+
+          this.line.geometry.vertices[i].set(renderPos.x, renderPos.y, renderPos.z);
         this.shadow.geometry.vertices[i].set(renderPos.x, -0.02, renderPos.z);
       }
 

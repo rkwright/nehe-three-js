@@ -58,11 +58,12 @@ GFX.Spring.prototype = {
 
     solve: function() {
 
-        var springVector = this.particle2.curState.pos.sub(this.particle1.curState.pos).clone();
-        springVector.normalize();
+        var springVector = this.particle2.curState.pos.clone();
+        springVector.sub(this.particle1.curState.pos);
         var len = springVector.length();
         var force = new THREE.Vector3(0, 0, 0);
         if (len !== 0) {
+            springVector.normalize();
             force.add(springVector.multiplyScalar(len - this.springLen).multiplyScalar(this.springConstant));
         }
 
@@ -119,7 +120,7 @@ GFX.Rope = function ( args ) {
     this.MAX_RENDER_TIME = 0.250;
     this.start = 0;
     this.t = 0;
-    this.dt = 0.01;
+    this.dt = 0.02;
     this.currentTime = performance.now() / 1e03;
     this.accumulator = 0;
 };
@@ -166,11 +167,11 @@ GFX.Rope.prototype = {
         for ( i = 0; i<this.particles.length; i++ ) {
             this.particles[i].update(dt);
         }
-    },
 
-    render:  function( blending ) {
+        console.log("pos: " + particle.curState.pos.x.toFixed(2) + " " + particle.curState.pos.y.toFixed(2) + " " +  particle.curState.pos.z.toFixed(2)
+            + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
+            + " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
 
-        this.renderFunc( this.particles, blending );
     },
 
     timeStep: function() {
@@ -192,7 +193,6 @@ GFX.Rope.prototype = {
         }
 
         var alpha = this.accumulator / this.dt;
-        //this.render( alpha );
 
         this.renderFunc(this.particles, alpha);
 

@@ -76,7 +76,7 @@
             var lineGeom = new THREE.Geometry();
             var pos;
 
-            for ( i=0; i<particles.length; i++ ) {
+            for ( var i=0; i<particles.length; i++ ) {
                 pos = particles[i].curState.pos;
 
                 lineGeom.vertices.push(new THREE.Vector3(pos.x, pos.y, pos.z));
@@ -142,6 +142,8 @@
                 createRope( particles );
 
             for ( var i =  0; i<particles.length; i++ ) {
+                var particle = particles[i];
+
                 renderPos.lerpVectors(particles[i].prevState.pos, particles[i].curState.pos, blending);
 
                 //console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2));
@@ -149,7 +151,9 @@
                 ropeLine.geometry.vertices[i].set(renderPos.x, renderPos.y, renderPos.z);
             }
 
-            console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2));
+            console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2)
+                + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
+                + " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
 
             ropeLine.geometry.verticesNeedUpdate = true;
         }

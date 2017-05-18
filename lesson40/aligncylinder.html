@@ -33,6 +33,7 @@
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
             cameraPos : [2, 5, 20],
+            axesHeight:10,
             controls:true,
             clearColor:0x222222,
             displayStats:"fps ms"
@@ -52,7 +53,7 @@
             var lineMat = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 4 });
             var lineGeom = new THREE.Geometry();
 
-            var vec0 = new THREE.Vector3(0, 0, 0);
+            var vec0 = new THREE.Vector3(-2, 3, 1);
             var vec1 = new THREE.Vector3(10, 6, 2)
             lineGeom.vertices.push(vec0);
             lineGeom.vertices.push(vec1);
@@ -60,15 +61,20 @@
             var lineVec = new THREE.Line(lineGeom, lineMat);
             gfxScene.add(lineVec);
 
-            var len = vec1.length();
+            createCylinderOnVec( vec0, vec1 );
+        }
+
+        function createCylinderOnVec( vec0, vec1 ) {
+            var newVec = vec1.clone();
+            newVec.sub( vec0 );
+
+            var len = newVec.length();
             var cylinderGeom = new THREE.CylinderGeometry(0.5, 0.5, len, 8);
             var cylinderMesh = new THREE.Mesh(cylinderGeom, new THREE.MeshLambertMaterial({color:0x444444, wireframe:true}));
-            //cylinderMesh.position.set(0, 0, 0);
             var axis = new THREE.Vector3(0, 1, 0);
-            cylinderMesh.quaternion.setFromUnitVectors(axis, vec1.clone().normalize());
-            cylinderMesh.position.copy(vec1.clone().multiplyScalar(0.5));
+            cylinderMesh.quaternion.setFromUnitVectors(axis, newVec.clone().normalize());
+            cylinderMesh.position.copy(vec0.clone());
             gfxScene.add(cylinderMesh);
-
         }
 
         /**

@@ -69,8 +69,19 @@
             var cylinderMat = new THREE.MeshLambertMaterial({color:0x444444, wireframe:true});
             var ropeMesh = new GFX.RopeMesh();
 
-            var cylinderMesh = ropeMesh.alignCylinder( vec0, vec1, cylinderMat );
+            var cylinderMesh = ropeMesh.createCylinder( vec0, vec1, 0.5, cylinderMat );
             gfxScene.add( cylinderMesh );
+
+            var vecA = new THREE.Vector3(2, -3, -1);
+            var vecB = new THREE.Vector3(-8, -6, -2);
+
+            var lineGeomB = new THREE.Geometry();
+            lineGeomB.vertices.push(vecA);
+            lineGeomB.vertices.push(vecB);
+            var lineVecB = new THREE.Line(lineGeomB, lineMat);
+            gfxScene.add(lineVecB);
+
+            ropeMesh.alignCylinder( vecA, vecB, cylinderMesh );
         }
 
 

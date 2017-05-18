@@ -32,12 +32,14 @@
 	<script type="text/javascript">
         var rope;
         var ropeLine;
+        var SPRING_LEN = 0.025;
+        var NUM_PARTICLES = 100
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [0, 1.5, 8],
+            cameraPos : [2, 2.5, 5],
             controls:true,
-            clearColor:0x888888,
+            clearColor:0x666666,
             displayStats:"fps ms"
         });
 
@@ -55,10 +57,10 @@
             var gravity = new THREE.Vector3(0, -9.82, 0);
 
             rope = new GFX.Rope({
-                numOfParticles: 100,
+                numOfParticles: NUM_PARTICLES,
                 mass: 0.05,
                 springConstant: 12000,
-                springLen: 0.05,
+                springLen: SPRING_LEN,
                 springFriction: 0.25,
                 gravitation: gravity,
                 airFriction: 0.04,
@@ -69,6 +71,7 @@
             });
 
             createFloor();
+            createPost();
         }
 
         function createRope( particles ) {
@@ -83,6 +86,21 @@
              }
             ropeLine = new THREE.Line(lineGeom, lineMat);
             gfxScene.add(ropeLine);
+        }
+
+        function createPost( posY ) {
+            var postHt = NUM_PARTICLES * SPRING_LEN * (2 / 3);
+
+            var postGeom = new THREE.CylinderGeometry(0.05, 0.05, postHt, 32);
+            var postMesh = new THREE.Mesh(postGeom, new THREE.MeshLambertMaterial({color:0x444444}));
+            postMesh.position.set(0, postHt/2, -1);
+            gfxScene.add(postMesh);
+
+            var armGeom = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 32);
+            var armMesh = new THREE.Mesh(armGeom, new THREE.MeshLambertMaterial({color:0x444444}));
+            armMesh.rotation.x = Math.PI / 2;
+            armMesh.position.set(0, postHt, -0.5);
+            gfxScene.add(armMesh);
         }
 
         function createFloor() {

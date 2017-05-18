@@ -35,14 +35,16 @@ GFX.Particle.prototype = {
     },
 
     acceleration: function( forces, mass ) {
-        return forces.divideScalar( mass );
+        var newForces = forces.clone();
+        return newForces.divideScalar( mass );
     },
 
     update: function( dt ) {
         this.prevState.copy(this.curState);
-        var accel = this.acceleration(this.forces, this.mass).multiplyScalar(dt);
-        this.curState.vel.add(accel);
-        this.curState.pos.add(this.curState.vel.multiplyScalar(dt));
+        var accel = this.acceleration(this.forces, this.mass);
+        this.curState.vel.add( accel.multiplyScalar(dt) );
+        var newVel = this.curState.vel.clone();
+        this.curState.pos.add( newVel.multiplyScalar(dt) );
     }
 };
 GFX.Spring = function ( particle1, particle2, springConstant, springLen, friction ) {
@@ -67,7 +69,12 @@ GFX.Spring.prototype = {
             force.add(springVector.multiplyScalar(len - this.springLen).multiplyScalar(this.springConstant));
         }
 
-        force.add(this.particle1.curState.vel.sub(this.particle2.curState.vel).multiplyScalar(-this.friction));
+        var newVel1 = this.particle1.curState.vel.clone();
+        var newVel2 = this.particle2.curState.vel.clone();
+        newVel1.sub(newVel2);
+        newVel1.multiplyScalar( -this.friction );
+        force.add( newVel1 );
+
         if (this.particle1.head !== true) {
             this.particle1.applyForce(force);
         }
@@ -117,12 +124,13 @@ GFX.Rope = function ( args ) {
                                         springConstant, springLen, springFriction);
     }
 
-    this.MAX_RENDER_TIME = 0.250;
-    this.start = 0;
+    this.MAX_RENDER_TIME = 33.3; // 0.250;
+    //this.start = 0;
     this.t = 0;
-    this.dt = 0.02;
-    this.currentTime = performance.now() / 1e03;
+    this.dt = 2;
+    this.currentTime = performance.now();
     this.accumulator = 0;
+    this.count = 0;
 };
 
 GFX.Rope.prototype = {
@@ -140,8 +148,10 @@ GFX.Rope.prototype = {
 
         for ( i = 0; i<this.particles.length; i++ ) {
             if (i !== 0) {
-                this.particles[i].applyForce(this.gravitation.multiplyScalar(this.particles[i].mass));
-                this.particles[i].applyForce(this.particles[i].curState.vel.multiplyScalar(-this.airFriction));
+                var newGrav = this.gravitation.clone();
+                this.particles[i].applyForce(newGrav.multiplyScalar(this.particles[i].mass));
+                var newVel = this.particles[i].curState.vel.clone();
+                this.particles[i].applyForce( newVel.multiplyScalar(-this.airFriction) );
             }
         }
 
@@ -151,15 +161,18 @@ GFX.Rope.prototype = {
                 vec = new THREE.Vector3(0, 0, 0);
                 vec.copy(particle.curState.vel);
                 vec.y = 0;
-                particle.applyForce(vec.multiplyScalar(-this.groundFriction));
+                var vecFriction = vec.clone();
+                particle.applyForce(vecFriction.multiplyScalar(-this.groundFriction));
                 vec.y = particle.curState.vel.y;
                 vec.x = 0;
                 vec.z = 0;
                 if (vec.y < 0) {
-                    particle.applyForce(vec.multiplyScalar(-this.groundAbsorption));
+                    var vecGround = vec.clone();
+                    particle.applyForce(vecGround.multiplyScalar(-this.groundAbsorption));
                 }
 
-                force = new THREE.Vector3(0, this.groundRepulsion, 0).multiplyScalar(0 - particle.curState.pos.y);
+                force = new THREE.Vector3(0, this.groundRepulsion, 0);
+                force.multiplyScalar(0 - particle.curState.pos.y);
                 particle.applyForce(force);
             }
         }
@@ -168,15 +181,17 @@ GFX.Rope.prototype = {
             this.particles[i].update(dt);
         }
 
-        console.log("pos: " + particle.curState.pos.x.toFixed(2) + " " + particle.curState.pos.y.toFixed(2) + " " +  particle.curState.pos.z.toFixed(2)
-            + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
-            + " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
+        particle = this.particles[49];
+        //console.log("pos: " + particle.curState.pos.x.toFixed(2) + " " + particle.curState.pos.y.toFixed(2) + " " +  particle.curState.pos.z.toFixed(2)
+        //   + " vel:  " + particle.curState.vel.x.toFixed(4) + " " + particle.curState.vel.y.toFixed(4) + " " +  particle.curState.vel.z.toFixed(4)
+        //   + " for:  " + particle.forces.x.toFixed(4) + " " + particle.forces.y.toFixed(4) + " " +  particle.forces.z.toFixed(4));
 
+        this.count++;
     },
 
     timeStep: function() {
 
-        var newTime = performance.now() / 1e03;
+        var newTime = performance.now();
         var deltaTime = Math.min(newTime - this.currentTime, this.MAX_RENDER_TIME);
         this.currentTime = newTime;
 
@@ -184,15 +199,20 @@ GFX.Rope.prototype = {
 
         //console.log("Accum:" + this.accumulator.toFixed(2) + " t: " + this.t.toFixed(2) );
 
+        var n = 0;
         while (this.accumulator >= this.dt) {
             this.accumulator -= this.dt;
 
-            this.update( this.dt );
+            this.update( this.dt / 1000 );
 
             this.t += this.dt;
+
+            n++;
         }
 
         var alpha = this.accumulator / this.dt;
+
+        //console.log("Render: " + this.accumulator.toFixed(2) + " t: " + this.t.toFixed(2) + " n: " + n);
 
         this.renderFunc(this.particles, alpha);
 

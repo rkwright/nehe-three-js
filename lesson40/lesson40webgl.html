@@ -35,7 +35,7 @@
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [0, 12, 30],
+            cameraPos : [0, 12, 20],
             controls:true,
             clearColor:0x888888,
             displayStats:"fps ms"
@@ -131,7 +131,7 @@
 
             var planeFloor = new THREE.Mesh(planeGeo, floorMat);
             planeFloor.rotation.x = -Math.PI / 2.0;
-            planeFloor.position.y = -10;
+            planeFloor.position.y = -0.04;
             gfxScene.add(planeFloor);
         }
 
@@ -151,9 +151,9 @@
                 ropeLine.geometry.vertices[i].set(renderPos.x, renderPos.y, renderPos.z);
             }
 
-            console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2)
-                + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
-                + " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
+           // console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2)
+           //     + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
+           //     + " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
 
             ropeLine.geometry.verticesNeedUpdate = true;
         }

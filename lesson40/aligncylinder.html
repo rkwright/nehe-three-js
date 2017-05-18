@@ -21,6 +21,7 @@
     <script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
     <script src="../js/stats.js" type="text/javascript"></script>
     <script src="../js/gfx-scene.js" type="text/javascript"></script>
+    <script src="js/RopeMesh.js" type="text/javascript"></script>
 </head>
 <body>
 
@@ -54,7 +55,7 @@
             var lineGeom = new THREE.Geometry();
 
             var vec0 = new THREE.Vector3(-2, 3, 1);
-            var vec1 = new THREE.Vector3(8, 6, 2)
+            var vec1 = new THREE.Vector3(8, 6, 2);
             lineGeom.vertices.push(vec0);
             lineGeom.vertices.push(vec1);
 
@@ -63,19 +64,30 @@
 
             //createCylinderOnVec( vec0, vec1 );
 
-            alignCylinder( vec0, vec1, new THREE.MeshLambertMaterial({color:0x444444, wireframe:true}));
+            //alignCylinder( vec0, vec1, new THREE.MeshLambertMaterial({color:0x444444, wireframe:true}));
+
+            var cylinderMat = new THREE.MeshLambertMaterial({color:0x444444, wireframe:true});
+            var ropeMesh = new GFX.RopeMesh();
+
+            var cylinderMesh = ropeMesh.alignCylinder( vec0, vec1, cylinderMat );
+            gfxScene.add( cylinderMesh );
         }
 
+
         function alignCylinder ( point0, point1, material ) {
-            var direction = new THREE.Vector3().subVectors(point1, point0);
+            var direction = new THREE.Vector3();
             var orientation = new THREE.Matrix4();
-            orientation.lookAt(point0, point1, new THREE.Object3D().up);
-            var mat = new THREE.Matrix4();
-            mat.set(1, 0, 0, 0,
+            var threeUp = new THREE.Object3D().up;
+            var matrix = new THREE.Matrix4();
+
+            direction.subVectors(point1, point0);
+            orientation.lookAt(point0, point1, threeUp);
+
+            matrix.set(1, 0, 0, 0,
                     0, 0, 1, 0,
                     0, -1, 0, 0,
                     0, 0, 0, 1);
-            orientation.multiply(mat);
+            orientation.multiply(matrix);
             var edgeGeometry = new THREE.CylinderGeometry(0.5, 0.5, direction.length(), 8, 1);
             var edge = new THREE.Mesh(edgeGeometry, material);
             edge.applyMatrix(orientation);

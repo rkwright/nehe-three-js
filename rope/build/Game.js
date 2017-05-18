@@ -93,7 +93,7 @@
     Particle.prototype.update = function(dt) {
       this.prevState.set(this.curState);
       this.curState.vel.add(acceleration(this.forces, this.mass).times_s(dt));
-      return this.curState.pos.add(this.curState.vel.times_s(dt));
+      this.curState.pos.add(this.curState.vel.times_s(dt));
     };
 
     return Particle;
@@ -236,9 +236,9 @@
         currPos = this.particles[i].curState.pos;
         renderPos = currPos.times_s(blending).plus(prevPos.times_s(1 - blending));
 
-          console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2)
-              + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
-              + " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
+          //console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2)
+          //    + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
+          //+ " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
 
           this.line.geometry.vertices[i].set(renderPos.x, renderPos.y, renderPos.z);
         this.shadow.geometry.vertices[i].set(renderPos.x, -0.02, renderPos.z);
@@ -289,15 +289,23 @@
     frameTime = Math.min(newTime - currentTime, MAX_RENDER_DT);
     currentTime = newTime;
     accumulator += frameTime;
+
+    //console.log("Accum:" + accumulator.toFixed(2) + " t: " + t.toFixed(2) );
+
+    var n = 0;
     while (accumulator >= PHYSICS_DT) {
 
       rope.update(PHYSICS_DT / 1000);
 
       t += PHYSICS_DT;
       accumulator -= PHYSICS_DT;
+
+      n++;
     }
 
-    blending = accumulator / PHYSICS_DT;
+      //console.log("Render: " + accumulator.toFixed(2) + " t: " + t.toFixed(2) + " n: "  + n);
+
+      blending = accumulator / PHYSICS_DT;
     rope.render(blending);
 
     renderer.render(scene, camera);

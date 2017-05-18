@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- -------------------------------------
+        Very roughly based (or inspired by) NeHe Tutorial 36
+	Original:  http://nehe.gamedev.net/tutorial/playing_avi_files_in_opengl/23001/
+    Largely cloned from https://medium.com/@andrew_b_berg/volumetric-light-scattering-in-three-js-6e1850680a41
+
+    @author: rkwright@geofx.com
+	-------------------------------------- -->
+	<title>Align Cylinder</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+    <!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="../css/NEHE.css" />
+
+    <!-- Include several libraries from THREE.js and the Scene class  -->
+	<script src="../js/three.js" type="text/javascript"></script>
+    <script src="../js/Detector.js" type="text/javascript"></script>
+    <script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
+    <script src="../js/stats.js" type="text/javascript"></script>
+    <script src="../js/gfx-scene.js" type="text/javascript"></script>
+</head>
+<body>
+
+	<div style="position: absolute; top: 10px; left: 10px;color:white">
+		<p></p>
+	</div>
+
+	<script type="text/javascript">
+
+        // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+        var gfxScene = new GFX.Scene( {
+            cameraPos : [2, 5, 20],
+            controls:true,
+            clearColor:0x222222,
+            displayStats:"fps ms"
+        });
+
+        // then initialize our demo's stuff
+        initializeDemo();
+
+        // Animate the scene
+        animateScene();
+
+        /**
+         * Initialize the Demo.
+         */
+        function initializeDemo() {
+
+            var lineMat = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 4 });
+            var lineGeom = new THREE.Geometry();
+
+            var vec0 = new THREE.Vector3(0, 0, 0);
+            var vec1 = new THREE.Vector3(10, 6, 2)
+            lineGeom.vertices.push(vec0);
+            lineGeom.vertices.push(vec1);
+
+            var lineVec = new THREE.Line(lineGeom, lineMat);
+            gfxScene.add(lineVec);
+
+            var len = vec1.length();
+            var cylinderGeom = new THREE.CylinderGeometry(0.5, 0.5, len, 8);
+            var cylinderMesh = new THREE.Mesh(cylinderGeom, new THREE.MeshLambertMaterial({color:0x444444, wireframe:true}));
+            //cylinderMesh.position.set(0, 0, 0);
+            var axis = new THREE.Vector3(0, 1, 0);
+            cylinderMesh.quaternion.setFromUnitVectors(axis, vec1.clone().normalize());
+            cylinderMesh.position.copy(vec1.clone().multiplyScalar(0.5));
+            gfxScene.add(cylinderMesh);
+
+        }
+
+        /**
+         * Animate the scene and call rendering.
+         */
+        function animateScene() {
+
+            // Tell the browser to call this function when page is visible
+            requestAnimationFrame(animateScene);
+
+            // Map the 3D scene down to the 2D screen (render the frame)
+            gfxScene.renderScene();
+        }
+    </script>
+</body>
+</html>

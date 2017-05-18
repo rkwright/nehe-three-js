@@ -35,7 +35,7 @@
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [0, 12, 20],
+            cameraPos : [0, 1.5, 8],
             controls:true,
             clearColor:0x888888,
             displayStats:"fps ms"
@@ -55,11 +55,11 @@
             var gravity = new THREE.Vector3(0, -9.82, 0);
 
             rope = new GFX.Rope({
-                numOfParticles: 50,
+                numOfParticles: 100,
                 mass: 0.05,
                 springConstant: 12000,
                 springLen: 0.05,
-                springFriction: 0.5,
+                springFriction: 0.25,
                 gravitation: gravity,
                 airFriction: 0.04,
                 groundRepulsion: 100,
@@ -72,7 +72,7 @@
         }
 
         function createRope( particles ) {
-            var lineMat = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 2 });
+            var lineMat = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 4 });
             var lineGeom = new THREE.Geometry();
             var pos;
 

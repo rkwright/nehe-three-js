@@ -32,7 +32,8 @@
 
 	<script type="text/javascript">
         var SPRING_LEN = 0.025;
-        var NUM_PARTICLES = 100
+        var NUM_PARTICLES = 100;
+        var LIGHT_GRAY =  0x888888;
         var rope;
         var ropeMesh;
         var ropeLine;
@@ -42,11 +43,17 @@
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [2, 2.5, 5],
+            cameraPos : [2, 2, 4],
             controls:true,
-            clearColor:0x666666,
+            clearColor:0xc5e1e3,
+            shadowMapEnabled : true,
             displayStats:"fps ms"
         });
+
+        gfxScene.clearAllLights();
+        gfxScene.addLight( 'ambient', { color:0xffffff, intensity : 1 });
+        var dirLight = gfxScene.addLight( 'directional', { color:0xffffff, intensity:0.35,  position:[-10,10,10],
+            castShadow:true, debug:false  });
 
         // then initialize our demo's stuff
         initializeDemo();
@@ -99,7 +106,7 @@
             //ropeTexture.anisotropy = 4;
             var ropeTexture = new THREE.ImageUtils.loadTexture("images/ropeTexture.jpg");
 
-            var cylinderMat = new THREE.MeshLambertMaterial({color:0x444444, wireframe:false, color: 0xC9A379});
+            var cylinderMat = new THREE.MeshLambertMaterial({ wireframe:false, color: 0xb7966f});
 
             ropeMesh = new GFX.RopeMesh();
 
@@ -108,6 +115,7 @@
                 var point1 = particles[i-1].curState.pos;
 
                 var cylinderMesh = ropeMesh.createCylinder(point0, point1, 0.01, cylinderMat);
+                cylinderMesh.castShadow = true;
                 ropeArray.push( cylinderMesh );
 
                 gfxScene.add(cylinderMesh);point0 = point1;
@@ -149,14 +157,16 @@
             var postHt = NUM_PARTICLES * SPRING_LEN * (2 / 3);
 
             var postGeom = new THREE.CylinderGeometry(0.05, 0.05, postHt, 32);
-            var postMesh = new THREE.Mesh(postGeom, new THREE.MeshLambertMaterial({color:0x444444}));
+            var postMesh = new THREE.Mesh(postGeom, new THREE.MeshLambertMaterial({color:LIGHT_GRAY, specular: 0xc0c0c0, shininess:50}));
             postMesh.position.set(0, postHt/2, -1);
+            postMesh.castShadow = true;
             gfxScene.add(postMesh);
 
             var armGeom = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 32);
-            var armMesh = new THREE.Mesh(armGeom, new THREE.MeshLambertMaterial({color:0x444444}));
+            var armMesh = new THREE.Mesh(armGeom, new THREE.MeshLambertMaterial({color:LIGHT_GRAY, specular: 0xc0c0c0, shininess:50}));
             armMesh.rotation.x = Math.PI / 2;
             armMesh.position.set(0, postHt, -0.5);
+            armMesh.castShadow = true;
             gfxScene.add(armMesh);
         }
 
@@ -167,12 +177,12 @@
 
             var planeGeo = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE);
 
-            var floorMat = new THREE.MeshStandardMaterial({
-                roughness: 0.8,
-                color: 0xffffff,
-                bumpScale: 0.0005
+            var floorMat = new THREE.MeshLambertMaterial({
+                color: 0xaaaaaa,
+                side: THREE.DoubleSide
             });
 
+            /*
             var textureLoader = new THREE.TextureLoader();
             textureLoader.load("images/hardwood2_diffuse.jpg", function (texture) {
                 texture.wrapS = THREE.RepeatWrapping;
@@ -203,10 +213,12 @@
                 floorMat.roughnessMap = texture;
                 floorMat.needsUpdate = true;
             });
+            */
 
             var planeFloor = new THREE.Mesh(planeGeo, floorMat);
             planeFloor.rotation.x = -Math.PI / 2.0;
             planeFloor.position.y = -0.04;
+            planeFloor.receiveShadow = true;
             gfxScene.add(planeFloor);
         }
 

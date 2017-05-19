@@ -86,7 +86,6 @@
 
         function createRope( particles ) {
 
-            var ropeTexture = new THREE.ImageUtils.loadTexture("images/ropeTexture.jpg");
             var ropeMat = new THREE.MeshLambertMaterial({ wireframe:false, color: 0xb7966f});
 
             cylinderUtil = new GFX.CylinderUtil();
@@ -133,13 +132,13 @@
             var postHt = NUM_PARTICLES * SPRING_LEN * (2 / 3);
 
             var postGeom = new THREE.CylinderGeometry(0.05, 0.05, postHt, 32);
-            var postMesh = new THREE.Mesh(postGeom, new THREE.MeshLambertMaterial({color:LIGHT_GRAY, specular: 0xc0c0c0, shininess:50}));
+            var postMesh = new THREE.Mesh(postGeom, new THREE.MeshLambertMaterial({color:LIGHT_GRAY}));
             postMesh.position.set(0, postHt/2 - ROPE_DIAMETER, -1);
             postMesh.castShadow = true;
             gfxScene.add(postMesh);
 
             var armGeom = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 32);
-            var armMesh = new THREE.Mesh(armGeom, new THREE.MeshLambertMaterial({color:LIGHT_GRAY, specular: 0xc0c0c0, shininess:50}));
+            var armMesh = new THREE.Mesh(armGeom, new THREE.MeshLambertMaterial({color:LIGHT_GRAY}));
             armMesh.rotation.x = Math.PI / 2;
             armMesh.position.set(0, postHt, -0.5);
             armMesh.castShadow = true;

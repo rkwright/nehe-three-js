@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <!-- -------------------------------------
-        Very roughly based (or inspired by) NeHe Tutorial 36
-	Original:  http://nehe.gamedev.net/tutorial/playing_avi_files_in_opengl/23001/
+        Very roughly based (or inspired by) NeHe Tutorial 40
+	Original:  http://nehe.gamedev.net/tutorial/rope_physics/17006/
     Largely cloned from https://medium.com/@andrew_b_berg/volumetric-light-scattering-in-three-js-6e1850680a41
 
     @author: rkwright@geofx.com
@@ -33,9 +33,10 @@
 	<script type="text/javascript">
         var SPRING_LEN = 0.025;
         var NUM_PARTICLES = 100;
+        var ROPE_DIAMETER = 0.01;
         var LIGHT_GRAY =  0x888888;
         var rope;
-        var ropeMesh;
+        var ropeMeshFactory;
         var ropeLine;
         var ropeArray = [];
         var prevPos = new THREE.Vector3();
@@ -43,22 +44,22 @@
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [2, 2, 4],
+            cameraPos : [2, 1.5, 4],
             controls:true,
             clearColor:0xc5e1e3,
             shadowMapEnabled : true,
             displayStats:"fps ms"
         });
 
+        // set up our custom lights as the default ones don't cast shadows
         gfxScene.clearAllLights();
         gfxScene.addLight( 'ambient', { color:0xffffff, intensity : 1 });
-        var dirLight = gfxScene.addLight( 'directional', { color:0xffffff, intensity:0.35,  position:[-10,10,10],
-            castShadow:true, debug:false  });
+        gfxScene.addLight( 'directional', { color:0xffffff, intensity:0.35,  position:[-10,10,10], castShadow:true  });
 
         // then initialize our demo's stuff
         initializeDemo();
 
-        // Animate the scene
+        // Start the animation
         animateScene();
 
         /**
@@ -66,20 +67,18 @@
          */
         function initializeDemo() {
 
-            var gravity = new THREE.Vector3(0, -9.82, 0);
-
             rope = new GFX.Rope({
                 numOfParticles: NUM_PARTICLES,
                 mass: 0.05,
                 springConstant: 12000,
                 springLen: SPRING_LEN,
                 springFriction: 0.25,
-                gravitation: gravity,
+                gravitation: new THREE.Vector3(0, -9.82, 0),
                 airFriction: 0.04,
                 groundRepulsion: 100,
                 groundFriction: 0.2,
                 groundAbsorption: 2,
-                renderFunc: render
+                renderFunc: renderFunc
             });
 
             createFloor();
@@ -87,49 +86,31 @@
         }
 
         function createRope( particles ) {
-            var lineMat = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 4 });
-            var lineGeom = new THREE.Geometry();
-            var pos;
 
-            for ( var i=0; i<particles.length; i++ ) {
-                pos = particles[i].curState.pos;
-
-                lineGeom.vertices.push(new THREE.Vector3(pos.x, pos.y, pos.z));
-             }
-            ropeLine = new THREE.Line(lineGeom, lineMat);
-            gfxScene.add(ropeLine);
-
-            //var textureLoader = new THREE.TextureLoader();
-            //var ropeTexture = textureLoader.load("images/rope.jpg");
-            //ropeTexture.wrapS = THREE.RepeatWrapping;
-            //ropeTexture.wrapT = THREE.RepeatWrapping;
-            //ropeTexture.anisotropy = 4;
             var ropeTexture = new THREE.ImageUtils.loadTexture("images/ropeTexture.jpg");
+            var ropeMat = new THREE.MeshLambertMaterial({ wireframe:false, color: 0xb7966f});
 
-            var cylinderMat = new THREE.MeshLambertMaterial({ wireframe:false, color: 0xb7966f});
-
-            ropeMesh = new GFX.RopeMesh();
+            ropeMeshFactory = new GFX.RopeMesh();
 
             var point0 = particles[0].curState.pos;
             for ( i=1; i<particles.length; i++ ) {
                 var point1 = particles[i-1].curState.pos;
 
-                var cylinderMesh = ropeMesh.createCylinder(point0, point1, 0.01, cylinderMat);
-                cylinderMesh.castShadow = true;
-                ropeArray.push( cylinderMesh );
+                var ropeMesh = ropeMeshFactory.createCylinder(point0, point1, ROPE_DIAMETER, ropeMat);
+                ropeMesh.castShadow = true;
+                ropeArray.push( ropeMesh );
 
-                gfxScene.add(cylinderMesh);point0 = point1;
+                gfxScene.add(ropeMesh);
+                point0 = point1;
             }
         }
 
-        function render( particles, blending ) {
+        function renderFunc( particles, blending ) {
 
-            if (ropeLine === undefined)
+            if (ropeMeshFactory === undefined)
                 createRope( particles );
 
-            var cylinderMat = new THREE.MeshLambertMaterial({color:0x444444, wireframe:true});
             prevPos.lerpVectors(particles[0].prevState.pos, particles[0].curState.pos, blending);
-            ropeLine.geometry.vertices[0].set(prevPos.x, prevPos.y, prevPos.z);
 
             for ( var i=1; i<particles.length; i++ ) {
                 var particle = particles[i];
@@ -138,10 +119,8 @@
 
                 //console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2));
 
-                ropeLine.geometry.vertices[i].set(curPos.x, curPos.y, curPos.z);
-
                 var mesh = ropeArray[i-1];
-                ropeMesh.alignCylinder( prevPos, curPos, mesh );
+                ropeMeshFactory.alignCylinder( prevPos, curPos, mesh );
 
                 prevPos.copy(curPos);
             }
@@ -149,16 +128,14 @@
            // console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2)
            //     + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
            //     + " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
-
-            ropeLine.geometry.verticesNeedUpdate = true;
         }
 
-        function createPost( posY ) {
+        function createPost() {
             var postHt = NUM_PARTICLES * SPRING_LEN * (2 / 3);
 
             var postGeom = new THREE.CylinderGeometry(0.05, 0.05, postHt, 32);
             var postMesh = new THREE.Mesh(postGeom, new THREE.MeshLambertMaterial({color:LIGHT_GRAY, specular: 0xc0c0c0, shininess:50}));
-            postMesh.position.set(0, postHt/2, -1);
+            postMesh.position.set(0, postHt/2 - ROPE_DIAMETER, -1);
             postMesh.castShadow = true;
             gfxScene.add(postMesh);
 
@@ -171,55 +148,16 @@
         }
 
         function createFloor() {
-            var FLOOR_S = 5;
-            var FLOOR_T = 5;
-            var PLANE_SIZE = 20;
+            var PLANE_SIZE = 10;
 
-            var planeGeo = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE);
+            var floorGeom = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE);
+            var floorMat = new THREE.MeshLambertMaterial({ color: 0xaaaaaa, side: THREE.DoubleSide });
 
-            var floorMat = new THREE.MeshLambertMaterial({
-                color: 0xaaaaaa,
-                side: THREE.DoubleSide
-            });
-
-            /*
-            var textureLoader = new THREE.TextureLoader();
-            textureLoader.load("images/hardwood2_diffuse.jpg", function (texture) {
-                texture.wrapS = THREE.RepeatWrapping;
-                texture.wrapT = THREE.RepeatWrapping;
-                texture.anisotropy = 4;
-                texture.repeat.set(FLOOR_S, FLOOR_T);
-                floorMat.side = THREE.DoubleSide;
-                floorMat.map = texture;
-                floorMat.needsUpdate = true;
-            });
-
-            textureLoader.load("images/hardwood2_bump.jpg", function (texture) {
-                texture.wrapS = THREE.RepeatWrapping;
-                texture.wrapT = THREE.RepeatWrapping;
-                texture.anisotropy = 4;
-                texture.repeat.set(FLOOR_S, FLOOR_T);
-                floorMat.side = THREE.DoubleSide;
-                floorMat.bumpMap = texture;
-                floorMat.needsUpdate = true;
-            });
-
-            textureLoader.load("images/hardwood2_roughness.jpg", function (texture) {
-                texture.wrapS = THREE.RepeatWrapping;
-                texture.wrapT = THREE.RepeatWrapping;
-                texture.anisotropy = 4;
-                texture.repeat.set(FLOOR_S, FLOOR_T);
-                floorMat.side = THREE.DoubleSide;
-                floorMat.roughnessMap = texture;
-                floorMat.needsUpdate = true;
-            });
-            */
-
-            var planeFloor = new THREE.Mesh(planeGeo, floorMat);
-            planeFloor.rotation.x = -Math.PI / 2.0;
-            planeFloor.position.y = -0.04;
-            planeFloor.receiveShadow = true;
-            gfxScene.add(planeFloor);
+            var floorMesh = new THREE.Mesh(floorGeom, floorMat);
+            floorMesh.rotation.x = -Math.PI / 2.0;
+            floorMesh.position.y = -ROPE_DIAMETER;
+            floorMesh.receiveShadow = true;
+            gfxScene.add(floorMesh);
         }
 
         /**

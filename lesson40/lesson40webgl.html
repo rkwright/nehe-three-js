@@ -22,6 +22,7 @@
     <script src="../js/stats.js" type="text/javascript"></script>
     <script src="../js/gfx-scene.js" type="text/javascript"></script>
     <script src="js/Rope.js" type="text/javascript"></script>
+    <script src="js/RopeMesh.js" type="text/javascript"></script>
 </head>
 <body>
 
@@ -30,10 +31,14 @@
 	</div>
 
 	<script type="text/javascript">
-        var rope;
-        var ropeLine;
         var SPRING_LEN = 0.025;
         var NUM_PARTICLES = 100
+        var rope;
+        var ropeMesh;
+        var ropeLine;
+        var ropeArray = [];
+        var prevPos = new THREE.Vector3();
+        var curPos  = new THREE.Vector3();
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
@@ -86,6 +91,58 @@
              }
             ropeLine = new THREE.Line(lineGeom, lineMat);
             gfxScene.add(ropeLine);
+
+            //var textureLoader = new THREE.TextureLoader();
+            //var ropeTexture = textureLoader.load("images/rope.jpg");
+            //ropeTexture.wrapS = THREE.RepeatWrapping;
+            //ropeTexture.wrapT = THREE.RepeatWrapping;
+            //ropeTexture.anisotropy = 4;
+            var ropeTexture = new THREE.ImageUtils.loadTexture("images/ropeTexture.jpg");
+
+            var cylinderMat = new THREE.MeshLambertMaterial({color:0x444444, wireframe:false, color: 0xC9A379});
+
+            ropeMesh = new GFX.RopeMesh();
+
+            var point0 = particles[0].curState.pos;
+            for ( i=1; i<particles.length; i++ ) {
+                var point1 = particles[i-1].curState.pos;
+
+                var cylinderMesh = ropeMesh.createCylinder(point0, point1, 0.01, cylinderMat);
+                ropeArray.push( cylinderMesh );
+
+                gfxScene.add(cylinderMesh);point0 = point1;
+            }
+        }
+
+        function render( particles, blending ) {
+
+            if (ropeLine === undefined)
+                createRope( particles );
+
+            var cylinderMat = new THREE.MeshLambertMaterial({color:0x444444, wireframe:true});
+            prevPos.lerpVectors(particles[0].prevState.pos, particles[0].curState.pos, blending);
+            ropeLine.geometry.vertices[0].set(prevPos.x, prevPos.y, prevPos.z);
+
+            for ( var i=1; i<particles.length; i++ ) {
+                var particle = particles[i];
+
+                curPos.lerpVectors(particle.prevState.pos, particle.curState.pos, blending);
+
+                //console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2));
+
+                ropeLine.geometry.vertices[i].set(curPos.x, curPos.y, curPos.z);
+
+                var mesh = ropeArray[i-1];
+                ropeMesh.alignCylinder( prevPos, curPos, mesh );
+
+                prevPos.copy(curPos);
+            }
+
+           // console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2)
+           //     + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
+           //     + " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
+
+            ropeLine.geometry.verticesNeedUpdate = true;
         }
 
         function createPost( posY ) {
@@ -151,29 +208,6 @@
             planeFloor.rotation.x = -Math.PI / 2.0;
             planeFloor.position.y = -0.04;
             gfxScene.add(planeFloor);
-        }
-
-        function render( particles, blending ) {
-            var renderPos = new THREE.Vector3();
-
-            if (ropeLine === undefined)
-                createRope( particles );
-
-            for ( var i =  0; i<particles.length; i++ ) {
-                var particle = particles[i];
-
-                renderPos.lerpVectors(particles[i].prevState.pos, particles[i].curState.pos, blending);
-
-                //console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2));
-
-                ropeLine.geometry.vertices[i].set(renderPos.x, renderPos.y, renderPos.z);
-            }
-
-           // console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2)
-           //     + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
-           //     + " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
-
-            ropeLine.geometry.verticesNeedUpdate = true;
         }
 
         /**

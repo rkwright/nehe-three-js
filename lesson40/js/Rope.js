@@ -60,8 +60,7 @@ GFX.Spring.prototype = {
 
     solve: function() {
 
-        var springVector = this.particle2.curState.pos.clone();
-        springVector.sub(this.particle1.curState.pos);
+        var springVector = this.particle2.curState.pos.clone().sub(this.particle1.curState.pos);
         var len = springVector.length();
         var force = new THREE.Vector3(0, 0, 0);
         if (len !== 0) {
@@ -69,9 +68,7 @@ GFX.Spring.prototype = {
             force.add(springVector.multiplyScalar(len - this.springLen).multiplyScalar(this.springConstant));
         }
 
-        var newVel1 = this.particle1.curState.vel.clone();
-        var newVel2 = this.particle2.curState.vel.clone();
-        newVel1.sub(newVel2);
+        var newVel1 = this.particle1.curState.vel.clone().sub(this.particle2.curState.vel);
         newVel1.multiplyScalar( -this.friction );
         force.add( newVel1 );
 
@@ -120,12 +117,11 @@ GFX.Rope = function ( args ) {
     this.springs = [];
 
     for ( i = 0; i<numParticles - 1; i++ ) {
-        this.springs[i] = new GFX.Spring(this.particles[i], this.particles[i + 1],
-                                        springConstant, springLen, springFriction);
+        this.springs[i] = new GFX.Spring(this.particles[i], this.particles[i + 1], springConstant, springLen, springFriction);
     }
 
-    this.MAX_RENDER_TIME = 33.3; // 0.250;
-    //this.start = 0;
+    // time step variables - should be local to the timestep?
+    this.MAX_RENDER_TIME = 33.3;
     this.t = 0;
     this.dt = 2;
     this.currentTime = performance.now();
@@ -136,7 +132,7 @@ GFX.Rope = function ( args ) {
 GFX.Rope.prototype = {
 
     update: function( dt ) {
-        var i, force, particle, vec;
+        var i, force, particle, vel;
 
         for (i = 0; i<this.particles.length; i++ ) {
             this.particles[i].forces.set(0, 0, 0);
@@ -158,16 +154,16 @@ GFX.Rope.prototype = {
         for ( i = 0; i<this.particles.length; i++ ) {
             particle = this.particles[i];
             if (particle.curState.pos.y < 0) {
-                vec = new THREE.Vector3(0, 0, 0);
-                vec.copy(particle.curState.vel);
-                vec.y = 0;
-                var vecFriction = vec.clone();
+                vel = new THREE.Vector3(0, 0, 0);
+                vel.copy(particle.curState.vel);
+                vel.y = 0;
+                var vecFriction = vel.clone();
                 particle.applyForce(vecFriction.multiplyScalar(-this.groundFriction));
-                vec.y = particle.curState.vel.y;
-                vec.x = 0;
-                vec.z = 0;
-                if (vec.y < 0) {
-                    var vecGround = vec.clone();
+                vel.y = particle.curState.vel.y;
+                vel.x = 0;
+                vel.z = 0;
+                if (vel.y < 0) {
+                    var vecGround = vel.clone();
                     particle.applyForce(vecGround.multiplyScalar(-this.groundAbsorption));
                 }
 
@@ -181,8 +177,8 @@ GFX.Rope.prototype = {
             this.particles[i].update(dt);
         }
 
-        particle = this.particles[49];
-        //console.log("pos: " + particle.curState.pos.x.toFixed(2) + " " + particle.curState.pos.y.toFixed(2) + " " +  particle.curState.pos.z.toFixed(2)
+        // particle = this.particles[49];
+        // console.log("pos: " + particle.curState.pos.x.toFixed(2) + " " + particle.curState.pos.y.toFixed(2) + " " +  particle.curState.pos.z.toFixed(2)
         //   + " vel:  " + particle.curState.vel.x.toFixed(4) + " " + particle.curState.vel.y.toFixed(4) + " " +  particle.curState.vel.z.toFixed(4)
         //   + " for:  " + particle.forces.x.toFixed(4) + " " + particle.forces.y.toFixed(4) + " " +  particle.forces.z.toFixed(4));
 

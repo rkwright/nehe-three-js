@@ -2,14 +2,14 @@
  * RopeMesh.js
  *
  */
-GFX.RopeMesh = function () {
+GFX.CylinderUtil = function () {
     this.direction = new THREE.Vector3();
     this.orientation = new THREE.Matrix4();
     this.threeUp = new THREE.Object3D().up;
     this.matrix = new THREE.Matrix4();
 };
 
-GFX.RopeMesh.prototype = {
+GFX.CylinderUtil.prototype = {
 
     createCylinder: function ( point0, point1, diameter, material ) {
         this.direction.subVectors(point1, point0);

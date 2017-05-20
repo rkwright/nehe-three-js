@@ -97,28 +97,28 @@
             }
 
 			function loadOBJ() {
-                var manager = new THREE.LoadingManager();
-                //Loader for Obj from Three.js
-                var loader = new THREE.OBJLoader( manager );
+                    var manager = new THREE.LoadingManager();
+                    //Loader for Obj from Three.js
+                    var loader = new THREE.OBJLoader( manager );
 
-                //Launch loading of the obj file, addBananaInScene is the callback when it's ready
-                loader.load( 'models/OBJ/banana.obj', onLoadOBJ);
-			}
+                    //Launch loading of the obj file, addBananaInScene is the callback when it's ready
+                    loader.load( 'models/OBJ/banana.obj', onLoadOBJ);
+                }
 
-            function onLoadOBJ (object) {
-                var bbs = getBoundingSphere( object );
+                function onLoadOBJ (object) {
+                    var bbs = getBoundingSphere( object );
 
-                moveObjectToOrigin(object, bbs, 1);
+                    moveObjectToOrigin(object, bbs, 1);
 
-                //Go through all children of the loaded object and search for a Mesh
-                object.traverse( function ( child ) {
-                    //This allow us to check if the children is an instance of the Mesh constructor
-                    if (child instanceof THREE.Mesh){
-                        child.material.color = new THREE.Color(0XFFFF00);
-                        // Sometimes there are some vertex normals missing in the .obj files, three.js will compute them
-                        child.geometry.computeVertexNormals();
-                    }
-                });
+                    //Go through all children of the loaded object and search for a Mesh
+                    object.traverse( function ( child ) {
+                        //This allow us to check if the children is an instance of the Mesh constructor
+                        if (child instanceof THREE.Mesh){
+                            child.material.color = new THREE.Color(0XFFFF00);
+                            // Sometimes there are some vertex normals missing in the .obj files, three.js will compute them
+                            child.geometry.computeVertexNormals();
+                        }
+                    });
 
                 modelMesh = object;
                 //modelMesh.scale.set(1,1,1);

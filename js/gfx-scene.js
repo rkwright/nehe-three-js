@@ -196,7 +196,7 @@ GFX.Scene.prototype = {
 		if (this.floorRepeat !== 0)
 			this.addFloor(this.floorRepeat);
 
-        // set up the stats window(s) if reqquested
+        // set up the stats window(s) if requested
 		this.setupStats( container );
 	},
 
@@ -396,7 +396,7 @@ GFX.Scene.prototype = {
             child = container.appendChild( this.fpStats.dom );
         }
 
-        if (this.displayStats.indexOf("ms") !== -1) {
+        if (typeof this.displayStats === 'string' && this.displayStats.indexOf("ms") !== -1) {
             this.msStats = new Stats();
             this.msStats.showPanel(1);
             this.msStats.domElement.style.position = 'absolute';
@@ -407,7 +407,7 @@ GFX.Scene.prototype = {
             container.appendChild( this.msStats.dom );
         }
 
-        if (this.displayStats.indexOf("mb") !== -1) {
+        if (typeof this.displayStats === 'string' && this.displayStats.indexOf("mb") !== -1) {
             this.mbStats = new Stats();
             this.mbStats.showPanel(2);
             this.mbStats.domElement.style.position = 'absolute';

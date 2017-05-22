@@ -174,7 +174,7 @@ THREE.ShaderGodRays = {
 			},
 
 			fGodRayIntensity: {
-				value: 0.69
+				value: 0.9  //0.69
 			},
 
 			vSunPositionScreenSpace: {

@@ -9,7 +9,7 @@
 
     @author: rkwright@geofx.com
 	-------------------------------------- -->
-	<title>NEHE Lesson 40</title>
+	<title>NEHE Lesson 41</title>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
     <!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
@@ -47,7 +47,7 @@
             //controls:true,
             clearColor:0xc5e1e3,
             shadowMapEnabled : true,
-            displayStats:"fps ms"
+            displayStats: true
         });
 
         // then initialize our demo's stuff
@@ -156,14 +156,16 @@
          */
         function animateScene() {
 
+            gfxScene.fpStats.update();
+
             // Tell the browser to call this function when page is visible
             requestAnimationFrame(animateScene);
 
             // Map the 3D scene down to the 2D screen (render the frame)
             //gfxScene.renderScene();
 
-            knot.rotation.x += 0.003;
-            knot.rotation.y += 0.003;
+            knot.rotation.x += 0.005;
+            knot.rotation.y += 0.005;
             //knot.rotation.z += 0.005;
 
             render();
@@ -227,23 +229,19 @@
                 // -- Draw scene objects --
 
                 // Colors
-
                 gfxScene.scene.overrideMaterial = null;
                 gfxScene.renderer.render( gfxScene.scene, gfxScene.camera, postprocessing.rtTextureColors );
 
                 // Depth
-
                 gfxScene.scene.overrideMaterial = materialDepth;
                 gfxScene.renderer.render( gfxScene.scene, gfxScene.camera, postprocessing.rtTextureDepth, true );
 
                 // -- Render god-rays --
 
                 // Maximum length of god-rays (in texture space [0,1]X[0,1])
-
                 var filterLen = 1.0;
 
                 // Samples taken by filter
-
                 var TAPS_PER_PASS = 6.0;
 
                 // Pass order could equivalently be 3,2,1 (instead of 1,2,3), which

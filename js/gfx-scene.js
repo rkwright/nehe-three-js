@@ -437,6 +437,14 @@ GFX.Scene.prototype = {
             this.mbStats.update();
 	},
 
+    updateStats: function() {
+        if (this.fpStats !== null && typeof this.fpStats !== 'undefined')
+            this.fpStats.update();
+        if (this.msStats !== null && typeof this.msStats !== 'undefined')
+            this.msStats.update();
+        if (this.mbStats !== null && typeof this.mbStats !== 'undefined')
+            this.mbStats.update();
+    },
 	addFog: function( values ) {
 		
 		if ( values !== undefined ) {
@@ -504,7 +512,7 @@ GFX.Scene.prototype = {
 		
 		//console.log("drawAxis " + axis + " ht: " +  AXIS_HEIGHT + ", " + AXIS_STEP + " color: " + axisColor);
 	
-		for ( i=0; i<(AXIS_HEIGHT/AXIS_STEP); i++ )
+		for ( var i=0; i<(AXIS_HEIGHT/AXIS_STEP); i++ )
 		{
 			//console.log("loop " +  i);
 			

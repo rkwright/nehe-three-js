@@ -46,7 +46,7 @@
 
         uniform float uKd;
         uniform float uBorder;
-
+        uniform float uLevels;
         varying vec3 vNormal;
         varying vec3 vViewPosition;
 
@@ -62,15 +62,8 @@
             //float diffuse = max( dot( normal, lVector ), 0.0);
             float diffuse = dot( normal, lVector );
 
-            if ( diffuse > 0.6 ) {
-                diffuse = 1.0;
-            }
-            else if ( diffuse > -0.2 ) {
-                diffuse = 0.7;
-            }
-            else {
-                diffuse = 0.3;
-            }
+            float sign = diffuse < 0.0 ? -1.0 : 1.0;
+            diffuse = (floor((abs(diffuse) + 0.001) * uLevels ) / uLevels) * sign + (1.0 / (uLevels * 2.0));
 
             gl_FragColor = vec4( uKd * uMaterialColor * uDirLightColor * diffuse, 1.0 );
         }
@@ -81,6 +74,7 @@
     // global variables  (ick)
     var modelMesh;
     var phongMaterial;
+    var nLevels = 4.0;
 
     // allocate the Scene object, request orbitControls and the stats
     var gfxScene = new GFX.Scene( {
@@ -89,6 +83,15 @@
         defaultLights: false,
         displayStats:true
     });
+
+    var N = 4;
+    for ( var k=0; k<10; k++ ) {
+        var diffus = ((-1 + k * 0.2) + 1) / 2;
+        var sign = diffus < 0 ? -1.0 : 1.0;
+        var val = (Math.floor((Math.abs(diffus) + 0.001) * N ) / N) * sign + (1 / (N * 2));
+        console.log("k: " + k + " diffus: " + diffus.toFixed(2) + " val: " + val.toFixed(3));
+    }
+
 
     // we can't use the default lights because we need to pass the directional light to the shader
     gfxScene.clearAllLights();
@@ -131,14 +134,9 @@
 
                     "uMaterialColor": { type: "c", value: new THREE.Color( 0xFFFFFF ) },
 
-                    uKd: {
-                        type: "f",
-                        value: 0.7
-                    },
-                    uBorder: {
-                        type: "f",
-                        value: 0.4
-                    }
+                    uKd:     { type: "f", value: 0.7 },
+                    uBorder: { type: "f", value: 0.4 },
+                    uLevels: { type: "f", value: nLevels }
                 }
             }
         };
@@ -203,13 +201,13 @@
         gfxScene.remove(modelMesh);
 
         switch (type) {
-            case '1':
+            case 't':
                 loadTeapot();
                 break;
-            case '2':
+            case 'r':
                 loadRabbit();
                 break;
-            case '3':
+            case 'k':
                 loadKnot();
                 break;
         }
@@ -217,29 +215,28 @@
 
     function onDocumentKeyPress(event) {
         // Get the key code of the pressed key
-        var keyChar = String.fromCharCode(event.which);
-        keyChar = keyChar.toLowerCase();
+        var keyChar = String.fromCharCode(event.which).toLowerCase();
 
-        var modelString = "123";
-        var matString = "ptw";
+        var levelString = "2345678";
+        var modelString = "trk";
 
         if ( modelString.indexOf(keyChar) !== -1) {
              switchModel(keyChar);
         }
-        //else if (matString.indexOf(keyChar) !== -1) {
-            //quadMaterial = makeMaterial(keyChar);
-            //quadric = makeQuad(quadType);
-        //}
+        else if (levelString.indexOf(keyChar) !== -1) {
+            nLevels = keyChar - '0';
+        }
     }
     /**
      * Animate the scene and call rendering.
      */
     function animateScene() {
 
-        //model.rotation.x += 0.005;
         if (modelMesh !== undefined)
             modelMesh.rotation.y += 0.01;
-        //model.rotation.z += 0.005;
+
+        // pass the levels value down to the shader
+        phongMaterial.uniforms.uLevels.value = nLevels;
 
         // Map the 3D scene down to the 2D screen (render the frame)
         gfxScene.renderScene();

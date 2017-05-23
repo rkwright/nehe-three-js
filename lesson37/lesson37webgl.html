@@ -59,7 +59,6 @@
             vec3 normal = normalize( vNormal );
 
             // check the diffuse dot product against uBorder and adjust diffuse value accordingly.
-            //float diffuse = max( dot( normal, lVector ), 0.0);
             float diffuse = dot( normal, lVector );
 
             float sign = diffuse < 0.0 ? -1.0 : 1.0;
@@ -134,7 +133,7 @@
 
                     "uMaterialColor": { type: "c", value: new THREE.Color( 0xFFFFFF ) },
 
-                    uKd:     { type: "f", value: 0.7 },
+                    uKd:     { type: "f", value: 0.9 },
                     uBorder: { type: "f", value: 0.4 },
                     uLevels: { type: "f", value: nLevels }
                 }

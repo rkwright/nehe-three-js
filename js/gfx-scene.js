@@ -13,7 +13,6 @@ GFX.Scene = function ( parameters ) {
 	
 	this.scene = null;
 	this.renderer = null;
-	this.camera = null;
     this.containerID = null;
     this.shadowMapEnabled = false;
 
@@ -23,6 +22,7 @@ GFX.Scene = function ( parameters ) {
 	this.canvasWidth = 0;
 	this.canvasHeight = 0;
 
+    this.camera = null;
     this.perspective = true;
     this.fov = 45;
     this.near = 0.01;

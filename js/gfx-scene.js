@@ -22,7 +22,9 @@ GFX.Scene = function ( parameters ) {
 	this.canvasWidth = 0;
 	this.canvasHeight = 0;
 
-    this.camera = null;
+	this.defaultCamera = true;
+    this.cameras = [];
+    // these are the default values that can be overridden by the user
     this.perspective = true;
     this.fov = 45;
     this.near = 0.01;
@@ -31,7 +33,7 @@ GFX.Scene = function ( parameters ) {
     this.orthoSize = 1;
 
 	this.controls = false;
-	this.orbitControls = null;
+	this.orbitControls = [];
 
 	this.displayStats = false;
 	this.fpStats = null;
@@ -163,13 +165,14 @@ GFX.Scene.prototype = {
 			this.canvasHeight = container.clientHeight;
 		}
 	
-		// set up the camera
-		this.setCamera(null);
-	
 		// allocate the THREE.js renderer
 		this.renderer = new THREE.WebGLRenderer({antialias:true});
-	
-		// Set the background color of the renderer to black, with full opacity
+
+        // set up the camera
+        if (this.defaultCamera === true)
+            this.setDefaultCamera();
+
+        // Set the background color of the renderer to black or the user-defined color, with full opacity
 		this.renderer.setClearColor(new THREE.Color( this.clearColor ), 1);
 
 		if (this.shadowMapEnabled === true )
@@ -187,8 +190,8 @@ GFX.Scene.prototype = {
 
 		// request the orbitControls be created and enabled
 		// add the controls
-		if (this.controls === true && this.renderer !== null)
-			this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+		//if (this.controls === true && this.renderer !== null)
+		//    this.setDefaultControls();
 		
 		if ( this.axesHeight !== 0 )
 			this.drawAxes(this.axesHeight);
@@ -208,38 +211,102 @@ GFX.Scene.prototype = {
 		this.scene.remove(obj);
 	},
 
+    /**
+     * Render the scene. Map the 3D world to the 2D screen.
+     */
+    renderScene: function() {
+        var i;
+        for ( i=0; i<this.cameras.length; i++ )
+            this.renderer.render(this.scene, this.cameras[i]);
+
+        // the orbit controls, if used, have to be updated as well
+        for ( i=0; i<this.orbitControls.length; i++ ) {
+            if (this.orbitControls[i] !== null && typeof this.orbitControls[i] !== 'undefined')
+                this.orbitControls[i].update();
+        }
+
+        this.updateStats();
+    },
+
 	/**
 	 * Set up the camera for the scene.  Perspective or Orthographic
 	 */
-	setCamera: function ( jsonObj ) {
-	    if (jsonObj !== null)
-	        GFX.setParameters(this, jsonObj);
+	setDefaultCamera: function ( jsonObj ) {
 
-        if (this.perspective === true)
-		    this.camera = new THREE.PerspectiveCamera(this.fov, this.canvasWidth / this.canvasHeight, this.near, this.far);
-        else {
+	    if (this.cameras.length > 0)
+	        this.cameras.pop();
 
-            var aspect = this.canvasWidth / this.canvasHeight;
-            var w2 = this.orthoSize * aspect / 2;
-            var h2 = this.orthoSize / 2;
-            this.camera = new THREE.OrthographicCamera( -w2, w2, h2, -h2, 0.01, 1000);
-
-            //this.camera = new THREE.OrthographicCamera( this.canvasWidth / -2, this.canvasWidth / 2,
-            //    this.canvasHeight / 2, this.canvasHeight / -2, 0.01, 1000 );
-
+	    if ( jsonObj === undefined ) {
+            var newObj = {
+                perspective: this.perspective,
+                cameraPos: this.cameraPos,
+                fov: this.fov,
+                near: this.near,
+                far: this.far
+            };
+            return this.addCamera(newObj, 0);
         }
 
-        this.camera.updateProjectionMatrix();
+	    return this.addCamera( jsonObj, 0 );
+    },
 
-        if (this.cameraPos === undefined)
-			this.camera.position.set(0, 10, 20);
-		else
-			this.camera.position.set(this.cameraPos[0], this.cameraPos[1], this.cameraPos[2]);
+    addCamera: function ( jsonObj, index ) {
+	    // assign the current/default global values to the local values
+	    var perspective = this.perspective;
+	    var cameraPos   = this.cameraPos;
+        var fov         = this.fov;
+        var near        = this.near;
+        var far         = this.far;
+        var orthoSize   = this.orthoSize;
 
-		this.camera.lookAt(this.scene.position);
+        if (jsonObj !== null && jsonObj !== undefined ) {
+            perspective = jsonObj.perspective || this.perspective;
+            cameraPos   = jsonObj.cameraPos || this.camerPos;
+            fov         = jsonObj.fov || this.fov;
+            near        = jsonObj.near || this.near;
+            far         = jsonObj.far || this.far;
+            orthoSize   = jsonObj.orthoSize || this.orthoSize;
+        }
 
-        if (this.controls === true && this.renderer !== null)
-            this.orbitControls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+        var camera;
+        var aspect = this.canvasWidth / this.canvasHeight;
+        if (perspective === true) {
+            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+        }
+        else {
+            var w2 = orthoSize * aspect / 2;
+            var h2 = orthoSize / 2;
+            camera = new THREE.OrthographicCamera( -w2, w2, h2, -h2, 0.01, 1000);
+        }
+
+        camera.updateProjectionMatrix();
+        camera.position.set(cameraPos[0], cameraPos[1], cameraPos[2]);
+
+        camera.lookAt(this.scene.position);
+
+        if ( index === undefined )
+            this.cameras.push( camera );
+        else
+            this.cameras.splice(0, 0, camera);
+
+        this.scene.add(camera);
+
+        if (this.controls === true && this.renderer !== null) {
+            this.orbitControls[this.cameras.length-1] = new THREE.OrbitControls(camera, this.renderer.domElement);
+        }
+    },
+
+    setDefaultControls: function() {
+
+        if (this.cameras.length > 0)
+            this.addControls( this.cameras[0] );
+    },
+
+    addControls: function ( camera ) {
+
+        if (camera !== null && typeof camera !== 'undefined') {
+            this.orbitControls.push( new THREE.OrbitControls(camera, this.renderer.domElement) );
+        }
     },
 
     /**
@@ -389,11 +456,11 @@ GFX.Scene.prototype = {
         if (this.displayStats === true || this.displayStats.indexOf("fps") !== -1) {
             this.fpStats = new Stats();
             this.fpStats.showPanel(0);
-            this.fpStats.domElement.style.position = 'absolute';
+            this.fpStats.domElement.style.position = 'fixed';
             this.fpStats.domElement.style.bottom = pos + 'px';
             pos += 80;
             this.fpStats.domElement.style.zIndex = 100;
-            child = container.appendChild( this.fpStats.dom );
+            container.appendChild( this.fpStats.dom );
         }
 
         if (typeof this.displayStats === 'string' && this.displayStats.indexOf("ms") !== -1) {
@@ -418,25 +485,6 @@ GFX.Scene.prototype = {
         }
     },
 
-    /**
-	 * Render the scene. Map the 3D world to the 2D screen.
-     */
-	renderScene: function() {
-		
-		this.renderer.render(this.scene, this.camera);
-
-		// the orbit controls, if used, have to be updated as well
-		if (this.orbitControls !== null && typeof this.orbitControls !== 'undefined')
-			this.orbitControls.update();
-
-		if (this.fpStats !== null && typeof this.fpStats !== 'undefined')
-			this.fpStats.update();
-        if (this.msStats !== null && typeof this.msStats !== 'undefined')
-            this.msStats.update();
-        if (this.mbStats !== null && typeof this.mbStats !== 'undefined')
-            this.mbStats.update();
-	},
-
     updateStats: function() {
         if (this.fpStats !== null && typeof this.fpStats !== 'undefined')
             this.fpStats.update();
@@ -445,6 +493,7 @@ GFX.Scene.prototype = {
         if (this.mbStats !== null && typeof this.mbStats !== 'undefined')
             this.mbStats.update();
     },
+
 	addFog: function( values ) {
 		
 		if ( values !== undefined ) {
@@ -509,7 +558,8 @@ GFX.Scene.prototype = {
 		var    	AXIS_SEGMENTS = 32;
 		var		AXIS_GRAY     = 0x777777;
 		var		AXIS_WHITE    = 0xEEEEEE;
-		
+		var     curColor;
+
 		//console.log("drawAxis " + axis + " ht: " +  AXIS_HEIGHT + ", " + AXIS_STEP + " color: " + axisColor);
 	
 		for ( var i=0; i<(AXIS_HEIGHT/AXIS_STEP); i++ )

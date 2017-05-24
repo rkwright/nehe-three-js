@@ -83,9 +83,9 @@
 				var keyChar = String.fromCharCode(event.which);
 
                 if (keyChar === 'p')
-                    gfxScene.setCamera({ perspective:true, cameraPos:[15,10,10], fov : 90  });
+                    gfxScene.setDefaultCamera({ perspective:true, cameraPos:[15,10,10], fov : 90  });
                 else if (keyChar === 'o')
-                    gfxScene.setCamera({ perspective:false, cameraPos:[15,10,10] });
+                    gfxScene.setDefaultCamera({ perspective:false, cameraPos:[15,10,10] });
  			}
 			/**
 			 * Animate the scene and call rendering.

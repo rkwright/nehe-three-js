@@ -108,16 +108,16 @@
             // setViewport parameters:
             //  lower_left_x, lower_left_y, viewport_width, viewport_height
 
-            renderer.setViewport( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
-            renderer.clear();
+            gfxScene.renderer.setViewport( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
+            gfxScene.renderer.clear();
 
             // left side
-            renderer.setViewport( 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
-            renderer.render( scene, gfxScene.camera );
+            gfxScene.renderer.setViewport( 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
+            gfxScene.renderer.render( scene, gfxScene.camera );
 
             // right side
-            renderer.setViewport( 0.5 * SCREEN_WIDTH + 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
-            renderer.render( scene, orthoCamera );
+            gfxScene.renderer.setViewport( 0.5 * SCREEN_WIDTH + 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
+            gfxScene.renderer.render( scene, orthoCamera );
         }
     </script>
 </body>

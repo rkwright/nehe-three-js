@@ -33,7 +33,7 @@
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [15,10,15],
+            cameraPos : [-7.75,3,-7.75],
             autoClear: false,
             controls:true,
             floorRepeat : FLOOR_REPEAT,
@@ -42,7 +42,7 @@
             displayStats: true
         });
 
-        var perspectiveCamera = gfxScene.addCamera({perspective:true, cameraPos:[10,8,8], fov : 90});
+        var perspectiveCamera = gfxScene.addCamera({perspective:true, cameraPos:[6,3,6], fov : 90});
 
         var orthoCamera = gfxScene.getCamera(0);
 

@@ -575,6 +575,7 @@ GFX.Scene.prototype = {
 		var floor = new THREE.Mesh(floorGeometry, floorMaterial);
 		floor.position.y = 0.0;
 		floor.rotation.x = Math.PI / 2;
+        floor.receiveShadow = this.shadowMapEnabled;
 		this.scene.add(floor);
 	},
 	

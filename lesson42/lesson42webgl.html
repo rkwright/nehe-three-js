@@ -7,7 +7,7 @@
 
     @author: rkwright@geofx.com
 	-------------------------------------- -->
-	<title>NEHE Lesson 41</title>
+	<title>NEHE Lesson 42</title>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
     <!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
@@ -29,17 +29,22 @@
 
     <script type="text/javascript">
         // global vars (ick)
-        var orthoCamera;
-        var orthoControls;
+        var FLOOR_REPEAT = 5;
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [0, 0, 200],
+            cameraPos : [15,10,15],
+            autoClear: false,
             controls:true,
+            floorRepeat : FLOOR_REPEAT,
             clearColor:0xc5e1e3,
             shadowMapEnabled : true,
             displayStats: true
         });
+
+        var perspectiveCamera = gfxScene.addCamera({perspective:true, cameraPos:[10,8,8], fov : 90});
+
+        var orthoCamera = gfxScene.getCamera(0);
 
         // then initialize our demo's stuff
         initializeDemo();
@@ -52,32 +57,12 @@
          */
         function initializeDemo() {
 
-            addOrthoCamera();
-
             var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
             var colorMaterial = new THREE.MeshPhongMaterial( { color: 0xff3333 } );
             var shape = THREE.SceneUtils.createMultiMaterialObject(
-                new THREE.TorusKnotGeometry( 30, 6, 160, 10, 2, 5 ), [ colorMaterial, wireMaterial ] );
-            shape.position.set(0, 0, 0);
+                new THREE.TorusKnotGeometry( 1, 0.25, 80, 10 ), [ colorMaterial, wireMaterial ] );
+            shape.position.set(0, 2, 0);
             gfxScene.add( shape );
-        }
-
-        function addOrthoCamera() {
-
-            var ORTHO_SIZE = 10;
-            var cameraPos = new THREE.Vector3( 15, 10, 10 );
-            var aspect = 0.5 * window.innerWidth / window.innerHeight;
-            var w2 = ORTHO_SIZE * aspect / 2;
-            var h2 = ORTHO_SIZE / 2;
-            orthoCamera = new THREE.OrthographicCamera( -w2, w2, h2, -h2, 0.01, 1000);
-
-            orthoCamera.updateProjectionMatrix();
-
-            orthoCamera.position.set( cameraPos[0], cameraPos[1], cameraPos[2] );
-
-            orthoCamera.lookAt(gfxScene.scene.position);
-
-            orthoControls = new THREE.OrbitControls( orthoCamera, gfxScene.renderer.domElement );
         }
 
         /**
@@ -90,7 +75,7 @@
             // Tell the browser to call this function when page is visible
             requestAnimationFrame(animateScene);
 
-            orthoControls.update();
+            //orthoControls.update();
             render();
         }
 
@@ -100,9 +85,9 @@
             var HALF_WIDTH = SCREEN_WIDTH / 2;
             var SCREEN_ASPECT =  SCREEN_WIDTH / SCREEN_HEIGHT * 0.5;
 
-            gfxScene.camera.aspect = SCREEN_ASPECT;
-            orthoCamera.aspect   = SCREEN_ASPECT;
-            gfxScene.camera.updateProjectionMatrix();
+            perspectiveCamera.aspect = SCREEN_ASPECT;
+            orthoCamera.aspect       = SCREEN_ASPECT;
+            perspectiveCamera.updateProjectionMatrix();
             orthoCamera.updateProjectionMatrix();
 
             // setViewport parameters:
@@ -111,13 +96,14 @@
             gfxScene.renderer.setViewport( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
             gfxScene.renderer.clear();
 
-            // left side
-            gfxScene.renderer.setViewport( 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
-            gfxScene.renderer.render( scene, gfxScene.camera );
-
             // right side
             gfxScene.renderer.setViewport( 0.5 * SCREEN_WIDTH + 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
-            gfxScene.renderer.render( scene, orthoCamera );
+            gfxScene.renderScene( orthoCamera );
+
+            // left side
+            gfxScene.renderer.setViewport( 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
+            gfxScene.renderScene( perspectiveCamera );
+
         }
     </script>
 </body>

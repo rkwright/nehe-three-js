@@ -167,6 +167,7 @@ GFX.Scene.prototype = {
 	
 		// allocate the THREE.js renderer
 		this.renderer = new THREE.WebGLRenderer({antialias:true});
+		this.renderer.autoClear = this.autoClear;
 
         // set up the camera
         if (this.defaultCamera === true)
@@ -214,17 +215,22 @@ GFX.Scene.prototype = {
     /**
      * Render the scene. Map the 3D world to the 2D screen.
      */
-    renderScene: function() {
-        var i;
-        for ( i=0; i<this.cameras.length; i++ )
-            this.renderer.render(this.scene, this.cameras[i]);
+    renderScene: function( camera ) {
 
-        // the orbit controls, if used, have to be updated as well
-        for ( i=0; i<this.orbitControls.length; i++ ) {
-            if (this.orbitControls[i] !== null && typeof this.orbitControls[i] !== 'undefined')
-                this.orbitControls[i].update();
+        if ( this.cameras.length < 1 )
+            return;
+
+        if (camera === undefined ) {
+
+            for ( var i=0; i<this.cameras.length; i++ )
+                this.renderer.render(this.scene, this.cameras[i]);
+        }
+        else {
+
+            this.renderer.render( this.scene, camera );
         }
 
+        this.updateControls();
         this.updateStats();
     },
 
@@ -260,7 +266,9 @@ GFX.Scene.prototype = {
         var orthoSize   = this.orthoSize;
 
         if (jsonObj !== null && jsonObj !== undefined ) {
-            perspective = jsonObj.perspective || this.perspective;
+            if (jsonObj.perspective !== undefined)
+                perspective = jsonObj.perspective;
+
             cameraPos   = jsonObj.cameraPos || this.camerPos;
             fov         = jsonObj.fov || this.fov;
             near        = jsonObj.near || this.near;
@@ -294,6 +302,18 @@ GFX.Scene.prototype = {
         if (this.controls === true && this.renderer !== null) {
             this.orbitControls[this.cameras.length-1] = new THREE.OrbitControls(camera, this.renderer.domElement);
         }
+
+        return camera;
+    },
+
+    getCamera: function ( index ){
+	    if (this.cameras.length < 1 || index < 0 || index >= this.cameras.length)
+	        return null;
+
+	    if ( index === undefined )
+            return this.cameras[0];
+        else
+            return this.cameras[index];
     },
 
     setDefaultControls: function() {
@@ -306,6 +326,13 @@ GFX.Scene.prototype = {
 
         if (camera !== null && typeof camera !== 'undefined') {
             this.orbitControls.push( new THREE.OrbitControls(camera, this.renderer.domElement) );
+        }
+    },
+
+    updateControls: function () {
+
+        for ( var i=0; i<this.orbitControls.length; i++ ) {
+            this.orbitControls[i].update();
         }
     },
 

@@ -480,6 +480,9 @@ GFX.Scene.prototype = {
 
     setupStats: function( container ) {
         var pos = 0;
+        if (this.displayStats === false)
+            return;
+
         if (this.displayStats === true || this.displayStats.indexOf("fps") !== -1) {
             this.fpStats = new Stats();
             this.fpStats.showPanel(0);

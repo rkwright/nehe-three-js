@@ -15,6 +15,7 @@ GFX.Scene = function ( parameters ) {
 	this.renderer = null;
     this.containerID = null;
     this.shadowMapEnabled = false;
+    this.alphaBuffer = false;
 
     this.clearColor = 0x000000;
     this.autoClear = true;
@@ -166,7 +167,7 @@ GFX.Scene.prototype = {
 		}
 	
 		// allocate the THREE.js renderer
-		this.renderer = new THREE.WebGLRenderer({antialias:true});
+		this.renderer = new THREE.WebGLRenderer({antialias:true, alpha: this.alphaBuffer});
 		this.renderer.autoClear = this.autoClear;
 
         // set up the camera
@@ -428,13 +429,17 @@ GFX.Scene.prototype = {
                 light = new THREE.HemisphereLight(color, groundColor, intensity);
                 this.hemisphereLights.push(light);
              }
-            else if (type === 'spot') {
+            else if (type === 'spotlight') {
                 var angle = this.getLightProp('angle', values, Math.PI/3);
                 var penumbra = this.getLightProp('penumbra', values, 0);
                 distance = this.getLightProp('distance', values, 0);
                 decay = this.getLightProp('decay', values, 1);
                 light = new THREE.SpotLight(color, intensity, distance, angle, penumbra, decay);
                 this.spotLights.push(light);
+            }
+            else {
+                console.error("Unknown type of light: " + type);
+                return undefined;
             }
 
             light.position.set(pos[0], pos[1], pos[2]);

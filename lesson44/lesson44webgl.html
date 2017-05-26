@@ -29,17 +29,20 @@
 
     <script type="text/javascript">
         // global vars (ick)
-        var orthoCamera;
-        var orthoControls;
+        var plane;
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [0, 0, 200],
+            cameraPos : [-20, 15, 45],
+            alphaBuffer: true,
+            defaultLigts: false,
             controls:true,
-            clearColor:0xc5e1e3,
-            shadowMapEnabled : true,
+            clearColor:0x000080,
             displayStats: true
         });
+
+        gfxScene.addLight( 'ambient', { color:0x1c1c1c, intensity : 0.75 });
+        var spotlight = gfxScene.addLight( 'spotlight', { color:0xcccccc, intensity:1,  position:[-40,60,10] });
 
         // then initialize our demo's stuff
         initializeDemo();
@@ -52,34 +55,69 @@
          */
         function initializeDemo() {
 
-            addOrthoCamera();
+            var textureGrass = THREE.ImageUtils.loadTexture("images/grass.jpg");
+            textureGrass.wrapS = THREE.RepeatWrapping;
+            textureGrass.wrapT = THREE.RepeatWrapping;
+            textureGrass.repeat.set(4, 4);
 
-            var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
-            var colorMaterial = new THREE.MeshPhongMaterial( { color: 0xff3333 } );
-            var shape = THREE.SceneUtils.createMultiMaterialObject(
-                new THREE.TorusKnotGeometry( 30, 6, 160, 10, 2, 5 ), [ colorMaterial, wireMaterial ] );
-            shape.position.set(0, 0, 0);
-            gfxScene.add( shape );
+            var planeGeometry = new THREE.PlaneGeometry(1000, 200, 20, 20);
+            var planeMaterial = new THREE.MeshLambertMaterial({map: textureGrass});
+            plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.receiveShadow = true;
+
+            // rotate and position the plane
+            plane.rotation.x = -0.5 * Math.PI;
+            plane.position.x = 15;
+            plane.position.y = 0;
+            plane.position.z = 0
+            
+            gfxScene.add(plane);
+
+            addFlareLight();
         }
 
-        function addOrthoCamera() {
+        function addFlareLight() {
 
-            var ORTHO_SIZE = 10;
-            var cameraPos = new THREE.Vector3( 15, 10, 10 );
-            var aspect = 0.5 * window.innerWidth / window.innerHeight;
-            var w2 = ORTHO_SIZE * aspect / 2;
-            var h2 = ORTHO_SIZE / 2;
-            orthoCamera = new THREE.OrthographicCamera( -w2, w2, h2, -h2, 0.01, 1000);
+            var flareLight = new THREE.DirectionalLight(0xffffff);
+            flareLight.position.set(30, 10, -50);
+            /*
+            flareLight.castShadow = true;
+            flareLight.shadow.camera.near = 0.1;
+            flareLight.shadow.camera.far = 100;
+            flareLight.shadow.camera.fov = 50;
+            flareLight.target = plane;
+            flareLight.distance = 0;
+            flareLight.shadow.camera.near = 2;
+            flareLight.shadow.camera.far = 200;
+            flareLight.shadow.camera.left = -100;
+            flareLight.shadow.camera.right= 100;
+            flareLight.shadow.camera.top = 100;
+            flareLight.shadow.camera.bottom = -100;
+            flareLight.shadow.mapSize.width = 2048;
+            flareLight.shadow.mapSize.height = 2048;
+            */
 
-            orthoCamera.updateProjectionMatrix();
+            gfxScene.add(flareLight);
 
-            orthoCamera.position.set( cameraPos[0], cameraPos[1], cameraPos[2] );
+            // used to determine the switch point for the light animation
+            var invert = 1;
+            var phase = 0;
 
-            orthoCamera.lookAt(gfxScene.scene.position);
+            var textureFlare0 = THREE.ImageUtils.loadTexture("images/lensflare0.png");
+            var textureFlare3 = THREE.ImageUtils.loadTexture("images/lensflare3.png");
 
-            orthoControls = new THREE.OrbitControls( orthoCamera, gfxScene.renderer.domElement );
+            var flareColor = new THREE.Color(0xffaacc);
+            var lensFlare = new THREE.LensFlare(textureFlare0, 350, 0.0, THREE.AdditiveBlending, flareColor);
+
+            lensFlare.add(textureFlare3, 60, 0.6, THREE.AdditiveBlending);
+            lensFlare.add(textureFlare3, 70, 0.7, THREE.AdditiveBlending);
+            lensFlare.add(textureFlare3, 120, 0.9, THREE.AdditiveBlending);
+            lensFlare.add(textureFlare3, 70, 1.0, THREE.AdditiveBlending);
+
+            lensFlare.position = flareLight.position;
+            gfxScene.add(lensFlare);
+
         }
-
         /**
          * Animate the scene and call rendering.
          */
@@ -90,8 +128,7 @@
             // Tell the browser to call this function when page is visible
             requestAnimationFrame(animateScene);
 
-            orthoControls.update();
-            render();
+            gfxScene.renderScene();
         }
 
         function render() {

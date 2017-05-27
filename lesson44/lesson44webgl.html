@@ -7,7 +7,7 @@
 
     @author: rkwright@geofx.com
 	-------------------------------------- -->
-	<title>NEHE Lesson 41</title>
+	<title>NEHE Lesson 44</title>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
     <!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
@@ -35,14 +35,26 @@
         var gfxScene = new GFX.Scene( {
             cameraPos : [-20, 15, 45],
             alphaBuffer: true,
-            defaultLigts: false,
+            defaultLights: false,
             controls:true,
-            clearColor:0x000080,
+            clearColor:0x4444aa,
+            shadowMapEnabled:true,
             displayStats: true
         });
 
-        gfxScene.addLight( 'ambient', { color:0x1c1c1c, intensity : 0.75 });
-        var spotlight = gfxScene.addLight( 'spotlight', { color:0xcccccc, intensity:1,  position:[-40,60,10] });
+        gfxScene.cameras[0].lookAt(new THREE.Vector3(10, 0, 0));
+
+        gfxScene.addLight( 'ambient', { color:0x1c1c1c, intensity : 1 });
+        /*
+        var spotlight = gfxScene.addLight( 'spotlight', {
+            color:0xcccccc,
+            intensity:1,
+            position:[-40,60,10],
+            castShadow:true });
+    */
+        var dirLight = gfxScene.addLight( 'directional', { color:0xffffff, intensity:0.75,  position:[-40,60,10],
+            castShadow:true  });
+
 
         // then initialize our demo's stuff
         initializeDemo();
@@ -55,23 +67,31 @@
          */
         function initializeDemo() {
 
-            var textureGrass = THREE.ImageUtils.loadTexture("images/grass.jpg");
+            var textureGrass = THREE.ImageUtils.loadTexture("images/grass-big.jpg");
             textureGrass.wrapS = THREE.RepeatWrapping;
             textureGrass.wrapT = THREE.RepeatWrapping;
-            textureGrass.repeat.set(4, 4);
+            textureGrass.repeat.set(16, 16);
 
-            var planeGeometry = new THREE.PlaneGeometry(1000, 200, 20, 20);
-            var planeMaterial = new THREE.MeshLambertMaterial({map: textureGrass});
+            var planeGeometry = new THREE.PlaneGeometry(250, 250, 20, 20);
+            var planeMaterial = new THREE.MeshLambertMaterial({map: textureGrass });
             plane = new THREE.Mesh(planeGeometry, planeMaterial);
             plane.receiveShadow = true;
 
             // rotate and position the plane
             plane.rotation.x = -0.5 * Math.PI;
-            plane.position.x = 15;
+            plane.position.x = 0;
             plane.position.y = 0;
-            plane.position.z = 0
-            
+            plane.position.z = 0;
             gfxScene.add(plane);
+
+            var monolith = new THREE.BoxGeometry(4.0, 15.0, 1.0);
+            var monoMat = new THREE.MeshPhongMaterial({ color: '#202020', emissive: 0x000000, shininess:100,
+                specular: 0x555555, shading: THREE.FlatShading  });
+            var monoMesh = new THREE.Mesh(monolith, monoMat);
+            monoMesh.position.set(0,0,0);
+            monoMesh.rotation.y += -Math.PI / 3;
+            monoMesh.castShadow = true;
+            gfxScene.add(monoMesh);
 
             addFlareLight();
         }
@@ -79,29 +99,11 @@
         function addFlareLight() {
 
             var flareLight = new THREE.DirectionalLight(0xffffff);
-            flareLight.position.set(30, 10, -50);
-            /*
-            flareLight.castShadow = true;
-            flareLight.shadow.camera.near = 0.1;
-            flareLight.shadow.camera.far = 100;
-            flareLight.shadow.camera.fov = 50;
+            flareLight.position.set(30, 20, -1000);
             flareLight.target = plane;
             flareLight.distance = 0;
-            flareLight.shadow.camera.near = 2;
-            flareLight.shadow.camera.far = 200;
-            flareLight.shadow.camera.left = -100;
-            flareLight.shadow.camera.right= 100;
-            flareLight.shadow.camera.top = 100;
-            flareLight.shadow.camera.bottom = -100;
-            flareLight.shadow.mapSize.width = 2048;
-            flareLight.shadow.mapSize.height = 2048;
-            */
 
             gfxScene.add(flareLight);
-
-            // used to determine the switch point for the light animation
-            var invert = 1;
-            var phase = 0;
 
             var textureFlare0 = THREE.ImageUtils.loadTexture("images/lensflare0.png");
             var textureFlare3 = THREE.ImageUtils.loadTexture("images/lensflare3.png");
@@ -114,7 +116,7 @@
             lensFlare.add(textureFlare3, 120, 0.9, THREE.AdditiveBlending);
             lensFlare.add(textureFlare3, 70, 1.0, THREE.AdditiveBlending);
 
-            lensFlare.position = flareLight.position;
+            lensFlare.position.copy(flareLight.position);
             gfxScene.add(lensFlare);
 
         }
@@ -129,32 +131,6 @@
             requestAnimationFrame(animateScene);
 
             gfxScene.renderScene();
-        }
-
-        function render() {
-            var SCREEN_WIDTH = window.innerWidth;
-            var SCREEN_HEIGHT = window.innerHeight;
-            var HALF_WIDTH = SCREEN_WIDTH / 2;
-            var SCREEN_ASPECT =  SCREEN_WIDTH / SCREEN_HEIGHT * 0.5;
-
-            gfxScene.camera.aspect = SCREEN_ASPECT;
-            orthoCamera.aspect   = SCREEN_ASPECT;
-            gfxScene.camera.updateProjectionMatrix();
-            orthoCamera.updateProjectionMatrix();
-
-            // setViewport parameters:
-            //  lower_left_x, lower_left_y, viewport_width, viewport_height
-
-            gfxScene.renderer.setViewport( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
-            gfxScene.renderer.clear();
-
-            // left side
-            gfxScene.renderer.setViewport( 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
-            gfxScene.renderer.render( scene, gfxScene.camera );
-
-            // right side
-            gfxScene.renderer.setViewport( 0.5 * SCREEN_WIDTH + 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
-            gfxScene.renderer.render( scene, orthoCamera );
         }
     </script>
 </body>

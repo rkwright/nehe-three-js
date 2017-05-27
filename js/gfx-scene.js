@@ -397,7 +397,8 @@ GFX.Scene.prototype = {
         var intensity = this.getLightProp ('intensity', values, 1);
         var castShadow = this.getLightProp('castShadow', values, false);
         var debug = this.getLightProp('debug', values, false);
-        var distance, decay;
+        var distance = this.getLightProp('distance', values, 100);
+        var decay;
 
         if (type === 'ambient') {
             light = new THREE.AmbientLight( color, intensity );

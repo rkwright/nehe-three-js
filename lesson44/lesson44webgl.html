@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <!-- -------------------------------------
-        Roughly inspired by NeHe Tutorial 42
-	Original:  http://nehe.gamedev.net/tutorial/multiple_viewports/20002/
+    Roughly inspired by NeHe Tutorial 44
+	Original:  http://nehe.gamedev.net/tutorial/3d_lens_flare_with_occlusion_testing/16007/
 
     @author: rkwright@geofx.com
 	-------------------------------------- -->
@@ -30,10 +30,11 @@
     <script type="text/javascript">
         // global vars (ick)
         var plane;
+        var icoMesh1, icoMesh2;
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [-20, 15, 45],
+            cameraPos : [-13, 10, 30],
             alphaBuffer: true,
             defaultLights: false,
             controls:true,
@@ -45,14 +46,7 @@
         gfxScene.cameras[0].lookAt(new THREE.Vector3(10, 0, 0));
 
         gfxScene.addLight( 'ambient', { color:0x1c1c1c, intensity : 1 });
-        /*
-        var spotlight = gfxScene.addLight( 'spotlight', {
-            color:0xcccccc,
-            intensity:1,
-            position:[-40,60,10],
-            castShadow:true });
-    */
-        var dirLight = gfxScene.addLight( 'directional', { color:0xffffff, intensity:0.75,  position:[-40,60,10],
+        gfxScene.addLight( 'directional', { color:0xffffff, intensity:0.75,  position:[-40,60,10],
             castShadow:true  });
 
 
@@ -84,7 +78,7 @@
             plane.position.z = 0;
             gfxScene.add(plane);
 
-            var monolith = new THREE.BoxGeometry(4.0, 15.0, 1.0);
+            var monolith = new THREE.BoxGeometry(4.0, 20.0, 1.0);
             var monoMat = new THREE.MeshPhongMaterial({ color: '#202020', emissive: 0x000000, shininess:100,
                 specular: 0x555555, shading: THREE.FlatShading  });
             var monoMesh = new THREE.Mesh(monolith, monoMat);
@@ -93,10 +87,23 @@
             monoMesh.castShadow = true;
             gfxScene.add(monoMesh);
 
-            addFlareLight();
+            var wireMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true } );
+            var colorMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, transparent:true, opacity:0.35 } );
+
+            icoMesh1 = THREE.SceneUtils.createMultiMaterialObject(
+                new THREE.IcosahedronGeometry( 1, 0 ), [ colorMaterial, wireMaterial ] );
+            icoMesh1.position.set(2, 2, 2);
+            gfxScene.add(icoMesh1);
+
+            icoMesh2 = THREE.SceneUtils.createMultiMaterialObject(
+                new THREE.IcosahedronGeometry( 1, 0 ), [ colorMaterial, wireMaterial ] );
+            icoMesh2.position.set(-2, 2, -2);
+            gfxScene.add(icoMesh2);
+
+            addFlare();
         }
 
-        function addFlareLight() {
+        function addFlare() {
 
             var flareLight = new THREE.DirectionalLight(0xffffff);
             flareLight.position.set(30, 20, -1000);
@@ -118,7 +125,6 @@
 
             lensFlare.position.copy(flareLight.position);
             gfxScene.add(lensFlare);
-
         }
         /**
          * Animate the scene and call rendering.
@@ -129,6 +135,24 @@
 
             // Tell the browser to call this function when page is visible
             requestAnimationFrame(animateScene);
+
+            var timer = Date.now() * 0.01;
+
+            icoMesh1.position.set(
+                Math.cos( timer * 0.1 ) * 5,
+                Math.abs( Math.cos( timer * 0.2 ) ) * 4 + 0.5,
+                Math.sin( timer * 0.1 ) * 5
+            );
+            icoMesh1.rotation.y = ( Math.PI / 2 ) - timer * 0.1;
+            icoMesh1.rotation.z = timer * 0.8;
+
+            icoMesh2.position.set(
+                Math.cos( -timer * 0.1 ) * 5,
+                Math.abs( Math.cos( -timer * 0.2 ) ) * 4 + 0.5,
+                Math.sin( -timer * 0.1 ) * 5
+            );
+            icoMesh2.rotation.y = ( Math.PI / 2 ) - -timer * 0.1;
+            icoMesh2.rotation.z = -timer * 0.8;
 
             gfxScene.renderScene();
         }

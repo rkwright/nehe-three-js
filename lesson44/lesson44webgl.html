@@ -43,14 +43,10 @@
             displayStats: true
         });
 
-        gfxScene.cameras[0].lookAt(new THREE.Vector3(10, 0, 0));
-
         gfxScene.addLight( 'ambient', { color:0x1c1c1c, intensity : 1 });
         gfxScene.addLight( 'directional', { color:0xffffff, intensity:0.75,  position:[-40,60,10],
             castShadow:true  });
 
-
-        // then initialize our demo's stuff
         initializeDemo();
 
         // Start the animation

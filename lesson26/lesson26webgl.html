@@ -47,7 +47,7 @@
                 var planeGeo = new THREE.PlaneBufferGeometry( 20, 20 );
 
                 // MIRROR planes
-                groundMirror = new THREE.Mirror( gfxScene.renderer, gfxScene.camera,
+                groundMirror = new THREE.Mirror( gfxScene.renderer, gfxScene.cameras[0],
                     {
 						textureWidth: gfxScene.canvasWidth,
 						textureHeight: gfxScene.canvasHeight,

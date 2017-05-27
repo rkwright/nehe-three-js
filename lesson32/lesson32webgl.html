@@ -464,7 +464,7 @@
                 vector.set( 2 * (e.clientX / gfxScene.canvasWidth) - 1, 1 - 2 * (e.clientY / gfxScene.canvasHeight ));
 
                  // pass two parameters to RayCaster, where the user clicked and the direction of the camera
-                pointCaster.setFromCamera(vector, gfxScene.camera);
+                pointCaster.setFromCamera(vector, gfxScene.cameras[0]);
 
                 // get all the objects that the ray instersects
                 var intersects = pointCaster.intersectObjects(objects.children);

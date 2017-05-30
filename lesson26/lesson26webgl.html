@@ -47,18 +47,15 @@
                 var planeGeo = new THREE.PlaneBufferGeometry( 20, 20 );
 
                 // MIRROR planes
-                groundMirror = new THREE.Mirror( gfxScene.renderer, gfxScene.cameras[0],
+                groundMirror = new THREE.Mirror( 100, 100,
                     {
 						textureWidth: gfxScene.canvasWidth,
 						textureHeight: gfxScene.canvasHeight,
-						color: 0x505050,
-						debugMode : true
+						color: 0x505050
                     } );
 
-                var mirrorMesh = new THREE.Mesh( planeGeo, groundMirror.material );
-                mirrorMesh.add( groundMirror );
-                mirrorMesh.rotateX( -Math.PI / 2 );
-                gfxScene.add( mirrorMesh );
+                groundMirror.rotateX( -Math.PI / 2 );
+                gfxScene.add( groundMirror );
 
                 var sphereGeom = new THREE.SphereGeometry(1.5, 32, 32);
                 var ballTexture = new THREE.ImageUtils.loadTexture("images/ball.png");
@@ -90,8 +87,6 @@
 	
 				// Tell the browser to call this function when page is visible
 				requestAnimationFrame(animateScene);
-
-                groundMirror.render();
 
                 var timer = Date.now() * 0.01;
 

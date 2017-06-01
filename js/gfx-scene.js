@@ -360,6 +360,14 @@ GFX.Scene.prototype = {
         this.pointLights.push( pointLight );
     },
 
+    getDefaultLight: function ( type ) {
+       if ( type.indexof("directional") !== -1 && this.directionalLights.length > 0 ) {
+           return this.directionalLights[0];
+       }
+       else
+           return undefined;
+    },
+
     /**
 	 * Add one or more lights to the current scene.  If the JSON object is null,
 	 * then the default lights are used.
@@ -410,12 +418,14 @@ GFX.Scene.prototype = {
             if (type === 'directional') {
                 var target = this.getLightProp('target', values, undefined);
                 light = new THREE.DirectionalLight(color, intensity);
-                light.shadow.mapSize.x = 2048;
-                light.shadow.mapSize.y = 2048;
-                light.shadow.camera.left = -20;
-                light.shadow.camera.bottom = -20;
-                light.shadow.camera.right = 20;
-                light.shadow.camera.top = 20;
+                if (this.shadowMapEnabled === true) {
+                    light.shadow.mapSize.x = 2048;
+                    light.shadow.mapSize.y = 2048;
+                    light.shadow.camera.left = -20;
+                    light.shadow.camera.bottom = -20;
+                    light.shadow.camera.right = 20;
+                    light.shadow.camera.top = 20;
+                }
 
                 this.directionalLights.push(light);
            }

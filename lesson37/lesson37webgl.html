@@ -83,24 +83,12 @@
         displayStats:true
     });
 
-    var N = 4;
-    for ( var k=0; k<10; k++ ) {
-        var diffus = ((-1 + k * 0.2) + 1) / 2;
-        var sign = diffus < 0 ? -1.0 : 1.0;
-        var val = (Math.floor((Math.abs(diffus) + 0.001) * N ) / N) * sign + (1 / (N * 2));
-        console.log("k: " + k + " diffus: " + diffus.toFixed(2) + " val: " + val.toFixed(3));
-    }
-
-
     // we can't use the default lights because we need to pass the directional light to the shader
-    gfxScene.clearAllLights();
     gfxScene.addLight( 'ambient', { color:0x333333, intensity : 1 });
     var dirLight = gfxScene.addLight( 'directional', { color:0xffffff, intensity:1.0,  position:[-10,10,20]});
 
-    // then initialize our demo's stuff
     initializeDemo();
 
-    // Animate the scene
     animateScene();
 
     /**
@@ -110,7 +98,7 @@
         var materialColor = new THREE.Color();
         materialColor.setRGB(1.0, 0.8, 0.6);
 
-        phongMaterial = createShaderMaterial("phongDiffuse", dirLight);
+        phongMaterial = createShaderMaterial( dirLight );
 
         phongMaterial.uniforms.uMaterialColor.value.copy(materialColor);
         phongMaterial.side = THREE.DoubleSide;
@@ -120,38 +108,27 @@
         document.addEventListener("keypress", onDocumentKeyPress, false);
     }
 
-    function createShaderMaterial(id, light) {
+    /**
+     *  Just a wrapper for creating the uniforms and the shader material
+     */
+    function createShaderMaterial( light ) {
 
-        // could be a global, defined once, but here for convenience
-        var shaderTypes = {
-            'phongDiffuse' : {
+       var uniforms =  {
 
-                uniforms: {
+            uDirLightPos: { type: "v3", value: light.position },
+            uDirLightColor: { type: "c", value: light.color },
 
-                    "uDirLightPos": { type: "v3", value: new THREE.Vector3() },
-                    "uDirLightColor": { type: "c", value: new THREE.Color( 0xFFFFFF ) },
+            uMaterialColor: { type: "c", value: new THREE.Color( 0xFFFFFF ) },
 
-                    "uMaterialColor": { type: "c", value: new THREE.Color( 0xFFFFFF ) },
-
-                    uKd:     { type: "f", value: 0.9 },
-                    uBorder: { type: "f", value: 0.4 },
-                    uLevels: { type: "f", value: nLevels }
-                }
-            }
-        };
-
-        var shader = shaderTypes[id];
-
-        var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
+            uKd:     { type: "f", value: 0.9 },
+            uBorder: { type: "f", value: 0.4 },
+            uLevels: { type: "f", value: nLevels }
+       };
 
         var vs = document.getElementById("vertexShader").textContent;
         var fs = document.getElementById("fragmentShader").textContent;
-        var material = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
 
-        material.uniforms.uDirLightPos.value = light.position;
-        material.uniforms.uDirLightColor.value = light.color;
-
-        return material;
+        return new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vs, fragmentShader: fs });
     }
 
     function loadTeapot() {

@@ -61,8 +61,10 @@
             // check the diffuse dot product against uBorder and adjust diffuse value accordingly.
             float diffuse = dot( normal, lVector );
 
-            float sign = diffuse < 0.0 ? -1.0 : 1.0;
-            diffuse = (floor((abs(diffuse) + 0.001) * uLevels ) / uLevels) * sign + (1.0 / (uLevels * 2.0));
+            if (uLevels > 0.0) {
+                float sign = diffuse < 0.0 ? -1.0 : 1.0;
+                diffuse = (floor((abs(diffuse) + 0.001) * uLevels ) / uLevels) * sign + (1.0 / (uLevels * 2.0));
+            }
 
             gl_FragColor = vec4( uKd * uMaterialColor * uDirLightColor * diffuse, 1.0 );
         }
@@ -193,7 +195,7 @@
         // Get the key code of the pressed key
         var keyChar = String.fromCharCode(event.which).toLowerCase();
 
-        var levelString = "2345678";
+        var levelString = "012345678";
         var modelString = "trk";
 
         if ( modelString.indexOf(keyChar) !== -1) {

@@ -135,18 +135,18 @@ GFX.Scene.prototype = {
                 var aspect = _self.canvasWidth / _self.canvasHeight;
 
                 if (_self.perspective === true ) {
-                    _self.camera.aspect = aspect;
+                    _self.cameras[0].aspect = aspect;
                 } else {
                     var w2 = _self.orthoSize * aspect / 2;
                     var h2 = _self.orthoSize / 2;
 
-                    _self.camera.left   = -w2;
-                    _self.camera.right  = w2;
-                    _self.camera.top    = h2;
-                    _self.camera.bottom = -h2;
+                    _self.cameras[0].left   = -w2;
+                    _self.cameras[0].right  = w2;
+                    _self.cameras[0].top    = h2;
+                    _self.cameras[0].bottom = -h2;
                 }
 
-                _self.camera.updateProjectionMatrix();
+                _self.cameras[0].updateProjectionMatrix();
                 _self.renderer.setSize( _self.canvasWidth, _self.canvasHeight );
             });
 		}
@@ -361,7 +361,7 @@ GFX.Scene.prototype = {
     },
 
     getDefaultLight: function ( type ) {
-       if ( type.indexof("directional") !== -1 && this.directionalLights.length > 0 ) {
+       if ( type.indexOf("directional") !== -1 && this.directionalLights.length > 0 ) {
            return this.directionalLights[0];
        }
        else

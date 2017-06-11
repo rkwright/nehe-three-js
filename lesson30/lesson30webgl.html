@@ -361,11 +361,12 @@
                 if (meshA === meshB)
                     console.log("Appears to be same object");
 
+                /*
                 var collision = new THREE.Vector3();
                 collision.x = ((meshA.position.x * OBJ_SIZE) + (meshB.position.x * OBJ_SIZE)) / (OBJ_SIZE + OBJ_SIZE);
                 collision.y = ((meshA.position.y * OBJ_SIZE) + (meshB.position.y * OBJ_SIZE)) / (OBJ_SIZE + OBJ_SIZE);
                 collision.z = ((meshA.position.z * OBJ_SIZE) + (meshB.position.z * OBJ_SIZE)) / (OBJ_SIZE + OBJ_SIZE);
-
+				*/
                 var avX = (meshA.velocity.x * (meshA.mass - meshB.mass) + (2 * meshB.mass * meshB.velocity.x)) / (meshA.mass + meshB.mass);
                 var avY = (meshA.velocity.y * (meshA.mass - meshB.mass) + (2 * meshB.mass * meshB.velocity.y)) / (meshA.mass + meshB.mass);
                 var avZ = (meshA.velocity.z * (meshA.mass - meshB.mass) + (2 * meshB.mass * meshB.velocity.z)) / (meshA.mass + meshB.mass);
@@ -389,8 +390,16 @@
                     mesh.rotateY(mesh.spin.y);
                     mesh.rotateZ(mesh.spin.z);
                     mesh.updateMatrixWorld();
+                }
 
-                    checkWallCollision ( mesh );
+                for ( i = 0; i < objects.children.length; i++) {
+                    mesh = objects.children[i];
+
+                    checkWallCollision(mesh);
+                }
+
+                for ( i = 0; i < objects.children.length; i++) {
+                    mesh = objects.children[i];
 
                     checkObjectCollisions( mesh );
                 }

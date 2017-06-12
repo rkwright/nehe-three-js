@@ -25,6 +25,8 @@ GFX.Scene = function ( parameters ) {
 
 	this.defaultCamera = true;
     this.cameras = [];
+    // just a proxy for backwards compatibility
+    this.camera;
     // these are the default values that can be overridden by the user
     this.perspective = true;
     this.fov = 45;
@@ -303,6 +305,10 @@ GFX.Scene.prototype = {
         if (this.controls === true && this.renderer !== null) {
             this.orbitControls[this.cameras.length-1] = new THREE.OrbitControls(camera, this.renderer.domElement);
         }
+
+        // set the "default" camera if not already done
+        if (this.camera === undefined)
+            this.camera = camera;
 
         return camera;
     },

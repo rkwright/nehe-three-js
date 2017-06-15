@@ -38,7 +38,7 @@ CANNON.Cannon.prototype = {
                                                    BARREL_LENGTH,
                                                    32, 1, true);
 
-        var material = new THREE.MeshPhongMaterial( { color : 0xdddddd,
+        var material = new THREE.MeshPhongMaterial( { color : 0x888888,
                                                       specular: 0x009900,
                                                       shininess: 30,
                                                       side:THREE.DoubleSide});

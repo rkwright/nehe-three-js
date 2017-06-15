@@ -195,7 +195,7 @@
         // Get the key code of the pressed key
         var keyChar = String.fromCharCode(event.which).toLowerCase();
 
-        var levelString = "012345678";
+        var levelString = "0123456789";
         var modelString = "trk";
 
         if ( modelString.indexOf(keyChar) !== -1) {
@@ -225,8 +225,9 @@
 
 </script>
     <!-- Create a DIV element, which will be shown over the WebGL canvas. -->
-    <div style="text-align:center; top: 0px; left: 10px;color:white">
-        '0 .. 2': which model
+    <div style="position: absolute; top: 10px; left: 10px">
+        Choose model, t,r,k <br/>
+        Number of levels: 0..9
     </div>
 </body>
 </html>

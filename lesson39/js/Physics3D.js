@@ -1,6 +1,6 @@
-/* Code from Game Physics by Glen Fielder
-*
-* http://gafferongames.com/game-physics/physics-in-3d/
+/*
+*  Inspired in part by
+*  http://gafferongames.com/game-physics/physics-in-3d/
 *
 * A cube with self contained physics simulation.
 *

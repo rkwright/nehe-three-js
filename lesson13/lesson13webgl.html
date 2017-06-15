@@ -260,9 +260,9 @@
 	 */
 	function addSphere( x, y, z, size ) {
 		if (size === undefined)
-			size = 0.01;
+			size = 0.02;
 
-		var sphere = new THREE.Mesh( new THREE.SphereGeometry(size, 32, 32), new THREE.MeshNormalMaterial());
+		var sphere = new THREE.Mesh( new THREE.SphereGeometry(size, 32, 32), new THREE.MeshBasicMaterial( { color:0xff0000 }));
 		sphere.position.set(x, y, z);
 		gfxScene.add(sphere);
 	}

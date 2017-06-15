@@ -31,7 +31,6 @@
 			var crateTexture;
 			var	yTranslation = CUBE_SIZE/2.0;
 			var	zTranslation = 0.0;
-			var	xPos, yPos;
             var fogType = "exponential";
 			var fogDensity = 0.10;
 
@@ -86,35 +85,36 @@
 	
 			function onDocumentKeyPress(event) {
 				// Get the key code of the pressed key
-				var keyChar = String.fromCharCode(event.which);
-	
-				if (keyChar == '+') {
+                var keyChar = event.key;
+                keyChar = keyChar.toLowerCase();
+
+				if (keyChar === '+') {
 					if (fogDensity < MAX_FOG )
 						fogDensity += FOG_INCR;
 					else 
 						fogDensity = MAX_FOG;
 					gfxScene.addFog( { fogDensity: fogDensity } );
 				}
-				else if (keyChar == '-') {  
+				else if (keyChar === '-') {
 					if (fogDensity > MIN_FOG)
 						fogDensity -= FOG_INCR;
 					else
 						fogDensity = 0;
 					gfxScene.addFog( { fogDensity: fogDensity } );
 				}
-				else if (keyChar == 'r') {
+				else if (keyChar === 'r') {
 					gfxScene.addFog( { fogColor: 0xff0000 } );
 				}
-				else if (keyChar == 'g') {
+				else if (keyChar === 'g') {
 					gfxScene.addFog( { fogColor: 0x00ff00 } );
 				}	
-				else if (keyChar == 'b') {
+				else if (keyChar === 'b') {
 					gfxScene.addFog( { fogColor: 0x0000ff } );
 				}
-				else if (keyChar == 'k') {
+				else if (keyChar === 'k') {
 					gfxScene.addFog( { fogColor: 0x000000 } );
 				}	
-				else if (keyChar == 'w') {
+				else if (keyChar === 'w') {
 					gfxScene.addFog( { fogColor: 0xffffff } );
 				}
  			}

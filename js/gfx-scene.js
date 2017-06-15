@@ -349,18 +349,18 @@ GFX.Scene.prototype = {
     setDefaultLights: function () {
         // Ambient light has no direction, it illuminates every object with the same
         // intensity. If only ambient light is used, no shading effects will occur.
-        var ambLight = new THREE.AmbientLight(0xc0c0c0);
+        var ambLight = new THREE.AmbientLight(0xc0c0c0, 0.5);
         this.scene.add( ambLight );
         this.ambientLights.push( ambLight);
 
         // Directional light has a source and shines in all directions, like the sun.
         // This behaviour creates shading effects.
-        var dirLight = new THREE.DirectionalLight(0xc0c0c0);
+        var dirLight = new THREE.DirectionalLight(0xc0c0c0, 0.5);
         dirLight.position.set(5, 20, 12);
         this.scene.add( dirLight );
         this.directionalLights.push( dirLight );
 
-        var pointLight = new THREE.PointLight(0xc0c0c0, 1.0);
+        var pointLight = new THREE.PointLight(0xc0c0c0, 0.5 );
         pointLight.position.set(-15, 20, 12);
         this.scene.add( pointLight );
         this.pointLights.push( pointLight );
@@ -508,31 +508,26 @@ GFX.Scene.prototype = {
         if (this.displayStats === true || this.displayStats.indexOf("fps") !== -1) {
             this.fpStats = new Stats();
             this.fpStats.showPanel(0);
-            this.fpStats.domElement.style.position = 'fixed';
-            this.fpStats.domElement.style.bottom = pos + 'px';
+            this.fpStats.dom.style.left = pos + 'px';
             pos += 80;
-            this.fpStats.domElement.style.zIndex = 100;
             container.appendChild( this.fpStats.dom );
         }
 
         if (typeof this.displayStats === 'string' && this.displayStats.indexOf("ms") !== -1) {
             this.msStats = new Stats();
             this.msStats.showPanel(1);
-            this.msStats.domElement.style.position = 'absolute';
-            this.msStats.domElement.style.bottom = '0px';
-            this.msStats.domElement.style.left = pos + 'px';
+            //this.msStats.domElement.style.position = 'absolute';
+            //this.msStats.domElement.style.bottom = '0px';
+            this.msStats.dom.style.left = pos + 'px';
             pos += 80;
-            this.msStats.domElement.style.zIndex = 100;
+            //this.msStats.domElement.style.zIndex = 100;
             container.appendChild( this.msStats.dom );
         }
 
         if (typeof this.displayStats === 'string' && this.displayStats.indexOf("mb") !== -1) {
             this.mbStats = new Stats();
             this.mbStats.showPanel(2);
-            this.mbStats.domElement.style.position = 'absolute';
-            this.mbStats.domElement.style.bottom = '0px';
-            this.mbStats.domElement.style.left = pos + '80px';
-            this.mbStats.domElement.style.zIndex = 100;
+            this.mbStats.dom.style.left = pos + '80px';
             container.appendChild( this.mbStats.dom );
         }
     },

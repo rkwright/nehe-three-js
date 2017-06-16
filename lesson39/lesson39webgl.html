@@ -65,6 +65,8 @@
          */
         function initializeDemo() {
 
+            createHelix();
+
             var initialPos = new THREE.Vector3(0, 5, 0);
             var initialMom = new THREE.Vector3(0, 0, 0);
             var mass = 1.0;
@@ -106,6 +108,26 @@
             gfxScene.add(springMesh);
         }
 
+        function createHelix() {
+            var x,y,z = 0;
+            var radius = 1;
+            var n = 0;
+            var NTWISTS = 1;
+            var ANGLE_INCR = Math.PI / 12;
+            var TWO_PI = Math.PI * 2.0;
+            var ZLENGTH = 10;
+            var ZINCR = ZLENGTH / (TWO_PI / ANGLE_INCR + NTWISTS );
+
+            for( var phi=0; phi<=TWO_PI; phi+=ANGLE_INCR )
+            {
+                x = Math.cos(phi) * radius;
+                y = Math.sin(phi) * radius;
+                z += ZINCR;
+
+                console.log( "n: " +  n++ + " phi: " + phi.toFixed(2) + " x: " + x.toFixed(2)+ " y: " + y.toFixed(2)+ " z: " + z.toFixed(2));
+            }  
+        }
+        
         // Calculate force and torque for physics state at time t.
         // Due to the way that the RK4 integrator works we need to calculate
         // force implicitly from state rather than explicitly applying forces

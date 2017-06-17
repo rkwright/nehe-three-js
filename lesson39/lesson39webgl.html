@@ -19,13 +19,11 @@
 	<script src="../js/three.js" type="text/javascript"></script>
     <script src="../js/Detector.js" type="text/javascript"></script>
     <script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
-    <script src="../js/ParametricGeometries.js" type="text/javascript"></script>
     <script src="../js/stats.js" type="text/javascript"></script>
     <script src="../js/gfx-scene.js" type="text/javascript"></script>
     <script src="js/State3D.js" type="text/javascript"></script>
     <script src="js/Derivative.js" type="text/javascript"></script>
     <script src="js/Physics3D.js" type="text/javascript"></script>
-    <script src="js/geometry.js" type="text/javascript"></script>
 
 </head>
 <body>
@@ -52,6 +50,7 @@
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
             cameraPos : [8, 6, 15],
+            axesHeight:10,
             controls:true,
             displayStats:"fps ms"
         });
@@ -87,7 +86,7 @@
 
             var plateGeometry = new THREE.BoxGeometry(3, 0.25, 3);
             plateMesh = new THREE.Mesh(plateGeometry, new THREE.MeshLambertMaterial({color:0x888888}));
-            plateMesh.position.set(0,5.5,0);
+            plateMesh.position.set(0,5.125,0);
             gfxScene.add(plateMesh);
         }
 
@@ -133,27 +132,6 @@
             gfxScene.add(springMesh);
         }
 
-        function CustomSinCurve( scale ) {
-
-            THREE.Curve.call( this );
-
-            this.scale = ( scale === undefined ) ? 1 : scale;
-
-        }
-
-        CustomSinCurve.prototype = Object.create( THREE.Curve.prototype );
-        CustomSinCurve.prototype.constructor = CustomSinCurve;
-
-        CustomSinCurve.prototype.getPoint = function ( t ) {
-
-            var tx = t * 3 - 1.5;
-            var ty = Math.sin( 2 * Math.PI * t );
-            var tz = 0;
-
-            return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
-
-        };
-
         function createSineCurve() {
             var path = new CustomSinCurve(10);
             var geometry = new THREE.TubeGeometry(path, 20, 2, 8, false);
@@ -186,10 +164,10 @@
         }
 
         function createHelix() {
-            var x,y = 0,z = 0;
-            var radius = 0.51;
+            var x,y = -5,z;
+            var radius = 0.25;
             var n = 0;
-            var NTWISTS = 5;
+            var NTWISTS = 10;
             var ANGLE_INCR = Math.PI / 12;
             var TWO_PI = Math.PI * 2.0;
             var HEIGHT = 10;
@@ -207,7 +185,7 @@
                 console.log( "n: " +  n++ + " phi: " + phi.toFixed(2) + " x: " + x.toFixed(2)+ " y: " + y.toFixed(2)+ " z: " + z.toFixed(2));
             }
 
-            var curve = new THREE.SplineCurve3( helix );
+            var curve = new THREE.CatmullRomCurve3( helix );
 
             var geometry = new THREE.TubeGeometry(
                 curve,  //path
@@ -217,9 +195,11 @@
                 false  //closed
             );
 
-            var material = new THREE.MeshLambertMaterial({color: 0x00ff00});
+            var material = new THREE.MeshLambertMaterial({color: 0xc0c0c0});
             var mesh = new THREE.Mesh(geometry, material);
             gfxScene.add(mesh);
+
+            mesh.scale.set(1, 0.25, 1);
         }
         
         // Calculate force and torque for physics state at time t.

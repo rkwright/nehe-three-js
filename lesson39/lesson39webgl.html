@@ -66,58 +66,24 @@
          */
         function initializeDemo() {
 
-            createHelix();
-
-            //drawSplineCurve();
-
-            //createSineCurve();
-
             var initialPos = new THREE.Vector3(0, 5, 0);
             var initialMom = new THREE.Vector3(0, 0, 0);
             var mass = 1.0;
             var size = 1.0;
 
-            physics3D = new GFX.Physics3D( render, forces, initialPos, initialMom, mass, size );
+            physics3D = new GFX.Physics3D(render, forces, initialPos, initialMom, mass, size);
 
             var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-            cubeMesh = new THREE.Mesh(cubeGeometry, new THREE.MeshLambertMaterial({color:0xFF0000}));
-            cubeMesh.position.set(0,10,0);
+            cubeMesh = new THREE.Mesh(cubeGeometry, new THREE.MeshLambertMaterial({color: 0xFF0000}));
+            cubeMesh.position.set(0, 10, 0);
             gfxScene.add(cubeMesh);
 
             var plateGeometry = new THREE.BoxGeometry(3, 0.25, 3);
-            plateMesh = new THREE.Mesh(plateGeometry, new THREE.MeshLambertMaterial({color:0x888888}));
-            plateMesh.position.set(0,5.125,0);
+            plateMesh = new THREE.Mesh(plateGeometry, new THREE.MeshLambertMaterial({color: 0x888888}));
+            plateMesh.position.set(0, 5.125, 0);
             gfxScene.add(plateMesh);
-        }
 
-        function drawSpline() {
-            var numPoints = 10;
-            //        var start = new THREE.Vector3(-5, 0, 20);
-            var start = new THREE.Vector3(-5, 0, 20);
-            var middle = new THREE.Vector3(0, 35, 0);
-            var end = new THREE.Vector3(5, 0, -20);
-
-            var curveQuad = new THREE.QuadraticBezierCurve3(start, middle, end);
-
-            var tube = new THREE.TubeGeometry(curveQuad, numPoints, 0.5, 20, false);
-            var mesh = new THREE.Mesh(tube, new THREE.MeshNormalMaterial({
-                opacity: 0.9,
-                transparent: true
-            }));
-
-            scene.add(mesh);
-            renderer.render(scene, camera);
-        }
-
-        function render( state ) {
-
-            //console.log("x,y,z: " + state.position.x.toFixed(2) + " " + state.position.y.toFixed(2) + " " +
-            //       state.position.z.toFixed(2));
-
-            cubeMesh.position.set(state.position.x, state.position.y, state.position.z);
-            cubeMesh.rotation.y = 2.0 *  Math.acos(state.orientation.w);
-
-            createSpring( state.position.y );
+            createHelix();
         }
 
         function createSpring( posY ) {
@@ -130,37 +96,6 @@
             springMesh = new THREE.Mesh(springGeometry, new THREE.MeshLambertMaterial({color:0x888888}));
             springMesh.position.set(0,cylY,0);
             gfxScene.add(springMesh);
-        }
-
-        function createSineCurve() {
-            var path = new CustomSinCurve(10);
-            var geometry = new THREE.TubeGeometry(path, 20, 2, 8, false);
-            var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-            var mesh = new THREE.Mesh(geometry, material);
-            gfxScene.add(mesh);
-        }
-
-        function drawSplineCurve () {
-            var vec = [];
-            vec.push( new THREE.Vector3(-1, 0, 1 ) );
-            vec.push( new THREE.Vector3(-0.5, 0.5, 0.5) );
-            vec.push( new THREE.Vector3(0, 0, 0) );
-            vec.push( new THREE.Vector3(0.5, -0.5, 0.5) );
-            vec.push( new THREE.Vector3(1, 0, 1) );
-
-            var curve = new THREE.SplineCurve3( vec );
-
-            var geometry = new THREE.TubeGeometry(
-                curve,  //path
-                20,    //segments
-                0.2,     //radius
-                8,     //radiusSegments
-                false  //closed
-            );
-
-            var material = new THREE.MeshLambertMaterial({color: 0x00ff00});
-            var mesh = new THREE.Mesh(geometry, material);
-            gfxScene.add(mesh);
         }
 
         function createHelix() {
@@ -200,6 +135,16 @@
             gfxScene.add(mesh);
 
             mesh.scale.set(1, 0.25, 1);
+        }
+        function render( state ) {
+
+            //console.log("x,y,z: " + state.position.x.toFixed(2) + " " + state.position.y.toFixed(2) + " " +
+            //       state.position.z.toFixed(2));
+
+            cubeMesh.position.set(state.position.x, state.position.y, state.position.z);
+            cubeMesh.rotation.y = 2.0 *  Math.acos(state.orientation.w);
+
+            createSpring( state.position.y );
         }
         
         // Calculate force and torque for physics state at time t.

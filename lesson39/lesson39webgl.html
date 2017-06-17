@@ -19,11 +19,13 @@
 	<script src="../js/three.js" type="text/javascript"></script>
     <script src="../js/Detector.js" type="text/javascript"></script>
     <script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
+    <script src="../js/ParametricGeometries.js" type="text/javascript"></script>
     <script src="../js/stats.js" type="text/javascript"></script>
     <script src="../js/gfx-scene.js" type="text/javascript"></script>
     <script src="js/State3D.js" type="text/javascript"></script>
     <script src="js/Derivative.js" type="text/javascript"></script>
     <script src="js/Physics3D.js" type="text/javascript"></script>
+    <script src="js/geometry.js" type="text/javascript"></script>
 
 </head>
 <body>
@@ -67,6 +69,10 @@
 
             createHelix();
 
+            //drawSplineCurve();
+
+            //createSineCurve();
+
             var initialPos = new THREE.Vector3(0, 5, 0);
             var initialMom = new THREE.Vector3(0, 0, 0);
             var mass = 1.0;
@@ -83,6 +89,25 @@
             plateMesh = new THREE.Mesh(plateGeometry, new THREE.MeshLambertMaterial({color:0x888888}));
             plateMesh.position.set(0,5.5,0);
             gfxScene.add(plateMesh);
+        }
+
+        function drawSpline() {
+            var numPoints = 10;
+            //        var start = new THREE.Vector3(-5, 0, 20);
+            var start = new THREE.Vector3(-5, 0, 20);
+            var middle = new THREE.Vector3(0, 35, 0);
+            var end = new THREE.Vector3(5, 0, -20);
+
+            var curveQuad = new THREE.QuadraticBezierCurve3(start, middle, end);
+
+            var tube = new THREE.TubeGeometry(curveQuad, numPoints, 0.5, 20, false);
+            var mesh = new THREE.Mesh(tube, new THREE.MeshNormalMaterial({
+                opacity: 0.9,
+                transparent: true
+            }));
+
+            scene.add(mesh);
+            renderer.render(scene, camera);
         }
 
         function render( state ) {
@@ -108,24 +133,93 @@
             gfxScene.add(springMesh);
         }
 
+        function CustomSinCurve( scale ) {
+
+            THREE.Curve.call( this );
+
+            this.scale = ( scale === undefined ) ? 1 : scale;
+
+        }
+
+        CustomSinCurve.prototype = Object.create( THREE.Curve.prototype );
+        CustomSinCurve.prototype.constructor = CustomSinCurve;
+
+        CustomSinCurve.prototype.getPoint = function ( t ) {
+
+            var tx = t * 3 - 1.5;
+            var ty = Math.sin( 2 * Math.PI * t );
+            var tz = 0;
+
+            return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+
+        };
+
+        function createSineCurve() {
+            var path = new CustomSinCurve(10);
+            var geometry = new THREE.TubeGeometry(path, 20, 2, 8, false);
+            var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+            var mesh = new THREE.Mesh(geometry, material);
+            gfxScene.add(mesh);
+        }
+
+        function drawSplineCurve () {
+            var vec = [];
+            vec.push( new THREE.Vector3(-1, 0, 1 ) );
+            vec.push( new THREE.Vector3(-0.5, 0.5, 0.5) );
+            vec.push( new THREE.Vector3(0, 0, 0) );
+            vec.push( new THREE.Vector3(0.5, -0.5, 0.5) );
+            vec.push( new THREE.Vector3(1, 0, 1) );
+
+            var curve = new THREE.SplineCurve3( vec );
+
+            var geometry = new THREE.TubeGeometry(
+                curve,  //path
+                20,    //segments
+                0.2,     //radius
+                8,     //radiusSegments
+                false  //closed
+            );
+
+            var material = new THREE.MeshLambertMaterial({color: 0x00ff00});
+            var mesh = new THREE.Mesh(geometry, material);
+            gfxScene.add(mesh);
+        }
+
         function createHelix() {
-            var x,y,z = 0;
-            var radius = 1;
+            var x,y = 0,z = 0;
+            var radius = 0.51;
             var n = 0;
-            var NTWISTS = 1;
+            var NTWISTS = 5;
             var ANGLE_INCR = Math.PI / 12;
             var TWO_PI = Math.PI * 2.0;
-            var ZLENGTH = 10;
-            var ZINCR = ZLENGTH / (TWO_PI / ANGLE_INCR + NTWISTS );
+            var HEIGHT = 10;
+            var ZINCR = HEIGHT / (TWO_PI / ANGLE_INCR * NTWISTS );
+            var helix = [];
 
-            for( var phi=0; phi<=TWO_PI; phi+=ANGLE_INCR )
+            for( var phi=0; phi<=TWO_PI*NTWISTS; phi+=ANGLE_INCR )
             {
                 x = Math.cos(phi) * radius;
-                y = Math.sin(phi) * radius;
-                z += ZINCR;
+                y += ZINCR;
+                z = Math.sin(phi) * radius;
+
+                helix.push( new THREE.Vector3(x, y, z));
 
                 console.log( "n: " +  n++ + " phi: " + phi.toFixed(2) + " x: " + x.toFixed(2)+ " y: " + y.toFixed(2)+ " z: " + z.toFixed(2));
-            }  
+            }
+
+            var curve = new THREE.SplineCurve3( helix );
+
+            var geometry = new THREE.TubeGeometry(
+                curve,  //path
+                n,    //segments
+                0.1,     //radius
+                8,     //radiusSegments
+                false  //closed
+            );
+
+            var material = new THREE.MeshLambertMaterial({color: 0x00ff00});
+            var mesh = new THREE.Mesh(geometry, material);
+            gfxScene.add(mesh);
         }
         
         // Calculate force and torque for physics state at time t.

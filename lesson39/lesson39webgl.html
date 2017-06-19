@@ -27,38 +27,23 @@
 
 </head>
 <body>
-
-	<div style="position: absolute; top: 10px; left: 10px;color:white">
-		<p></p>
-	</div>
-
 	<script type="text/javascript">
 
         var physics3D;
         var cubeMesh;
         var plateMesh;
         var springMesh;
-        var DAMPING_TORQUE = -0.5;
-        var FORCE_X = 0;
-        var FORCE_Y = 2;
-        var FORCE_Z = 0;
-        var FORCE_SCALE = -5.0;
-        var TORQUE_X = 0.0;
-        var TORQUE_Y = 1.0;
-        var TORQUE_Z = 0.0;
+        var springMat;
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
             cameraPos : [8, 6, 15],
-            axesHeight:10,
             controls:true,
             displayStats:"fps ms"
         });
 
-        // then initialize our demo's stuff
         initializeDemo();
 
-        // Animate the scene
         animateScene();
 
         /**
@@ -80,68 +65,55 @@
 
             var plateGeometry = new THREE.BoxGeometry(3, 0.25, 3);
             plateMesh = new THREE.Mesh(plateGeometry, new THREE.MeshLambertMaterial({color: 0x888888}));
-            plateMesh.position.set(0, 5.125, 0);
+            plateMesh.position.set(0, 5.5, 0);
             gfxScene.add(plateMesh);
 
-            createHelix();
+            springMat = new THREE.MeshPhongMaterial({color: 0xc0c0c0, shininess:50});
+
+            createSpring( 5 );
         }
 
         function createSpring( posY ) {
-            var h = 6 - posY;
-            var cylY = 5.5 - h * 0.5;
+            var TWO_PI = Math.PI * 2.0;
+            var NTWISTS = 10;
+            var ANGLE_INCR = Math.PI / 6;
 
-            gfxScene.remove( springMesh );
+            var height = 6 - posY;
+            var cylY = 5.5 - height * 0.5;
 
-            var springGeometry = new THREE.CylinderGeometry(0.1, 0.1, h, 32);
-            springMesh = new THREE.Mesh(springGeometry, new THREE.MeshLambertMaterial({color:0x888888}));
-            springMesh.position.set(0,cylY,0);
-            gfxScene.add(springMesh);
-        }
-
-        function createHelix() {
-            var x,y = -5,z;
+            var x,z;
+            var y = height/2;
             var radius = 0.25;
             var n = 0;
-            var NTWISTS = 10;
-            var ANGLE_INCR = Math.PI / 12;
-            var TWO_PI = Math.PI * 2.0;
-            var HEIGHT = 10;
-            var ZINCR = HEIGHT / (TWO_PI / ANGLE_INCR * NTWISTS );
+            var yIncr = height / (TWO_PI / ANGLE_INCR * NTWISTS );
             var helix = [];
 
-            for( var phi=0; phi<=TWO_PI*NTWISTS; phi+=ANGLE_INCR )
-            {
+            for( var phi=0; phi<=TWO_PI*NTWISTS; phi+=ANGLE_INCR ) {
                 x = Math.cos(phi) * radius;
-                y += ZINCR;
+                y -= yIncr;
                 z = Math.sin(phi) * radius;
 
                 helix.push( new THREE.Vector3(x, y, z));
 
-                console.log( "n: " +  n++ + " phi: " + phi.toFixed(2) + " x: " + x.toFixed(2)+ " y: " + y.toFixed(2)+ " z: " + z.toFixed(2));
+                //console.log( "n: " +  n + " phi: " + phi.toFixed(2) + " x: " + x.toFixed(2)+ " y: " + y.toFixed(2)+ " z: " + z.toFixed(2));
+                n++;
             }
 
             var curve = new THREE.CatmullRomCurve3( helix );
+            var geometry = new THREE.TubeGeometry( curve, n, 0.05, 6, false );
 
-            var geometry = new THREE.TubeGeometry(
-                curve,  //path
-                n,    //segments
-                0.1,     //radius
-                8,     //radiusSegments
-                false  //closed
-            );
-
-            var material = new THREE.MeshLambertMaterial({color: 0xc0c0c0});
-            var mesh = new THREE.Mesh(geometry, material);
-            gfxScene.add(mesh);
-
-            mesh.scale.set(1, 0.25, 1);
+            gfxScene.remove( springMesh );
+            springMesh = new THREE.Mesh(geometry, springMat);
+            springMesh.position.set(0,cylY,0);
+            gfxScene.add( springMesh );
         }
+
         function render( state ) {
 
             //console.log("x,y,z: " + state.position.x.toFixed(2) + " " + state.position.y.toFixed(2) + " " +
             //       state.position.z.toFixed(2));
 
-            cubeMesh.position.set(state.position.x, state.position.y, state.position.z);
+            cubeMesh.position.set(state.position.x, state.position.y - 1, state.position.z);
             cubeMesh.rotation.y = 2.0 *  Math.acos(state.orientation.w);
 
             createSpring( state.position.y );
@@ -154,6 +126,14 @@
         // its accuracy by detecting curvature in derivative values over the
         // timestep so we need our force values to supply the curvature.
         function forces (state, t, derivative ) {
+            var DAMPING_TORQUE = -0.5;
+            var FORCE_X = 0;
+            var FORCE_Y = 2;
+            var FORCE_Z = 0;
+            var FORCE_SCALE = -5.0;
+            var TORQUE_X = 0.0;
+            var TORQUE_Y = 1.0;
+            var TORQUE_Z = 0.0;
 
             // attract towards origin
             derivative.force.copy(state.position);
@@ -181,6 +161,8 @@
             // Tell the browser to call this function when page is visible
             requestAnimationFrame(animateScene);
 
+            // do one step in the physics part of the animation, which will call back to forces() and render()
+            // to alter the scene
             physics3D.timeStep();
 
             // Map the 3D scene down to the 2D screen (render the frame)

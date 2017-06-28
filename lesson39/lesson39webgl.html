@@ -30,7 +30,7 @@
 	<script type="text/javascript">
 
         var physics3D;
-        var cubeMesh;
+        var ballMesh;
         var plateMesh;
         var springMesh;
         var springMat;
@@ -58,10 +58,10 @@
 
             physics3D = new GFX.Physics3D(render, forces, initialPos, initialMom, mass, size);
 
-            var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-            cubeMesh = new THREE.Mesh(cubeGeometry, new THREE.MeshLambertMaterial({color: 0xFF0000}));
-            cubeMesh.position.set(0, 10, 0);
-            gfxScene.add(cubeMesh);
+            var ballGeometry = new THREE.SphereGeometry(1, 32, 32);
+            ballMesh = new THREE.Mesh(ballGeometry, new THREE.MeshLambertMaterial({color: 0xFF0000}));
+            ballMesh.position.set(0, 10, 0);
+            gfxScene.add(ballMesh);
 
             var plateGeometry = new THREE.BoxGeometry(3, 0.25, 3);
             plateMesh = new THREE.Mesh(plateGeometry, new THREE.MeshLambertMaterial({color: 0x888888}));
@@ -102,7 +102,11 @@
             var curve = new THREE.CatmullRomCurve3( helix );
             var geometry = new THREE.TubeGeometry( curve, n, 0.05, 6, false );
 
-            gfxScene.remove( springMesh );
+            if (springMesh !== undefined) {
+                springMesh.geometry.dispose();
+                gfxScene.remove( springMesh );
+            }
+
             springMesh = new THREE.Mesh(geometry, springMat);
             springMesh.position.set(0,cylY,0);
             gfxScene.add( springMesh );
@@ -113,9 +117,8 @@
             //console.log("x,y,z: " + state.position.x.toFixed(2) + " " + state.position.y.toFixed(2) + " " +
             //       state.position.z.toFixed(2));
 
-            cubeMesh.position.set(state.position.x, state.position.y - 1, state.position.z);
-            cubeMesh.rotation.y = 2.0 *  Math.acos(state.orientation.w);
-
+            ballMesh.position.set(state.position.x, state.position.y - 1, state.position.z);
+           
             createSpring( state.position.y );
         }
         
@@ -132,7 +135,7 @@
             var FORCE_Z = 0;
             var FORCE_SCALE = -5.0;
             var TORQUE_X = 0.0;
-            var TORQUE_Y = 1.0;
+            var TORQUE_Y = 0.0;
             var TORQUE_Z = 0.0;
 
             // attract towards origin

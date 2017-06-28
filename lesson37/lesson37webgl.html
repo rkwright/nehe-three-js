@@ -27,28 +27,21 @@
 
     <script id="vertexShader" type="x-shader/x-vertex">
         varying vec3 vNormal;
-        varying vec3 vViewPosition;
 
         void main() {
 
             gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
             vNormal = normalize( normalMatrix * normal );
-            vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-            vViewPosition = -mvPosition.xyz;
         }
     </script>
 
     <script id="fragmentShader" type="x-shader/x-fragment">
         uniform vec3 uMaterialColor;
 
-        uniform vec3 uDirLightPos;
-        uniform vec3 uDirLightColor;
-
-        uniform float uKd;
-        uniform float uBorder;
-        uniform float uLevels;
-        varying vec3 vNormal;
-        varying vec3 vViewPosition;
+        uniform vec3    uDirLightPos;
+        uniform vec3    uDirLightColor;
+        uniform float   uLevels;
+        varying vec3    vNormal;
 
         void main() {
             // compute direction to light
@@ -66,7 +59,7 @@
                 diffuse = (floor((abs(diffuse) + 0.001) * uLevels ) / uLevels) * sign + (1.0 / (uLevels * 2.0));
             }
 
-            gl_FragColor = vec4( uKd * uMaterialColor * uDirLightColor * diffuse, 1.0 );
+            gl_FragColor = vec4( uMaterialColor * uDirLightColor * diffuse, 1.0 );
         }
     </script>
 </head>
@@ -86,7 +79,7 @@
     });
 
     // we can't use the default lights because we need to pass the directional light to the shader
-    gfxScene.addLight( 'ambient', { color:0x333333, intensity : 1 });
+    //gfxScene.addLight( 'ambient', { color:0x333333, intensity : 1 });
     var dirLight = gfxScene.addLight( 'directional', { color:0xffffff, intensity:1.0,  position:[-10,10,20]});
 
     initializeDemo();
@@ -97,13 +90,8 @@
      * Initialize the Demo.
      */
     function initializeDemo() {
-        var materialColor = new THREE.Color();
-        materialColor.setRGB(1.0, 0.8, 0.6);
 
         phongMaterial = createShaderMaterial( dirLight );
-
-        phongMaterial.uniforms.uMaterialColor.value.copy(materialColor);
-        phongMaterial.side = THREE.DoubleSide;
 
         loadTeapot();
 
@@ -119,11 +107,7 @@
 
             uDirLightPos: { type: "v3", value: light.position },
             uDirLightColor: { type: "c", value: light.color },
-
-            uMaterialColor: { type: "c", value: new THREE.Color( 0xFFFFFF ) },
-
-            uKd:     { type: "f", value: 0.9 },
-            uBorder: { type: "f", value: 0.4 },
+            uMaterialColor: { type: "c", value: new THREE.Color( 1.0, 0.8, 0.6 ) },
             uLevels: { type: "f", value: nLevels }
        };
 

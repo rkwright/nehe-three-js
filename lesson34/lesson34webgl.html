@@ -144,14 +144,12 @@
                 var shaderMaterial = new THREE.ShaderMaterial({
                         uniforms: uniforms,
                         vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
-                        fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-                        side: THREE.DoubleSide
+                        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
                     });
 
                 var planeGeo = new THREE.PlaneGeometry( 20, 20, 513, 513 );
                 plane = new THREE.Mesh(	planeGeo, shaderMaterial );
                 plane.rotation.x = -Math.PI / 2;
-                plane.position.y = 0;
 
                 gfxScene.add(plane);
             });

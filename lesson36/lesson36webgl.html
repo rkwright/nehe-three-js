@@ -98,14 +98,15 @@
         gfxScene.add( halo );
 
         var clearPass = new THREE.ClearPass();
+
+        var texture = new THREE.TextureLoader().load( 'images/deathvalleysky.jpg' );
+        var texturePass = new THREE.TexturePass( texture );
+
         var renderPass = new THREE.RenderPass(gfxScene.scene, gfxScene.camera);
         renderPass.clear = false;
 
         var copyPass = new THREE.ShaderPass(THREE.CopyShader);
         copyPass.renderToScreen = true;
-
-        var texture = new THREE.TextureLoader().load( 'images/deathvalleysky.jpg' );
-        var texturePass = new THREE.TexturePass( texture );
 
         composer = new THREE.EffectComposer(gfxScene.renderer);
 
@@ -131,7 +132,6 @@
 
         // Tell the browser to call this function when page is visible
         requestAnimationFrame(animateScene);
-
     }
 
 </script>

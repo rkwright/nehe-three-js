@@ -36,15 +36,15 @@
 
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
-            cameraPos : [-20,17,-9],
+            cameraPos : [26,16,-2],
+            perspective:false,
+            orthoSize: FLOOR_REPEAT * 2,
             autoClear: false,
             controls:true,
             floorRepeat : FLOOR_REPEAT,
             floorX: FLOOR_SIZE,
             floorZ: FLOOR_SIZE,
-            clearColor:0xc5e1e3,
-            shadowMapEnabled : true//,
-            //displayStats: true
+            clearColor:0xc5e1e3
         });
 
         var perspectiveCamera = gfxScene.addCamera({perspective:true, cameraPos:[12,6,8], fov : 90});
@@ -129,7 +129,6 @@
             modelMesh.scale.set(1, 1, 1);
             modelMesh.castShadow = true;
             gfxScene.add(modelMesh);
-            updateLabel("STL");
         }
 
         /**
@@ -155,8 +154,10 @@
             var SCREEN_ASPECT =  SCREEN_WIDTH / SCREEN_HEIGHT * 0.5;
 
             perspectiveCamera.aspect = SCREEN_ASPECT;
-            orthoCamera.aspect       = SCREEN_ASPECT;
             perspectiveCamera.updateProjectionMatrix();
+
+            orthoCamera.lookAt( new THREE.Vector3(0,0,-10) );
+            orthoCamera.aspect  = SCREEN_ASPECT;
             orthoCamera.updateProjectionMatrix();
 
             // setViewport parameters:
@@ -166,7 +167,7 @@
             gfxScene.renderer.clear();
 
             // right side
-            gfxScene.renderer.setViewport( 0.5 * SCREEN_WIDTH + 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
+            gfxScene.renderer.setViewport( 0.5 * SCREEN_WIDTH + 1, 1,   SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
             gfxScene.renderScene( orthoCamera );
 
             // left side

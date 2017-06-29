@@ -47,6 +47,7 @@ GFX.Particle.prototype = {
         this.curState.pos.add( newVel.multiplyScalar(dt) );
     }
 };
+
 GFX.Spring = function ( particle1, particle2, springConstant, springLen, friction ) {
 
     this.particle1 = particle1;

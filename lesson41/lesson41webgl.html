@@ -44,7 +44,7 @@
         // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
         var gfxScene = new GFX.Scene( {
             cameraPos : [0, 0, 200],
-            //controls:true,
+            controls:true,
             clearColor:0xc5e1e3,
             shadowMapEnabled : true,
             displayStats: true
@@ -94,17 +94,17 @@
 
             postprocessing.scene.add( postprocessing.camera );
 
-            var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-            postprocessing.rtTextureColors = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+            var params = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+            postprocessing.rtTextureColors = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, params );
 
-            postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+            postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, params );
 
             // Aggressive downsize god-ray ping-pong render targets to minimize cost
 
             var w = window.innerWidth / 4.0;
             var h = window.innerHeight / 4.0;
-            postprocessing.rtTextureGodRays1 = new THREE.WebGLRenderTarget( w, h, pars );
-            postprocessing.rtTextureGodRays2 = new THREE.WebGLRenderTarget( w, h, pars );
+            postprocessing.rtTextureGodRays1 = new THREE.WebGLRenderTarget( w, h, params );
+            postprocessing.rtTextureGodRays2 = new THREE.WebGLRenderTarget( w, h, params );
 
             // god-ray shaders
 

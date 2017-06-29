@@ -26,7 +26,7 @@ GFX.Scene = function ( parameters ) {
 	this.defaultCamera = true;
     this.cameras = [];
     // just a proxy for backwards compatibility
-    this.camera;
+    this.camera = undefined;
     // these are the default values that can be overridden by the user
     this.perspective = true;
     this.fov = 45;

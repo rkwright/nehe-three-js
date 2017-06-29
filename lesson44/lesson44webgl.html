@@ -69,9 +69,6 @@
 
             // rotate and position the plane
             plane.rotation.x = -0.5 * Math.PI;
-            plane.position.x = 0;
-            plane.position.y = 0;
-            plane.position.z = 0;
             gfxScene.add(plane);
 
             var monolith = new THREE.BoxGeometry(4.0, 20.0, 1.0);
@@ -117,7 +114,7 @@
             lensFlare.add(textureFlare3, 60, 0.6, THREE.AdditiveBlending);
             lensFlare.add(textureFlare3, 70, 0.7, THREE.AdditiveBlending);
             lensFlare.add(textureFlare3, 120, 0.9, THREE.AdditiveBlending);
-            lensFlare.add(textureFlare3, 70, 1.0, THREE.AdditiveBlending);
+            lensFlare.add(textureFlare3, 160, 1.1, THREE.AdditiveBlending);
 
             lensFlare.position.copy(flareLight.position);
             gfxScene.add(lensFlare);

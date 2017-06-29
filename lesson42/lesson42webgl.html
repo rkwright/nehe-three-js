@@ -53,7 +53,7 @@
 
         gfxScene.clearAllLights();
         gfxScene.addLight( 'ambient', { color:0xffffff, intensity : 0.75 });
-        var dirLight = gfxScene.addLight( 'directional', { color:0xffffff, intensity:1,  position:[0,10,0], castShadow:true });
+        var dirLight = gfxScene.addLight( 'directional', { color:0xffffff, intensity:1,  position:[0,10,0] });
 
         // then initialize our demo's stuff
         initializeDemo();
@@ -84,7 +84,6 @@
 
             globe = new THREE.Mesh(globeGeom, mat);
             globe.position.set(0, 1.5, 0);
-            globe.castShadow = true;
             gfxScene.add(globe);
 
             var icoGeom = new THREE.IcosahedronGeometry(2.0, 0);
@@ -94,7 +93,6 @@
             });
             var icoMesh = new THREE.Mesh(icoGeom, icoMat);
             icoMesh.position.set(-5, 1.75, 5);
-            icoMesh.castShadow = true;
             gfxScene.add(icoMesh);
 
             var monolith = new THREE.BoxGeometry(4.0, 9.0, 1.0);
@@ -104,7 +102,6 @@
             });
             var monoMesh = new THREE.Mesh(monolith, monoMat);
             monoMesh.position.set(-5, 4.5, -5);
-            monoMesh.castShadow = true;
             gfxScene.add(monoMesh);
 
             loadPiano();
@@ -143,7 +140,6 @@
 
             globe.rotation.y += 0.005;
 
-            //orthoControls.update();
             render();
         }
 

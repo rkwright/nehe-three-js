@@ -15,20 +15,20 @@
 		<link rel="stylesheet" type="text/css" href="../css/NEHE.css" /> 
 
 		<!-- Include several libraries from THREE.js and the Scene class  -->
-		<script src="../js/three.js" type="text/javascript"></script>
-		<script src="../js/Detector.js" type="text/javascript"></script>
-		<script src="../js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
-		<script src="../js/stats.js" type="text/javascript"></script>
-		<script src="../js/gfx-scene.js" type="text/javascript"></script>
-        <script src="../js/loaders/OBJLoader.js" type="text/javascript"></script>
-        <script src="../js/loaders/ColladaLoader.js" type="text/javascript"></script>
-        <script src="../js/loaders/AWDLoader.js"></script>
-        <script src="../js/loaders/BabylonLoader.js"></script>
-        <script src="../js/loaders/PDBLoader.js"></script>
-        <script src="../js/loaders/PLYLoader.js"></script>
-        <script src="../js/loaders/STLLoader.js"></script>
-        <script src="../js/loaders/VRMLLoader.js"></script>
-        <script src="../js/loaders/VTKLoader.js"></script>
+		<script src="../three-js/three.js" type="text/javascript"></script>
+		<script src="../three-js/Detector.js" type="text/javascript"></script>
+		<script src="../three-js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
+		<script src="../three-js/stats.js" type="text/javascript"></script>
+        <script src="../three-js/loaders/OBJLoader.js" type="text/javascript"></script>
+        <script src="../three-js/loaders/ColladaLoader.js" type="text/javascript"></script>
+        <script src="../three-js/loaders/AWDLoader.js"></script>
+        <script src="../three-js/loaders/BabylonLoader.js"></script>
+        <script src="../three-js/loaders/PDBLoader.js"></script>
+        <script src="../three-js/loaders/PLYLoader.js"></script>
+        <script src="../three-js/loaders/STLLoader.js"></script>
+        <script src="../three-js/loaders/VRMLLoader.js"></script>
+        <script src="../three-js/loaders/VTKLoader.js"></script>
+		<script src="../gfx/gfx-scene.js" type="text/javascript"></script>
 	</head>
 	<body>	
 		<script type="text/javascript">
@@ -54,7 +54,7 @@
 	
 			function initializeDemo() {
 
-			    loadModel("4");
+			    loadModel("3");
 
                 document.addEventListener("keypress", onDocumentKeyPress, false);
             }
@@ -78,9 +78,9 @@
                     case '3':
                         loadBabylon();
                         break;
-                    case '4':
+                    /*case '4':
                         loadPDB();
-                        break;
+                        break;*/
                     case '5':
                         loadPLY();
                         break;

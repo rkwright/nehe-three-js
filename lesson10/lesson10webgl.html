@@ -80,7 +80,7 @@
 					var uvs = [];
 					// need to see which triangle we are on so we map the correct half of the
 					// texture.  Otherwise we end up mapping the same half twice.
-					if ((i & 1) == 1) {				
+					if ((i & 1) === 1) {
 						uvs.push( new THREE.Vector2( 0.0, 1.0 ) );
 						uvs.push( new THREE.Vector2( 1.0, 1.0 ) );
 						uvs.push( new THREE.Vector2( 1.0, 0.0 ) );

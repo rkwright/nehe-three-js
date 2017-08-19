@@ -17,7 +17,6 @@
 		<!-- Include several libraries from THREE.js and the Scene class  -->
 		<script src="../three-js/three.js" type="text/javascript"></script>
 		<script src="../three-js/Detector.js" type="text/javascript"></script>
-		<script src="../three-js/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
 		<script src="../three-js/stats.js" type="text/javascript"></script>
         <script src="../three-js/loaders/OBJLoader.js" type="text/javascript"></script>
         <script src="../three-js/loaders/ColladaLoader.js" type="text/javascript"></script>
@@ -28,6 +27,7 @@
         <script src="../three-js/loaders/STLLoader.js"></script>
         <script src="../three-js/loaders/VRMLLoader.js"></script>
         <script src="../three-js/loaders/VTKLoader.js"></script>
+		<script src="../gfx/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
 		<script src="../gfx/gfx-scene.js" type="text/javascript"></script>
 	</head>
 	<body>	
@@ -137,7 +137,7 @@
             }
 
             function onLoadCollada( object ) {
-                dae = object.scene;
+                var dae = object.scene;
 
                 // Go through all children of the loaded object and search for a Mesh
                 dae.traverse( function ( child ) {
@@ -166,7 +166,7 @@
             }
 
             function onLoadAWD ( object ) {
-                awd = object;
+                var awd = object;
 
                 // Go through all children of the loaded object and search for a Mesh
                 awd.traverse( function ( child ) {
@@ -193,7 +193,7 @@
             }
 
             function onLoadBabylon ( object ) {
-			    babylon = object;
+			    var babylon = object;
                 // apply custom material
                 object.traverse( function(child) {
                     if (child instanceof THREE.Mesh) {
@@ -353,7 +353,7 @@
             }
 
             function moveObjectToOrigin ( object, bbs, size ) {
-                scaleVal = size / bbs.radius;
+                var scaleVal = size / bbs.radius;
                 object.translateX( -bbs.center.x * scaleVal );
                 object.translateY( -bbs.center.y * scaleVal );
                 object.translateZ( -bbs.center.z * scaleVal );

@@ -80,7 +80,7 @@
                         break;
                     /*case '4':
                         loadPDB();
-                        break;*/
+                        break; */
                     case '5':
                         loadPLY();
                         break;
@@ -218,6 +218,7 @@
                 updateLabel("Babylon");
             }
 
+            /*
             function  loadPDB () {
                 var manager = new THREE.LoadingManager();
                 var loader = new THREE.PDBLoader( manager );
@@ -253,7 +254,7 @@
                 gfxScene.add(modelMesh);
                 updateLabel("PDB");
             }
-
+*/
             function  loadPLY () {
                 var manager = new THREE.LoadingManager();
                 var loader = new THREE.PLYLoader( manager );
@@ -368,9 +369,9 @@
             function onDocumentKeyPress(event) {
 				// Get the key code of the pressed key
 				var keyChar = String.fromCharCode(event.which);
-                var modelString = "012345678";
+                var modelString = "01235678";
 
-                if ( modelString.indexOf(keyChar) != -1) {
+                if ( modelString.indexOf(keyChar) !== -1) {
                     loadModel(keyChar);
                 }
 			}

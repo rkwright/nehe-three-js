@@ -91,10 +91,10 @@
             cylinderUtil = new GFX.CylinderUtil();
 
             var point0 = particles[0].curState.pos;
-            for ( i=1; i<particles.length; i++ ) {
+            for ( var i=1; i<particles.length; i++ ) {
                 var point1 = particles[i-1].curState.pos;
 
-                var ropeMesh = cylinderUtil.createCylinder(point0, point1, ROPE_DIAMETER, ropeMat);
+                var ropeMesh = cylinderUtil.createCylinder(point0, point1, ROPE_DIAMETER, 8, ropeMat);
                 ropeMesh.castShadow = true;
                 ropeArray.push( ropeMesh );
 

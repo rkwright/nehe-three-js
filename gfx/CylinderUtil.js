@@ -1,5 +1,9 @@
 /**
- * RopeMesh.js
+ * @author rkwright / www.geofx.com
+ *
+ * Copyright 2017, All rights reserved.
+ *
+ * CylinderUtil.js
  *
  */
 GFX.CylinderUtil = function () {
@@ -11,7 +15,7 @@ GFX.CylinderUtil = function () {
 
 GFX.CylinderUtil.prototype = {
 
-    createCylinder: function ( point0, point1, diameter, material ) {
+    createCylinder: function ( point0, point1, diameter, segments, material ) {
         this.direction.subVectors(point1, point0);
         this.orientation.lookAt(point0, point1, this.threeUp);
 
@@ -20,7 +24,7 @@ GFX.CylinderUtil.prototype = {
                          0, -1, 0, 0,
                          0,  0, 0, 1 );
         this.orientation.multiply(this.matrix);
-        var cylinderGeom = new THREE.CylinderGeometry(diameter, diameter, this.direction.length(), 8, 1);
+        var cylinderGeom = new THREE.CylinderGeometry(diameter, diameter, this.direction.length(), segments, 1);
         var cylinderMesh = new THREE.Mesh( cylinderGeom, material );
         cylinderMesh.applyMatrix(this.orientation);
 

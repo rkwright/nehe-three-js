@@ -26,73 +26,54 @@
     2. Detector.js (checks the browsers WebGL capabilities) -->
 	<script src="../three-js/three.js"></script>
 	<script src="../three-js/Detector.js"></script>
+	<script type="text/javascript" src="../three-js/dat.gui.min.js"></script>
 </head>
 <body>
-<!-- Create a DIV element, which will be shown over the WebGL canvas. The last line
-("Renderer: ") will be completed either by "WebGL Renderer" or by "Canvas Renderer". -->
-<div id="overlaytext" style="position: absolute; top: 10px; left: 10px">
-	'F': Loop through the three texture filters (only for WebGL renderer)<br/>
-	'L': Toggle light (only for WebGL renderer)<br/>
-	Cursor left / right: Control y rotation speed<br/>
-	Cursor up / down: Control x rotation speed<br/>
-	Renderer:
-	<p>Min Filter: <span id="minFilterType">Linear</span><br/>
-		Mag Filter: <span id="magFilterType">Linear</span></p>
-	<p id="textureSize">Texture Size: 1024</p>
-</div>
-
 <!-- This is the DIV element which will contain the WebGL canvas. To be identifiable later on,
 the id 'WebGLCanvas' is applied to it. -->
 <div id="WebGLCanvas"/>
 
 <!-- This JavaScript block encloses the Three.js commands -->
 <script> //<![CDATA[
-// Global scene object
+
+var X_DELTA = 0.002;
+var Y_DELTA = 0.003;
+var Z_DELTA = 0.004;
+
+var xRotation = 0;
+var yRotation = 0;
+var zRotation = 0;
+
+// Global scene and camera object
 var scene;
-
-// Global camera object
 var camera;
-
-// x and y rotation
-var xRotation = 0.0;
-var yRotation = 0.0;
-
-// Rotation speed around x and y axis
-var xSpeed = 0.0;
-var ySpeed = 0.0;
-
-// Translation along the z axis
-var zTranslation = 0.0;
-
-
-// Texture and flag for current texture filter
-var crateTexture;
-var textureSize = 256;
-var textureFilter = 0;
-
-var filter = [ THREE.NearestFilter,
-	THREE.LinearFilter,
-	THREE.NearestMipMapNearestFilter,
-	THREE.LinearMipMapLinearFilter ];
-
-var filterType = [ "Nearest",
-	"Linear",
-	"NearestMipMapNearest",
-	"LinearMipMapLinear" ];
-
-// The next two objects hold two different kinds of light: Ambient and directional light.
-// 'enableLights' is the flag, which is switched by the key 'f'.
-var ambientLight;
-var directionalLight;
+var gui;
 
 // Global mesh object of the cube
 var cubeMesh;
 var cubeGeometry;
+var crateTexture;
 
-// Initialize the scene
+var options = [];
+
+var filter = [
+    THREE.NearestFilter,
+    THREE.LinearFilter,
+    THREE.NearestMipMapNearestFilter,
+    THREE.LinearMipMapLinearFilter
+];
+
+var filterType = [
+    "Nearest",
+    "Linear",
+    "NearestMipMapNearest",
+    "LinearMipMapLinear"
+];
+
+setupOptions();
+
 initializeScene();
 
-// Animate the scene
 animateScene();
 
 /**
@@ -110,14 +91,14 @@ function initializeScene(){
 	if(Detector.webgl){
 		renderer = new THREE.WebGLRenderer({antialias:true});
 		webGLAvailable = true;
-		document.getElementById("overlaytext").innerHTML += "WebGL Renderer";
+		document.getElementById("WebGLCanvas").innerHTML += "WebGL Renderer";
 
 		// If its not supported, instantiate the canvas renderer to support all non WebGL
 		// browsers
 	}
     else {
 		renderer = new THREE.CanvasRenderer();
-		document.getElementById("overlaytext").innerHTML += "Canvas Renderer";
+		document.getElementById("WebGLCanvas").innerHTML += "Canvas Renderer";
 	}
 
 	// Set the background color of the renderer to black, with full opacity
@@ -168,7 +149,7 @@ function initializeScene(){
 	cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
 
 	// Load an image as texture
-	crateTexture = new THREE.ImageUtils.loadTexture("images/StoneWall-"+textureSize+".png");
+	crateTexture = new THREE.ImageUtils.loadTexture("images/StoneWall-"+options.textureSize+".png");
 
 	// Create a material, which contains the texture.
 	// Unfortunately, the CanvasRenderer doesn't support MeshLambertMaterial in combination
@@ -179,7 +160,7 @@ function initializeScene(){
 	// face (front and back). This prevents the so called 'backface culling'. Usually,
 	// only the side is rendered, whose normal vector points towards the camera. The other
 	// side is not rendered (backface culling). But this performance optimization sometimes
-	// leads to wholes in the surface. When this happens in your surface, simply set
+	// leads to holes in the surface. When this happens in your surface, simply set
 	// 'doubleSided' to 'true'.
 	var cubeMaterial = new THREE.MeshLambertMaterial({ map:crateTexture, side:THREE.DoubleSide });
 
@@ -194,106 +175,88 @@ function initializeScene(){
 	// whole mesh by 'zTranslation' units on the z axis. Finally add the mesh
 	// to the scene.
 	cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
-	cubeMesh.position.set(0.0, 0.0, zTranslation);
+	cubeMesh.position.set(0.0, 0.0, 0.0);
 	scene.add(cubeMesh);
 
 	// Ambient light has no direction, it illuminates every object with the same
 	// intensity. If only ambient light is used, no shading effects will occur.
-	ambientLight = new THREE.AmbientLight(0x010101, 1.0);
+	var ambientLight = new THREE.AmbientLight(0x010101, 1.0);
 	scene.add(ambientLight);
 
 	// Directional light has a source and shines in all directions, like the sun.
 	// This behaviour creates shading effects.
-	directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+	var directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
 	directionalLight.position.set( 0, 0, 6 ).normalize();
 	scene.add(directionalLight);
 
-	// Add a listener for 'keydown' events. By this listener, all key events will be
-	// passed to the function 'onDocumentKeyDown'. There's another event type 'keypress'.
-	// It will report only the visible characters like 'a', but not the function keys
-	// like 'cursor up'.
-	document.addEventListener("keydown", onDocumentKeyDown, false);
+	setupDatGUI();
 }
 
-/**
- * This function is called, when a key is oushed down.
- */
-function onDocumentKeyDown(event) {
-	// Get the key code of the pressed key
-	var keyCode = event.which;
+function setupOptions() {
+    options.rotating = false;
 
-	if (keyCode === 70) {            // 'F' - Toggle through the texture filters
-		updateFilter();
+    options.textureSize = 256;
+    options.nFilter = 0;
+    options.textureFilter = filterType[options.nFilter];
 
-	}
-    else if (keyCode === 76) {       // 'L' - Toggle light
-		// Just toggle the intensity to turn lights on and off
-        ambientLight.intensity = ambientLight.intensity > 0 ? 0 : 1;
-        directionalLight.intensity = directionalLight.intensity > 0 ? 0 : 1;
-	}
-    else if (keyCode === 38) {       // Cursor up
-		xSpeed -= 0.005;
+}
 
-	}
-    else if (keyCode === 40) {       // Cursor down
-		xSpeed += 0.005;
+function setupDatGUI() {
+    gui = new dat.GUI();
 
-	}
-    else if (keyCode === 37) {       // Cursor left
-		ySpeed -= 0.005;
+    gui.add( options, 'rotating' ).onChange(function() {
 
-	}
-    else if (keyCode === 39) {       // Cursor right
-		ySpeed += 0.005;
+        console.log("rotating: " + options.rotating);
 
-	}
-    else if (keyCode === 33) {       // Page up
-		zTranslation -= 0.2;
+        if (options.rotating === false) {
+            xRotation = 0;
+            yRotation = 0;
+            zRotation = 0;
+        }
+    });
 
-	}
-    else if (keyCode === 34) {       // Page down
-		zTranslation += 0.2;
-	}
-	else if (keyCode === 84) {       // 'T' switch textures
-		textureSize = textureSize === 1024 ? 256 : textureSize === 256 ? 64 : 1024;
+    gui.add(options, "textureFilter", [ filterType[0], filterType[1], filterType[2], filterType[3]  ]).onChange(function() {
 
-		cubeMesh.material.map = new THREE.ImageUtils.loadTexture("images/StoneWall-"+textureSize+".png");
-		updateFilter();
-		cubeMesh.material.needsUpdate = true;
+        options.nFilter = filterType.indexOf(options.textureFilter);
+        console.log("nFilter: " + options.nFilter + " textureFilter: " + filterType[options.nFilter]);
+        updateFilter();
+    });
 
-		document.getElementById("textureSize").innerHTML = "Texture Size: " + textureSize;
-	}
+    gui.add(options, "textureSize", [ 64, 256, 1024  ]).onChange(function() {
 
-	event.stopPropagation();
+        updateTexture();
+        console.log("textureSize " + options.textureSize);
+    });
+}
+function updateTexture() {
+    cubeMesh.material.map = new THREE.ImageUtils.loadTexture("images/StoneWall-" + options.textureSize + ".png");
+    updateFilter();
+    cubeMesh.material.needsUpdate = true;
 }
 
 /**
  *  Just update the filters
  */
 function updateFilter() {
-    textureFilter = ++textureFilter % 4;
-
-    cubeMesh.material.map.minFilter = filter[textureFilter];
-    cubeMesh.material.map.magFilter = filter[textureFilter % 2];
+    cubeMesh.material.map.minFilter = filter[options.nFilter];
+    cubeMesh.material.map.magFilter = filter[options.nFilter % 2];
     cubeMesh.material.map.needsUpdate = true;
-
-    document.getElementById("minFilterType").innerHTML = filterType[textureFilter];
-    document.getElementById("magFilterType").innerHTML = filterType[textureFilter % 2];
 }
 
 /**
  * Animate the scene and call rendering.
  */
 function animateScene(){
-	// Update and set the rotation around x and y axis
-	xRotation += xSpeed;
-	yRotation += ySpeed;
-	cubeMesh.rotation.set(xRotation, yRotation, 0.0);
+	// Update and set the rotation around the axes
+    if (options.rotating) {
+        xRotation += X_DELTA;
+        yRotation += Y_DELTA;
+        zRotation += Z_DELTA;
+    }
 
-	// Apply the the translation along the z axis
-	cubeMesh.position.z = zTranslation;
+    cubeMesh.rotation.set(xRotation, yRotation, zRotation);
 
-	// Define the function, which is called by the browser supported timer loop. If the
+    // Define the function which is called by the browser supported timer loop. If the
 	// browser tab is not visible, the animation is paused. So 'animateScene()' is called
 	// in a browser controlled loop.
 	requestAnimationFrame(animateScene);

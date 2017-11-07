@@ -68,7 +68,7 @@ GFX.Scene = function ( parameters ) {
     this.initialize();
 };
 
-GFX.setParameters= function( object, values ) {
+GFX.setParameters = function( object, values ) {
 
     if ( values === undefined ) return;
 

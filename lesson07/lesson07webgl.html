@@ -54,8 +54,6 @@ var cubeMesh;
 var cubeGeometry;
 var crateTexture;
 
-var options = [];
-
 var filter = [
     THREE.NearestFilter,
     THREE.LinearFilter,
@@ -70,7 +68,7 @@ var filterType = [
     "LinearMipMapLinear"
 ];
 
-setupOptions();
+var options = setupDatGUI();
 
 initializeScene();
 
@@ -188,25 +186,19 @@ function initializeScene(){
 	var directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
 	directionalLight.position.set( 0, 0, 6 ).normalize();
 	scene.add(directionalLight);
-
-	setupDatGUI();
 }
 
-function setupOptions() {
+function setupDatGUI() {
+    var options = [];
     options.rotating = false;
 
     options.textureSize = 256;
     options.nFilter = 0;
     options.textureFilter = filterType[options.nFilter];
 
-}
-
-function setupDatGUI() {
     gui = new dat.GUI();
 
     gui.add( options, 'rotating' ).onChange(function() {
-
-        console.log("rotating: " + options.rotating);
 
         if (options.rotating === false) {
             xRotation = 0;
@@ -218,15 +210,15 @@ function setupDatGUI() {
     gui.add(options, "textureFilter", [ filterType[0], filterType[1], filterType[2], filterType[3]  ]).onChange(function() {
 
         options.nFilter = filterType.indexOf(options.textureFilter);
-        console.log("nFilter: " + options.nFilter + " textureFilter: " + filterType[options.nFilter]);
         updateFilter();
     });
 
     gui.add(options, "textureSize", [ 64, 256, 1024  ]).onChange(function() {
 
         updateTexture();
-        console.log("textureSize " + options.textureSize);
     });
+
+    return options
 }
 function updateTexture() {
     cubeMesh.material.map = new THREE.ImageUtils.loadTexture("images/StoneWall-" + options.textureSize + ".png");

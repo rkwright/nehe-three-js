@@ -26,13 +26,7 @@
 		<script type="text/javascript">
             var MAX_FOG = 0.5;
             var MIN_FOG = 0.0;
-            var FOG_INCR = 0.025;
-            var CUBE_SIZE = 0.25;
-
-			var crateTexture;
-			var	yTranslation = CUBE_SIZE/2.0;
-			var	zTranslation = 0.0;
-            var fogType = "exponential";
+			var fogType = "exponential";
 			var fogDensity = 0.10;
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
@@ -46,7 +40,7 @@
 				fogDensity : fogDensity,
 				fogColor: 0xffffff });
 
-			var options = setupOptions();
+			var options = setupDatGUI();
 
 			// then initialize our demo's stuff
 			initializeDemo();
@@ -58,8 +52,13 @@
 			 * Initialize the Demo.  
 			 */
 			function initializeDemo() {
-	
-				// Create the cubes
+                var CUBE_SIZE = 0.25;
+                var crateTexture;
+                var xTranslation = 0.0;
+                var	yTranslation = CUBE_SIZE/2.0;
+                var	zTranslation = 0.0;
+
+                // Create the cubes
 				var boxGeometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
 	
 				// Load an image as texture
@@ -71,7 +70,7 @@
 				});
 
 				var boxMesh;
-				for ( var x=-5; x<=5; x += 1) {
+				for ( var x=-5; x<=5; x += 1 ) {
 					boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
 					boxMesh.position.set(x, yTranslation, zTranslation);
 					gfxScene.add(boxMesh);
@@ -79,38 +78,31 @@
 				
 				for ( var z=-5; z<=5; z += 1 ) {
 					boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
-					boxMesh.position.set(0.0, yTranslation, z);
+					boxMesh.position.set(xTranslation, yTranslation, z);
 					gfxScene.add(boxMesh);
 				}
-
-                setupDatGUI();
             }
 
             /**
-             *
+             * Initialize the dat.gui library and the options elements
              */
-            function setupOptions() {
+            function setupDatGUI() {
                 var options = [];
 
                 options.density = 0.1;
                 options.color = 0xffffff;
 
-                return options;
-            }
-
-            /**
-             *
-             */
-            function setupDatGUI() {
                 gui = new dat.GUI();
 
                 gui.add(options, 'density', MIN_FOG, MAX_FOG).onChange(function() {
                     gfxScene.addFog( { fogDensity: options.density } );
                 });
 
-                gui.addColor( options, 'color').onChange( function( colorValue  ) {
-                    gfxScene.addFog( { fogColor: colorValue } );
+                gui.addColor( options, 'color').onChange( function( color  ) {
+                    gfxScene.addFog( { fogColor: color } );
                 });
+
+                return options;
             }
 
 			/**

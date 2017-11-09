@@ -22,7 +22,6 @@
 		<script type="text/javascript">
             // the global var (ick!) for the cube's mesh
             var mesh;
-            var maskType = 0;
             var maskList = [ "Lattice", "Flowers" ];
 
             // allocate the Scene object, and set the camera position
@@ -82,8 +81,6 @@
                     options.mask = maskList.indexOf(options.mask) + 1;
                     makeMesh( options.mask );
                 });
-
-                return options;
             }
 
             /**

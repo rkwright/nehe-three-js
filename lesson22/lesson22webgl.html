@@ -19,28 +19,24 @@
 		<script src="../three-js/three.js" type="text/javascript"></script>
 		<script src="../three-js/Detector.js" type="text/javascript"></script>
         <script src="../three-js/stats.js" type="text/javascript"></script>
+        <script src="../three-js/dat.gui.min.js" type="text/javascript"></script>
 		<script src="../gfx/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
         <script src="../gfx/gfx-scene.js" type="text/javascript"></script>
 
 	</head>
 	<body>
-    <!-- Create a DIV element, which will be shown over the WebGL canvas. The last line
-    ("Renderer: ") will be completed either by "WebGL Renderer" or by "Canvas Renderer". -->
-    <div id="overlaytext" style="position: absolute; top: 10px; left: 10px">
-        'b' turn bump mapping on/off
-        't' swap textures
-    </div>
 		<script type="text/javascript">
             // the global var (ick!) for the cube's mesh
             var mesh;
-            var bumped = true;
-            var image = "flower";
+            var imageList = [ "flower", "stone"];
 
             // allocate the Scene object, and set the camera position
             var gfxScene = new GFX.Scene( { cameraPos : [3, 5, 8],
                                             controls : true,
 											axesHeight:10,
                                             displayStats:true});
+
+            setupDatGUI();
 
 			// Initialize the demo
 			initializeDemo();
@@ -52,12 +48,7 @@
 			 *  Initialize the demo's local aspects, i.e not the scene.
 			 */
 			function initializeDemo() {
-                makeMesh( bumped, image );
-
-                // Add a listener for 'keydown' events. There's another event type: 'keypress',
-                // but it will report only the visible characters like 'a', but not the function keys
-                // like 'cursor up'.
-                document.addEventListener("keydown", onDocumentKeyDown, false);
+                makeMesh( true, imageList[0] );
 			}
 
 			/**
@@ -70,7 +61,6 @@
 			    gfxScene.remove(mesh);
 
                 var geom = new THREE.CubeGeometry( 2, 2, 2 );
-                //geom.computeVertexNormals();
 
                 var texture = new THREE.ImageUtils.loadTexture("images/" + image + ".jpg");
                 var bump = bumped === true ? new THREE.ImageUtils.loadTexture("images/" + image + "-bump.jpg") : null;
@@ -88,24 +78,23 @@
             }
 
             /**
-             * This function is called, when a key is pushed down.
+             *
              */
-            function onDocumentKeyDown(event){
+            function setupDatGUI() {
+                var options = [];
 
-                var keyChar = String.fromCharCode(event.which);
-                keyChar = keyChar.toLowerCase();
+                options.image = imageList[0];
+                options.bumped = true;
 
-                if (keyChar === 'b') {
-                    bumped = !bumped;
-                }
-                else if (keyChar === 't') {
-                    if ( image.indexOf('f') !== -1)
-                        image = "stone";
-                    else
-                        image = "flower";
-                }
+                gui = new dat.GUI();
 
-                makeMesh(bumped, image);
+                gui.add(options, "image", [ imageList[0], imageList[1] ]).onChange(function() {
+                    makeMesh( options.bumped, options.image );
+                });
+
+                gui.add(options, "bumped" ).onChange(function() {
+                    makeMesh( options.bumped, options.image );
+                });
             }
 			/**
 			 * Animate the scene and call rendering.

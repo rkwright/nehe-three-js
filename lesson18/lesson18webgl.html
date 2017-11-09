@@ -54,7 +54,7 @@
 									                    controls:true,
 									                    displayStats:true });
 
-			var options = setupDatGUI();
+			setupDatGUI();
 
 			// then initialize our demo's stuff
 			initializeDemo();
@@ -183,8 +183,6 @@
                     quadType = quadList.indexOf(options.quad);
                     quadric = makeQuad(quadType);
                 });
-
-                return options;
             }
 
             /**

@@ -27,7 +27,6 @@
 			var	quadric;
 			var	quadGeometry;
 			var	quadMaterial;
-			var	materialType = 't';	// texture, paint or wire
 			var	quadType = '2';
             var backgroundScene;
             var backgroundCamera;
@@ -53,7 +52,7 @@
 				// Load an image as texture
 				quadTexture = new THREE.ImageUtils.loadTexture("images/ElCapitanSphere.jpg");
 
-				quadMaterial = makeMaterial(materialType);
+				quadMaterial = makeMaterial('t');
 	
 				quadric = makeQuad(quadType);
 
@@ -71,8 +70,6 @@
                 backgroundScene = new THREE.Scene();
                 backgroundCamera = new THREE.Camera();
                 backgroundScene.add(backgroundMesh );
-
-                document.addEventListener("keypress", onDocumentKeyPress, false);
 			}
 	
 			function makeMaterial ( matType ) {
@@ -126,25 +123,11 @@
 					break;
 				}
 
-
-
 				quad = new THREE.Mesh(quadGeometry, quadMaterial);
 				
 				gfxScene.add(quad);
 				
 				return quad;
-			}
-	
-			function onDocumentKeyPress(event) {
-				// Get the key code of the pressed key
-				var keyChar = String.fromCharCode(event.which);
-                keyChar = keyChar.toLowerCase();
-
-				var quadString = "012";
-
-					if ( quadString.indexOf(keyChar) !== -1) {
-					quadric = makeQuad(keyChar);
-				}
 			}
 	
 			/**
@@ -164,9 +147,5 @@
 			}
 
 		</script>
-
-		<!-- Create a DIV element, which will be shown over the WebGL canvas. -->
-		<div style="position: absolute; top: 10px; left: 10px;color:white">
-		'0 .. 2': Type of quadric<br/>
 	</body>
 </html>

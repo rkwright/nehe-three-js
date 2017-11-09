@@ -13,25 +13,25 @@
 		<script src="../three-js/three.js" type="text/javascript"></script>
 		<script src="../three-js/Detector.js" type="text/javascript"></script>
         <script src="../three-js/stats.js" type="text/javascript"></script>
+		<script src="../three-js/dat.gui.min.js" type="text/javascript"></script>
 		<script src="../gfx/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
         <script src="../gfx/gfx-scene.js" type="text/javascript"></script>
 
 	</head>
 	<body>
-    <!-- Create a DIV element, which will be shown over the WebGL canvas. The last line
-    ("Renderer: ") will be completed either by "WebGL Renderer" or by "Canvas Renderer". -->
-    <div id="overlaytext" style="position: absolute; top: 10px; left: 10px">
-        '1 ,2 ' select image/mask 1 or 2
-    </div>
 		<script type="text/javascript">
             // the global var (ick!) for the cube's mesh
             var mesh;
+            var maskType = 0;
+            var maskList = [ "Lattice", "Flowers" ];
 
             // allocate the Scene object, and set the camera position
             var gfxScene = new GFX.Scene( { cameraPos : [3, 5, 10],
                                             controls : true,
 											axesHeight:10,
                                             displayStats:true});
+
+            setupDatGUI();
 
 			// Initialize the demo
 			initializeDemo();
@@ -44,11 +44,6 @@
 			 */
 			function initializeDemo() {
                 makeMesh( 1 );
-
-                // Add a listener for 'keydown' events. There's another event type: 'keypress',
-                // but it will report only the visible characters like 'a', but not the function keys
-                // like 'cursor up'.
-                document.addEventListener("keydown", onDocumentKeyDown, false);
 			}
 
 			/**
@@ -73,20 +68,25 @@
             }
 
             /**
-             * This function is called, when a key is pushed down.
+             *
              */
-            function onDocumentKeyDown(event){
+            function setupDatGUI() {
+                var options = [];
 
-                var keyCode = event.which;      // Get the key code of the pressed key
+                options.mask = maskList[0];
 
-                if (keyCode == 49) {             // '1'
-                    makeMesh(1);
-                }
-                else if (keyCode == 50) {        // '2'
-                    makeMesh(2);
-                }
+                gui = new dat.GUI();
+
+                gui.add(options, "mask", [ maskList[0], maskList[1] ]).onChange(function() {
+
+                    options.mask = maskList.indexOf(options.mask) + 1;
+                    makeMesh( options.mask );
+                });
+
+                return options;
             }
-			/**
+
+            /**
 			 * Animate the scene and call rendering.
 			 */
 			function animateScene() {

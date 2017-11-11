@@ -40,7 +40,7 @@
 				fogDensity : fogDensity,
 				fogColor: 0xffffff });
 
-			var options = setupDatGUI();
+			setupDatGUI();
 
 			// then initialize our demo's stuff
 			initializeDemo();
@@ -101,8 +101,6 @@
                 gui.addColor( options, 'color').onChange( function( color  ) {
                     gfxScene.addFog( { fogColor: color } );
                 });
-
-                return options;
             }
 
 			/**

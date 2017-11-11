@@ -31,7 +31,7 @@
 <body>
 <!-- This is the DIV element which will contain the WebGL canvas. To be identifiable later on,
 the id 'WebGLCanvas' is applied to it. -->
-<div id="WebGLCanvas"/>
+<div id="WebGLCanvas"></div>
 
 <!-- This JavaScript block encloses the Three.js commands -->
 <script> //<![CDATA[
@@ -51,22 +51,7 @@ var gui;
 
 // Global mesh object of the cube
 var cubeMesh;
-var cubeGeometry;
 var crateTexture;
-
-var filter = [
-    THREE.NearestFilter,
-    THREE.LinearFilter,
-    THREE.NearestMipMapNearestFilter,
-    THREE.LinearMipMapLinearFilter
-];
-
-var filterType = [
-    "Nearest",
-    "Linear",
-    "NearestMipMapNearest",
-    "LinearMipMapLinear"
-];
 
 var options = setupDatGUI();
 
@@ -144,7 +129,7 @@ function initializeScene(){
 	scene.add(camera);
 
 	// Create the cube
-	cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
+	var cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
 
 	// Load an image as texture
 	crateTexture = new THREE.ImageUtils.loadTexture("images/StoneWall-"+options.textureSize+".png");
@@ -188,7 +173,24 @@ function initializeScene(){
 	scene.add(directionalLight);
 }
 
+/**
+ *  Setup the data parameters and user interface
+ */
 function setupDatGUI() {
+    var filter = [
+        THREE.NearestFilter,
+        THREE.LinearFilter,
+        THREE.NearestMipMapNearestFilter,
+        THREE.LinearMipMapLinearFilter
+    ];
+
+    var filterType = [
+        "Nearest",
+        "Linear",
+        "NearestMipMapNearest",
+        "LinearMipMapLinear"
+    ];
+
     var options = [];
     options.rotating = false;
 
@@ -210,28 +212,31 @@ function setupDatGUI() {
     gui.add(options, "textureFilter", [ filterType[0], filterType[1], filterType[2], filterType[3]  ]).onChange(function() {
 
         options.nFilter = filterType.indexOf(options.textureFilter);
-        updateFilter();
+        updateFilter( filter[options.nFilter], filter[options.nFilter % 2] );
     });
 
     gui.add(options, "textureSize", [ 64, 256, 1024  ]).onChange(function() {
 
-        updateTexture();
+        updateTexture( options.textureSize );
     });
 
-    return options
+    return options;
 }
-function updateTexture() {
-    cubeMesh.material.map = new THREE.ImageUtils.loadTexture("images/StoneWall-" + options.textureSize + ".png");
-    updateFilter();
+
+/**
+ * Just load the new texture and set the update flag for the scene
+ */
+function updateTexture( textureSize ) {
+    cubeMesh.material.map = new THREE.ImageUtils.loadTexture("images/StoneWall-" + textureSize + ".png");
     cubeMesh.material.needsUpdate = true;
 }
 
 /**
  *  Just update the filters
  */
-function updateFilter() {
-    cubeMesh.material.map.minFilter = filter[options.nFilter];
-    cubeMesh.material.map.magFilter = filter[options.nFilter % 2];
+function updateFilter( minFilter, magFilter ) {
+    cubeMesh.material.map.minFilter = minFilter;
+    cubeMesh.material.map.magFilter = magFilter;
     cubeMesh.material.map.needsUpdate = true;
 }
 

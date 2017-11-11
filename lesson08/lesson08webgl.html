@@ -29,25 +29,10 @@
 
             // Texture and flag for current texture filter
             var glassTexture;
-            var textureFilter = 0;
-
-            var filter = [
-                THREE.NearestFilter,
-                THREE.LinearFilter,
-                THREE.NearestMipMapNearestFilter,
-                THREE.LinearMipMapLinearFilter
-			];
-
-            var filterType = [
-                "Nearest",
-                "Linear",
-                "NearestMipMapNearest",
-                "LinearMipMapLinear"
-			];
+            //var textureFilter = 0;
 
             // Global mesh object of the cube
             var cubeMesh;
-            var options = setupDatGUI();
 
             // allocate the Scene object, and set the camera position
             var gfxScene = new GFX.Scene( { cameraPos:[0,0,6] });
@@ -55,7 +40,9 @@
             var directionalLight = gfxScene.directionalLights[0];
             var ambientLight = gfxScene.ambientLights[0];
 
-			initializeDemo();
+            var options = setupDatGUI();
+
+            initializeDemo();
 
 			animateScene();
 
@@ -87,14 +74,28 @@
             }
 
             /**
-             *
+             * Set the various parameters and user interface
              */
             function setupDatGUI() {
+                var filter = [
+                    THREE.NearestFilter,
+                    THREE.LinearFilter,
+                    THREE.NearestMipMapNearestFilter,
+                    THREE.LinearMipMapLinearFilter
+                ];
+
+                var filterType = [
+                    "Nearest",
+                    "Linear",
+                    "NearestMipMapNearest",
+                    "LinearMipMapLinear"
+                ];
+
                 var options = [];
 
                 options.rotating = false;
-                options.blending = false;
-                options.light = true;
+                options.blending = true;
+                options.light    = true;
 
                 options.nFilter = 0;
                 options.textureFilter = filterType[options.nFilter];
@@ -122,7 +123,7 @@
                         cubeMesh.material.opacity = 0.5;
                         cubeMesh.material.combine = THREE.MixOperation;
                     }
-                    updateFilter();
+                    updateFilter(filter[options.nFilter], filter[options.nFilter] % 2);
                 });
 
                 gui.add( options, 'light' ).onChange(function() {
@@ -133,7 +134,7 @@
                 gui.add(options, "textureFilter", [ filterType[0], filterType[1], filterType[2], filterType[3]  ]).onChange(function() {
 
                     options.nFilter = filterType.indexOf(options.textureFilter);
-                    updateFilter();
+                    updateFilter(filter[options.nFilter], filter[options.nFilter % 2]);
                 });
 
                 return options;
@@ -142,9 +143,9 @@
 			/**
 			 *  Just update the filters and the labels
 			 */
-			function updateFilter() {
-				cubeMesh.material.map.minFilter = filter[textureFilter];
-				cubeMesh.material.map.magFilter = filter[textureFilter % 2];
+			function updateFilter( minFilter, magFilter ) {
+				cubeMesh.material.map.minFilter = minFilter;
+				cubeMesh.material.map.magFilter = magFilter;
 				cubeMesh.material.map.needsUpdate = true;
 			}
 

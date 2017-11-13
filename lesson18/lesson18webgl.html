@@ -31,22 +31,6 @@
 			var	quadMaterial;
 			var	materialType = 0;	// texture, paint or wire
 			var	quadType = 0;
-            var quadList = [
-                "Box",
-                "Circle",
-                "Cylinder",
-                "Dodecahedron",
-                "Icosahedron",
-                "Cone",
-                "Octahedron",
-                "Ring",
-                "Sphere",
-                "Tetrahedron",
-                "Torus",
-                "TorusKnot"
-            ];
-
-            var materialList = ["Color", "Texture", "Wireframe"];
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
 			var gfxScene = new GFX.Scene( { cameraPos : [0, 6, 12],
@@ -141,9 +125,25 @@
 			}
 
             /**
-             *
+             * Specify the parameters and user interface
              */
             function setupDatGUI() {
+                var quadList = [
+                    "Box",
+                    "Circle",
+                    "Cylinder",
+                    "Dodecahedron",
+                    "Icosahedron",
+                    "Cone",
+                    "Octahedron",
+                    "Ring",
+                    "Sphere",
+                    "Tetrahedron",
+                    "Torus",
+                    "TorusKnot"
+                ];
+
+                var materialList = ["Color", "Texture", "Wireframe"];
                 var options = [];
 
                 options.quadType = 0;

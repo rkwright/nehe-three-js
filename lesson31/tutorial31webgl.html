@@ -18,6 +18,7 @@
 		<script src="../three-js/three.js" type="text/javascript"></script>
 		<script src="../three-js/Detector.js" type="text/javascript"></script>
 		<script src="../three-js/stats.js" type="text/javascript"></script>
+        <script src="../three-js/dat.gui.min.js" type="text/javascript"></script>
         <script src="../three-js/loaders/OBJLoader.js" type="text/javascript"></script>
         <script src="../three-js/loaders/ColladaLoader.js" type="text/javascript"></script>
         <script src="../three-js/loaders/AWDLoader.js"></script>
@@ -41,7 +42,9 @@
                 axesHeight:10,
 				controls:true,
 				displayStats:true});
-	
+
+			setupDatGUI();
+
 			// then initialize our demo's stuff
 			initializeDemo();
 	
@@ -54,9 +57,9 @@
 	
 			function initializeDemo() {
 
-			    loadModel("3");
+			    loadModel(3);
 
-                document.addEventListener("keypress", onDocumentKeyPress, false);
+                //document.addEventListener("keypress", onDocumentKeyPress, false);
             }
 
             function loadModel( type ) {
@@ -66,33 +69,33 @@
                 gfxScene.remove( modelMesh );
 
                 switch ( modelType ) {
-                    case '0':
+                    case 0:
                         loadOBJ();
                         break;
-                    case '1':
+                    case 1:
                         loadCollada();
                         break;
-                    case '2':
+                    case 2:
                         loadAWD();
                         break;
-                    case '3':
+                    case 3:
                         loadBabylon();
+                        break;
+                    case 4:
+                        loadPLY();
+                        break;
+                    case 5:
+                        loadSTL();
+                        break;
+                    case 6:
+                        loadVRML();
+                        break;
+                    case 7:
+                        loadVTK();
                         break;
                     /*case '4':
                         loadPDB();
-                        break; */
-                    case '5':
-                        loadPLY();
-                        break;
-                    case '6':
-                        loadSTL();
-                        break;
-                    case '7':
-                        loadVRML();
-                        break;
-                    case '8':
-                        loadVTK();
-                        break;
+                        break;*/
                 }
             }
 
@@ -124,7 +127,6 @@
                 modelMesh = object;
                 //modelMesh.scale.set(1,1,1);
                 gfxScene.add(modelMesh);
-                updateLabel("OBJ");
             }
 
             function  loadCollada () {
@@ -154,7 +156,6 @@
                 modelMesh.rotateX(-Math.PI/2);
                 modelMesh.rotateZ(Math.PI/2);
                 gfxScene.add(modelMesh);
-                updateLabel("Collada");
             }
 
             function  loadAWD () {
@@ -181,7 +182,6 @@
                 modelMesh = awd;
                 modelMesh.scale.set(0.075, 0.075, 0.075);
                 gfxScene.add(modelMesh);
-                updateLabel("AWD");
             }
 
             function  loadBabylon () {
@@ -215,10 +215,87 @@
                 modelMesh.rotateY(Math.PI);
                 modelMesh.scale.set(0.05, 0.05, 0.05);
                 gfxScene.add(modelMesh);
-                updateLabel("Babylon");
             }
 
-            /*
+            function  loadPLY () {
+                var manager = new THREE.LoadingManager();
+                var loader = new THREE.PLYLoader( manager );
+
+                // Launch loading of the PLY file, onLoad* will be called when it's ready
+                loader.load( 'models/PLY/F117.ply', onLoadPLY);
+            }
+
+            function onLoadPLY ( geometry ) {
+
+                geometry.computeVertexNormals();
+                var material = new THREE.MeshPhongMaterial({color: 0xC0C0C0, shading:THREE.FlatShading, specular: 0xFFFFFF, shininess: 100});
+                modelMesh = new THREE.Mesh(geometry, material);
+                modelMesh.rotation.set(-Math.PI / 2, 0, 0);
+                modelMesh.scale.set(0.5, 0.5, 0.5);
+                modelMesh.position.set(-2, 0, 5.36);
+                gfxScene.add(modelMesh);
+            }
+
+            // prepare STL loader and load the model
+            function  loadSTL () {
+                var manager = new THREE.LoadingManager();
+                var loader = new THREE.STLLoader( manager );
+
+                // Launch loading of the STL file, onLoad* will be called when it's ready
+                loader.load( 'models/STL/piano.stl', onLoadSTL);
+            }
+
+            function onLoadSTL ( geometry ) {
+
+                geometry.computeVertexNormals();
+                var material = new THREE.MeshNormalMaterial();
+                modelMesh = new THREE.Mesh(geometry, material);
+                modelMesh.rotation.set(-Math.PI / 2, 0, Math.PI / 2);
+                modelMesh.rotateZ(Math.PI);
+                modelMesh.scale.set(0.5, 0.5, 0.5);
+                gfxScene.add(modelMesh);
+            }
+
+            // prepare VRML loader and load the model
+            function  loadVRML () {
+                var manager = new THREE.LoadingManager();
+                var loader = new THREE.VRMLLoader( manager );
+
+                // Launch loading of the VRML file, onLoad* will be called when it's ready
+                loader.load( 'models/VRML/house.wrl', onLoadVRML);
+            }
+
+            function onLoadVRML ( object ) {
+
+                modelMesh = object;
+                modelMesh.scale.set(0.5, 0.5, 0.5);
+                modelMesh.position.set(-1.5, 0, 2.5 );
+
+                gfxScene.add(modelMesh);
+            }
+
+            // prepare VTK loader and load the model
+            function  loadVTK () {
+                var manager = new THREE.LoadingManager();
+                var loader = new THREE.VTKLoader( manager );
+
+                // Launch loading of the VTK file, onLoad* will be called when it's ready
+                loader.load( 'models/VTK/bunny.vtk', onLoadVTK);
+            }
+
+            function onLoadVTK ( geometry ) {
+
+                geometry.computeVertexNormals();
+
+                var material = new THREE.MeshLambertMaterial( { color:0xEEEEEE, shading:THREE.FlatShading } );
+                modelMesh = new THREE.Mesh(geometry, material);
+                modelMesh.rotation.set(0, Math.PI/2, 0);
+                modelMesh.scale.set(15, 15, 15);
+                modelMesh.position.set(-0.15, -0.5, 0);
+                gfxScene.add(modelMesh);
+            }
+
+            /*  PDB Loader got changed significantly around r82 and needs a significant refactoring
             function  loadPDB () {
                 var manager = new THREE.LoadingManager();
                 var loader = new THREE.PDBLoader( manager );
@@ -253,94 +330,8 @@
                 modelMesh.scale.set(0.5, 0.5, 0.5);
                 gfxScene.add(modelMesh);
                 updateLabel("PDB");
-            }
-*/
-            function  loadPLY () {
-                var manager = new THREE.LoadingManager();
-                var loader = new THREE.PLYLoader( manager );
-
-                // Launch loading of the PLY file, onLoad* will be called when it's ready
-                loader.load( 'models/PLY/F117.ply', onLoadPLY);
-            }
-
-            function onLoadPLY ( geometry ) {
-
-                geometry.computeVertexNormals();
-                var material = new THREE.MeshPhongMaterial({color: 0xC0C0C0, shading:THREE.FlatShading, specular: 0xFFFFFF, shininess: 100});
-                modelMesh = new THREE.Mesh(geometry, material);
-                modelMesh.rotation.set(-Math.PI / 2, 0, 0);
-                modelMesh.scale.set(0.5, 0.5, 0.5);
-                modelMesh.position.set(-2, 0, 5.36);
-                gfxScene.add(modelMesh);
-                updateLabel("PLY");
-            }
-
-            // prepare STL loader and load the model
-            function  loadSTL () {
-                var manager = new THREE.LoadingManager();
-                var loader = new THREE.STLLoader( manager );
-
-                // Launch loading of the STL file, onLoad* will be called when it's ready
-                loader.load( 'models/STL/piano.stl', onLoadSTL);
-            }
-
-            function onLoadSTL ( geometry ) {
-
-                geometry.computeVertexNormals();
-                var material = new THREE.MeshNormalMaterial();
-                modelMesh = new THREE.Mesh(geometry, material);
-                modelMesh.rotation.set(-Math.PI / 2, 0, Math.PI / 2);
-                modelMesh.rotateZ(Math.PI);
-                modelMesh.scale.set(0.5, 0.5, 0.5);
-                gfxScene.add(modelMesh);
-                updateLabel("STL");
-            }
-
-            // prepare VRML loader and load the model
-            function  loadVRML () {
-                var manager = new THREE.LoadingManager();
-                var loader = new THREE.VRMLLoader( manager );
-
-                // Launch loading of the VRML file, onLoad* will be called when it's ready
-                loader.load( 'models/VRML/house.wrl', onLoadVRML);
-            }
-
-            function onLoadVRML ( object ) {
-
-                modelMesh = object;
-                modelMesh.scale.set(0.5, 0.5, 0.5);
-                modelMesh.position.set(-1.5, 0, 2.5 );
-
-                gfxScene.add(modelMesh);
-                updateLabel("VRML");
-            }
-
-            // prepare VTK loader and load the model
-            function  loadVTK () {
-                var manager = new THREE.LoadingManager();
-                var loader = new THREE.VTKLoader( manager );
-
-                // Launch loading of the VTK file, onLoad* will be called when it's ready
-                loader.load( 'models/VTK/bunny.vtk', onLoadVTK);
-            }
-
-            function onLoadVTK ( geometry ) {
-
-                geometry.computeVertexNormals();
-
-                var material = new THREE.MeshLambertMaterial( { color:0xEEEEEE, shading:THREE.FlatShading } );
-                modelMesh = new THREE.Mesh(geometry, material);
-                modelMesh.rotation.set(0, Math.PI/2, 0);
-                modelMesh.scale.set(15, 15, 15);
-                modelMesh.position.set(-0.15, -0.5, 0);
-                gfxScene.add(modelMesh);
-                updateLabel("VTK");
-            }
+            } */
             //================= Utilities ==========================
-
-            function updateLabel( modelStr ) {
-                document.getElementById("modelType").innerHTML = modelStr;
-            }
 
             function getBoundingSphere ( object ) {
                 var helper = new THREE.BoxHelper(object, 0xff0000);
@@ -366,16 +357,33 @@
 
             }
 
-            function onDocumentKeyPress(event) {
-				// Get the key code of the pressed key
-				var keyChar = String.fromCharCode(event.which);
-                var modelString = "01235678";
+            /**
+             * Set up the parameters and interface
+             */
+            function setupDatGUI() {
+                var modelList= [
+                    "OBJ",
+                    "Collada",
+                    "AWD",
+                    "Babylon",
+                    "PLY",
+                    "STL",
+                    "VRML",
+                    "VTK"
+                ];
 
-                if ( modelString.indexOf(keyChar) !== -1) {
-                    loadModel(keyChar);
-                }
-			}
-	
+                var options = [];
+
+                options.model = modelList[0];
+
+                gui = new dat.GUI();
+
+                gui.add(options, "model", [ modelList[0],modelList[1],modelList[2],modelList[3],modelList[4],modelList[5],modelList[6],modelList[7] ]).onChange(function() {
+                    var modelType = modelList.indexOf( options.model );
+                    loadModel(modelType);
+                });
+            }
+
 			/**
 			 * Animate the scene and call rendering.
 			 */
@@ -389,11 +397,5 @@
 			}
 
 		</script>
-
-		<!-- Create a DIV element, which will be shown over the WebGL canvas. -->
-		<div style="position: absolute; top: 10px; left: 10px;color:white">
-			<span>Choose which model: 0...8</span><br/>
-			Model: <span id="modelType">XX</span>
-		</div>
 	</body>
 </html>

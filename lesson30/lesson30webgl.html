@@ -23,11 +23,6 @@
 	</head>
 	<body>
 
-    <div style="position: absolute; top: 10px; left: 10px;color:white">
-        <p> <span id="LogText"></span></p>
-
-    </div>
-
     <script type="text/javascript">
             var raycaster = new THREE.Raycaster();
             var walls = new THREE.Object3D();
@@ -73,8 +68,6 @@
                 gfxScene.add(objects);
 
                 gfxScene.renderScene();
-
-                document.addEventListener("keypress", onDocumentKeyPress, false);
             }
 
 			function randColor() {
@@ -287,20 +280,6 @@
 
                 gfxScene.add(walls);
             }
-
-            /**
-             * Just a handler for the keypress event to control parameters of the demo
-             */
-			function onDocumentKeyPress(event) {
-				// Get the key code of the pressed key
-				var keyChar = String.fromCharCode(event.which);
-                keyChar = keyChar.toLowerCase();
-
-				var renderString = "012";
-
-					if ( renderString.indexOf(keyChar) !== -1) {
-                    }
-			}
 
             function checkWallCollision ( mesh ) {
 

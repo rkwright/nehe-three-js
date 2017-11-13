@@ -22,7 +22,6 @@
 		<script type="text/javascript">
             // the global var (ick!) for the cube's mesh
             var mesh;
-            var maskList = [ "Lattice", "Flowers" ];
 
             // allocate the Scene object, and set the camera position
             var gfxScene = new GFX.Scene( { cameraPos : [3, 5, 10],
@@ -67,9 +66,10 @@
             }
 
             /**
-             *
+             * Set up the parameters and user interface
              */
             function setupDatGUI() {
+                var maskList = [ "Lattice", "Flowers" ];
                 var options = [];
 
                 options.mask = maskList[0];

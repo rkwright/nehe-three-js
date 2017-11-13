@@ -28,7 +28,6 @@
 		<script type="text/javascript">
             // the global var (ick!) for the cube's mesh
             var mesh;
-            var imageList = [ "flower", "stone"];
 
             // allocate the Scene object, and set the camera position
             var gfxScene = new GFX.Scene( { cameraPos : [3, 5, 8],
@@ -48,7 +47,7 @@
 			 *  Initialize the demo's local aspects, i.e not the scene.
 			 */
 			function initializeDemo() {
-                makeMesh( true, imageList[0] );
+                makeMesh( true, "flower" );
 			}
 
 			/**
@@ -68,8 +67,6 @@
 
                 var material = new THREE.MeshPhongMaterial( {
                     map:texture,
-                    minFilter:THREE.LinearFilter,
-                    magFilter:THREE.LinearFilter,
                     bumpMap:bump,
                     bumpScale:scale } );
 
@@ -81,6 +78,7 @@
              *
              */
             function setupDatGUI() {
+                var imageList = [ "flower", "stone"];
                 var options = [];
 
                 options.image = imageList[0];

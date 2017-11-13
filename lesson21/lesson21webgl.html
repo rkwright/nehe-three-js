@@ -29,7 +29,6 @@
 
 			var crateTexture;
 			var	yTranslation = CUBE_SIZE/2.0 + 0.1;
-			var	viewTypes = [ "Orthographic", "Perspective" ];
 			var viewType = 0;
 
 			// allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
@@ -80,9 +79,10 @@
 			}
 
              /**
-              *
+              * Set up the parameters and user-interface
               */
              function setupDatGUI() {
+                 var	viewTypes = [ "Orthographic", "Perspective" ];
                  var options = [];
 
                  options.viewType = viewTypes[0];
@@ -95,7 +95,7 @@
                      if ( viewType === 1 )
                         gfxScene.setDefaultCamera({ perspective:true, cameraPos:[15,10,10], fov : 90  });
                     else
-                         gfxScene.setDefaultCamera({ perspective:false, cameraPos:[15,10,10] });
+                        gfxScene.setDefaultCamera({ perspective:false, cameraPos:[15,10,10] });
                  });
              }
 

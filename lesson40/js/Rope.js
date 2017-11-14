@@ -86,11 +86,11 @@ GFX.Rope = function ( args ) {
     var i, particle, mass, numParticles;
     var springConstant, springFriction, springLen;
 
-    numParticles = args.numOfParticles || 30;
-    mass = args.mass || 0.05;
-    springConstant = args.springConstant || 1000;
-    springLen = args.springLen || 0.05;
-    springFriction = args.springFriction || 0.5;
+    this.numParticles = args.numOfParticles || 30;
+    this.mass = args.mass || 0.05;
+    this.springConstant = args.springConstant || 1000;
+    this.springLen = args.springLen || 0.05;
+    this.springFriction = args.springFriction || 0.5;
     this.gravitation = args.gravitation || 9.82;
     this.airFriction = args.airFriction || 0.04;
     this.groundRepulsion = args.groundRepulsion || 100;
@@ -102,35 +102,39 @@ GFX.Rope = function ( args ) {
     else
         console.error("No renderFunc supplied!");
 
-    this.particles = [];
-
-    for ( i = 0; i < numParticles; i++ ) {
-        this.particles[i] = new GFX.Particle(mass);
-    }
-
-    for ( i = 0; i<this.particles.length;  i++ ) {
-        particle = this.particles[i];
-        particle.curState.pos.x = i * springLen;
-        particle.curState.pos.y = this.particles.length * springLen * (2 / 3);
-    }
-
-    this.particles[0].head = true;
-    this.springs = [];
-
-    for ( i = 0; i<numParticles - 1; i++ ) {
-        this.springs[i] = new GFX.Spring(this.particles[i], this.particles[i + 1], springConstant, springLen, springFriction);
-    }
-
-    // time step variables - should be local to the timestep?
-    this.MAX_RENDER_TIME = 33.3;
-    this.t = 0;
-    this.dt = 2;
-    this.currentTime = performance.now();
-    this.accumulator = 0;
-    this.count = 0;
+    this.initialize();
 };
 
 GFX.Rope.prototype = {
+
+    initialize: function() {
+        this.particles = [];
+
+        for ( i = 0; i < this.numParticles; i++ ) {
+            this.particles[i] = new GFX.Particle(this.mass);
+        }
+
+        for ( i = 0; i<this.particles.length;  i++ ) {
+            particle = this.particles[i];
+            particle.curState.pos.x = i * this.springLen;
+            particle.curState.pos.y = this.particles.length * this.springLen * (2 / 3);
+        }
+
+        this.particles[0].head = true;
+        this.springs = [];
+
+        for ( i = 0; i<this.numParticles - 1; i++ ) {
+            this.springs[i] = new GFX.Spring(this.particles[i], this.particles[i + 1], this.springConstant, this.springLen, this.springFriction);
+        }
+
+        // time step variables - should be local to the timestep?
+        this.MAX_RENDER_TIME = 33.3;
+        this.t = 0;
+        this.dt = 2;
+        this.currentTime = performance.now();
+        this.accumulator = 0;
+        this.count = 0;
+    },
 
     update: function( dt ) {
         var i, force, particle, vel;

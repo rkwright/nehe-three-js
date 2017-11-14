@@ -19,6 +19,7 @@
     <script src="../three-js/three.js" type="text/javascript"></script>
     <script src="../three-js/Detector.js" type="text/javascript"></script>
     <script src="../three-js/stats.js" type="text/javascript"></script>
+    <script src="../three-js/dat.gui.min.js" type="text/javascript"></script>
     <script src="../three-js/loaders/VTKLoader.js" type="text/javascript"></script>
     <script src="../three-js/libs/TeapotBufferGeometry.js" type="text/javascript"></script>
     <script src="../gfx/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
@@ -81,6 +82,8 @@
     //gfxScene.addLight( 'ambient', { color:0x333333, intensity : 1 });
     var dirLight = gfxScene.addLight( 'directional', { color:0xffffff, intensity:1.0,  position:[-10,10,20]});
 
+    setupDatGUI();
+
     initializeDemo();
 
     animateScene();
@@ -93,8 +96,6 @@
         phongMaterial = createShaderMaterial( dirLight );
 
         loadTeapot();
-
-        document.addEventListener("keypress", onDocumentKeyPress, false);
     }
 
     /**
@@ -162,32 +163,40 @@
         gfxScene.remove(modelMesh);
 
         switch (type) {
-            case 't':
+            case 0:
                 loadTeapot();
                 break;
-            case 'r':
+            case 1:
                 loadRabbit();
                 break;
-            case 'k':
+            case 2:
                 loadKnot();
                 break;
         }
     }
 
-    function onDocumentKeyPress(event) {
-        // Get the key code of the pressed key
-        var keyChar = String.fromCharCode(event.which).toLowerCase();
+    /**
+     * Set up the parameters and interface
+     */
+    function setupDatGUI() {
+        var modelList = ["Teapot", "Rabbit", "Knot"];
+        var options = [];
 
-        var levelString = "0123456789";
-        var modelString = "trk";
+        options.levels = 4;
+        options.model = modelList[0];
 
-        if ( modelString.indexOf(keyChar) !== -1) {
-             switchModel(keyChar);
-        }
-        else if (levelString.indexOf(keyChar) !== -1) {
-            nLevels = keyChar - '0';
-        }
+        gui = new dat.GUI();
+
+        gui.add(options, "levels").min(0).max(9).step(1).onChange(function() {
+            nLevels = options.levels;
+        });
+
+        gui.add(options, "model", [ modelList[0], modelList[1], modelList[2] ]).onChange(function() {
+            var model = modelList.indexOf( options.model );
+            switchModel(model);
+        });
     }
+
     /**
      * Animate the scene and call rendering.
      */
@@ -207,10 +216,5 @@
     }
 
 </script>
-    <!-- Create a DIV element, which will be shown over the WebGL canvas. -->
-    <div style="position: absolute; top: 10px; left: 10px">
-        Choose model, t,r,k <br/>
-        Number of levels: 0..9
-    </div>
 </body>
 </html>

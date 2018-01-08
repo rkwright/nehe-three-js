@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- -------------------------------------
+        Very roughly based (or inspired by) NeHe Tutorial 40
+	Original:  http://nehe.gamedev.net/tutorial/rope_physics/17006/
+    Largely cloned from https://medium.com/@andrew_b_berg/volumetric-light-scattering-in-three-js-6e1850680a41
+
+    @author: rkwright@geofx.com
+	-------------------------------------- -->
+	<title>NEHE Lesson 40</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+    <!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="../css/NEHE.css" />
+
+    <!-- Include several libraries from THREE.js and the Scene class  -->
+	<script src="../three-js/three.js" type="text/javascript"></script>
+    <script src="../three-js/Detector.js" type="text/javascript"></script>
+    <script src="../three-js/stats.js" type="text/javascript"></script>
+    <script src="../three-js/dat.gui.min.js" type="text/javascript"></script>
+    <script src="../gfx/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
+    <script src="../gfx/gfx-scene.js" type="text/javascript"></script>
+    <script src="../gfx/CylinderUtil.js" type="text/javascript"></script>
+    <script src="js/Rope.js" type="text/javascript"></script>
+</head>
+<body>
+
+	<script type="text/javascript">
+        var SPRING_LEN = 0.025;
+        var NUM_PARTICLES = 100;
+        var ROPE_DIAMETER = 0.01;
+        var LIGHT_GRAY =  0x888888;
+        var rope;
+        var cylinderUtil;
+        var ropeArray = [];
+        var prevPos = new THREE.Vector3();
+        var curPos  = new THREE.Vector3();
+
+        // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+        var gfxScene = new GFX.Scene( {
+            cameraPos : [2, 1.5, 4],
+            controls:true,
+            clearColor:0xc5e1e3,
+            shadowMapEnabled : true,
+            displayStats:"fps ms"
+        });
+
+        // set up our custom lights as the default ones don't cast shadows
+        gfxScene.clearAllLights();
+        gfxScene.addLight( 'ambient', { color:0xffffff, intensity : 1 });
+        gfxScene.addLight( 'directional', { color:0xffffff, intensity:0.35,  position:[-10,10,10], castShadow:true  });
+
+        setupDatGUI();
+
+        // then initialize our demo's stuff
+        initializeDemo();
+
+        // Start the animation
+        animateScene();
+
+        /**
+         * Initialize the Demo.
+         */
+        function initializeDemo() {
+
+            rope = new Rope.Rope({
+                numOfParticles: NUM_PARTICLES,
+                mass: 0.05,
+                springConstant: 12000,
+                springLen: SPRING_LEN,
+                springFriction: 0.25,
+                gravitation: new THREE.Vector3(0, -9.82, 0),
+                airFriction: 0.04,
+                groundRepulsion: 100,
+                groundFriction: 0.2,
+                groundAbsorption: 2,
+                renderFunc: renderFunc
+            });
+
+            createFloor();
+            createPost();
+        }
+
+        function createRope( particles ) {
+
+            var ropeMat = new THREE.MeshLambertMaterial({ wireframe:false, color: 0xb7966f});
+
+            cylinderUtil = new CylinderUtil.CylinderUtil();
+
+            var point0 = particles[0].curState.pos;
+            for ( var i=1; i<particles.length; i++ ) {
+                var point1 = particles[i-1].curState.pos;
+
+                var ropeMesh = cylinderUtil.createCylinder(point0, point1, ROPE_DIAMETER, 8, ropeMat);
+                ropeMesh.castShadow = true;
+                ropeArray.push( ropeMesh );
+
+                gfxScene.add(ropeMesh);
+                point0 = point1;
+            }
+        }
+
+        function renderFunc( particles, blending ) {
+
+            if (cylinderUtil === undefined)
+                createRope( particles );
+
+            prevPos.lerpVectors(particles[0].prevState.pos, particles[0].curState.pos, blending);
+
+            for ( var i=1; i<particles.length; i++ ) {
+                var particle = particles[i];
+
+                curPos.lerpVectors(particle.prevState.pos, particle.curState.pos, blending);
+
+                //console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2));
+
+                var mesh = ropeArray[i-1];
+                cylinderUtil.alignCylinder( prevPos, curPos, mesh );
+
+                prevPos.copy(curPos);
+            }
+
+           // console.log("pos: " + renderPos.x.toFixed(2) + " " + renderPos.y.toFixed(2) + " " +  renderPos.z.toFixed(2)
+           //     + " vel:  " + particle.curState.vel.x.toFixed(2) + " " + particle.curState.vel.y.toFixed(2) + " " +  particle.curState.vel.z.toFixed(2)
+           //     + " for:  " + particle.forces.x.toFixed(2) + " " + particle.forces.y.toFixed(2) + " " +  particle.forces.z.toFixed(2));
+        }
+
+        function createPost() {
+            var postHt = NUM_PARTICLES * SPRING_LEN * (2 / 3);
+
+            var postGeom = new THREE.CylinderGeometry(0.05, 0.05, postHt, 32);
+            var postMesh = new THREE.Mesh(postGeom, new THREE.MeshLambertMaterial({color:LIGHT_GRAY}));
+            postMesh.position.set(0, postHt/2 - ROPE_DIAMETER, -1);
+            postMesh.castShadow = true;
+            gfxScene.add(postMesh);
+
+            var armGeom = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 32);
+            var armMesh = new THREE.Mesh(armGeom, new THREE.MeshLambertMaterial({color:LIGHT_GRAY}));
+            armMesh.rotation.x = Math.PI / 2;
+            armMesh.position.set(0, postHt, -0.5);
+            armMesh.castShadow = true;
+            gfxScene.add(armMesh);
+        }
+
+        function createFloor() {
+            var PLANE_SIZE = 10;
+
+            var floorGeom = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE);
+            var floorMat = new THREE.MeshLambertMaterial({ color: 0xaaaaaa, side: THREE.DoubleSide });
+
+            var floorMesh = new THREE.Mesh(floorGeom, floorMat);
+            floorMesh.rotation.x = -Math.PI / 2.0;
+            floorMesh.position.y = -ROPE_DIAMETER;
+            floorMesh.receiveShadow = true;
+            gfxScene.add(floorMesh);
+        }
+
+        /**
+         * Set up the parameters and interface
+         */
+        function setupDatGUI() {
+            var options = {
+                refresh: function () {
+                    rope.initialize();
+                }
+            };
+
+            gui = new dat.GUI();
+
+            gui.add( options, 'refresh' );
+        }
+
+        /**
+         * Animate the scene and call rendering.
+         */
+        function animateScene() {
+
+            // Tell the browser to call this function when page is visible
+            requestAnimationFrame(animateScene);
+
+            rope.timeStep();
+
+            // Map the 3D scene down to the 2D screen (render the frame)
+            gfxScene.renderScene();
+        }
+    </script>
+</body>
+</html>

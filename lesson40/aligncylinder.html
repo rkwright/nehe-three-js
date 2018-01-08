@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- -------------------------------------
+        Very roughly based (or inspired by) NeHe Tutorial 36
+	Original:  http://nehe.gamedev.net/tutorial/playing_avi_files_in_opengl/23001/
+    Largely cloned from https://medium.com/@andrew_b_berg/volumetric-light-scattering-in-three-js-6e1850680a41
+
+    @author: rkwright@geofx.com
+	-------------------------------------- -->
+	<title>Align Cylinder</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+    <!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="../css/NEHE.css" />
+
+    <!-- Include several libraries from THREE.js and the Scene class  -->
+	<script src="../three-js/three.js" type="text/javascript"></script>
+    <script src="../three-js/Detector.js" type="text/javascript"></script>
+    <script src="../three-js/stats.js" type="text/javascript"></script>
+    <script src="../gfx/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
+    <script src="../gfx/gfx-scene.js" type="text/javascript"></script>
+    <script src="../gfx/CylinderUtil.js" type="text/javascript"></script>
+</head>
+<body>
+
+	<div style="position: absolute; top: 10px; left: 10px;color:white">
+		<p></p>
+	</div>
+
+	<script type="text/javascript">
+
+        // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+        var gfxScene = new GFX.Scene( {
+            cameraPos : [2, 5, 20],
+            axesHeight:10,
+            controls:true,
+            clearColor:0x222222,
+            displayStats:"fps ms"
+        });
+
+        // then initialize our demo's stuff
+        initializeDemo();
+
+        // Animate the scene
+        animateScene();
+
+        /**
+         * Initialize the Demo.
+         */
+        function initializeDemo() {
+
+            var lineMat = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 4 });
+            var lineGeom = new THREE.Geometry();
+
+            var vec0 = new THREE.Vector3(-2, 3, 1);
+            var vec1 = new THREE.Vector3(8, 6, 2);
+            lineGeom.vertices.push(vec0);
+            lineGeom.vertices.push(vec1);
+
+            var lineVec = new THREE.Line(lineGeom, lineMat);
+            gfxScene.add(lineVec);
+
+            //createCylinderOnVec( vec0, vec1 );
+
+            //alignCylinder( vec0, vec1, new THREE.MeshLambertMaterial({color:0x444444, wireframe:true}));
+
+            var cylinderMat = new THREE.MeshLambertMaterial({color:0x444444, wireframe:true});
+            var ropeMesh = new GFX.CylinderUtil();
+
+            var cylinderMesh = ropeMesh.createCylinder( vec0, vec1, 0.5, 8, cylinderMat );
+            gfxScene.add( cylinderMesh );
+
+            var vecA = new THREE.Vector3(2, -3, -1);
+            var vecB = new THREE.Vector3(-8, -6, -2);
+
+            var lineGeomB = new THREE.Geometry();
+            lineGeomB.vertices.push(vecA);
+            lineGeomB.vertices.push(vecB);
+            var lineVecB = new THREE.Line(lineGeomB, lineMat);
+            gfxScene.add(lineVecB);
+
+            ropeMesh.alignCylinder( vecA, vecB, cylinderMesh );
+        }
+
+
+        function alignCylinder ( point0, point1, material ) {
+            var direction = new THREE.Vector3();
+            var orientation = new THREE.Matrix4();
+            var threeUp = new THREE.Object3D().up;
+            var matrix = new THREE.Matrix4();
+
+            direction.subVectors(point1, point0);
+            orientation.lookAt(point0, point1, threeUp);
+
+            matrix.set(1, 0, 0, 0,
+                    0, 0, 1, 0,
+                    0, -1, 0, 0,
+                    0, 0, 0, 1);
+            orientation.multiply(matrix);
+            var edgeGeometry = new THREE.CylinderGeometry(0.5, 0.5, direction.length(), 8, 1);
+            var edge = new THREE.Mesh(edgeGeometry, material);
+            edge.applyMatrix(orientation);
+            // position based on midpoints - there may be a better solution than this
+            edge.position.x = (point1.x + point0.x) / 2;
+            edge.position.y = (point1.y + point0.y) / 2;
+            edge.position.z = (point1.z + point0.z) / 2;
+            gfxScene.add(edge);
+            return edge;
+    }
+
+        /**
+         * Animate the scene and call rendering.
+         */
+        function animateScene() {
+
+            // Tell the browser to call this function when page is visible
+            requestAnimationFrame(animateScene);
+
+            // Map the 3D scene down to the 2D screen (render the frame)
+            gfxScene.renderScene();
+        }
+    </script>
+</body>
+</html>

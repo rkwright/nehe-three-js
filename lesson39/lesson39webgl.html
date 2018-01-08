@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- -------------------------------------
+        Very roughly based (or inspired by) NeHe Tutorial 36
+	Original:  http://nehe.gamedev.net/tutorial/playing_avi_files_in_opengl/23001/
+    Largely cloned from https://medium.com/@andrew_b_berg/volumetric-light-scattering-in-three-js-6e1850680a41
+
+    @author: rkwright@geofx.com
+	-------------------------------------- -->
+	<title>NEHE Lesson 39</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+    <!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="../css/NEHE.css" />
+
+    <!-- Include several libraries from THREE.js and the Scene class  -->
+	<script src="../three-js/three.js" type="text/javascript"></script>
+    <script src="../three-js/Detector.js" type="text/javascript"></script>
+    <script src="../three-js/stats.js" type="text/javascript"></script>
+    <script src="../gfx/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
+    <script src="../gfx/gfx-scene.js" type="text/javascript"></script>
+    <script src="js/State3D.js" type="text/javascript"></script>
+    <script src="js/Derivative.js" type="text/javascript"></script>
+    <script src="js/Physics3D.js" type="text/javascript"></script>
+
+</head>
+<body>
+	<script type="text/javascript">
+
+        var physics3D;
+        var ballMesh;
+        var plateMesh;
+        var springMesh;
+        var springMat;
+
+        // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+        var gfxScene = new GFX.Scene( {
+            cameraPos : [8, 6, 15],
+            controls:true,
+            displayStats:"fps ms"
+        });
+
+        initializeDemo();
+
+        animateScene();
+
+        /**
+         * Initialize the Demo.
+         */
+        function initializeDemo() {
+
+            var initialPos = new THREE.Vector3(0, 5, 0);
+            var initialMom = new THREE.Vector3(0, 0, 0);
+            var mass = 1.0;
+            var size = 1.0;
+
+            physics3D = new GFX.Physics3D(render, forces, initialPos, initialMom, mass, size);
+
+            var ballGeometry = new THREE.SphereGeometry(1, 32, 32);
+            ballMesh = new THREE.Mesh(ballGeometry, new THREE.MeshLambertMaterial({color: 0xFF0000}));
+            ballMesh.position.set(0, 10, 0);
+            gfxScene.add(ballMesh);
+
+            var plateGeometry = new THREE.BoxGeometry(3, 0.25, 3);
+            plateMesh = new THREE.Mesh(plateGeometry, new THREE.MeshLambertMaterial({color: 0x888888}));
+            plateMesh.position.set(0, 5.5, 0);
+            gfxScene.add(plateMesh);
+
+            springMat = new THREE.MeshPhongMaterial({color: 0xc0c0c0, shininess:50});
+
+            createSpring( 5 );
+        }
+
+        function createSpring( posY ) {
+            var TWO_PI = Math.PI * 2.0;
+            var NTWISTS = 10;
+            var ANGLE_INCR = Math.PI / 6;
+
+            var height = 6 - posY;
+            var cylY = 5.5 - height * 0.5;
+
+            var x,z;
+            var y = height/2;
+            var radius = 0.25;
+            var n = 0;
+            var yIncr = height / (TWO_PI / ANGLE_INCR * NTWISTS );
+            var helix = [];
+
+            for( var phi=0; phi<=TWO_PI*NTWISTS; phi+=ANGLE_INCR ) {
+                x = Math.cos(phi) * radius;
+                y -= yIncr;
+                z = Math.sin(phi) * radius;
+
+                helix.push( new THREE.Vector3(x, y, z));
+
+                //console.log( "n: " +  n + " phi: " + phi.toFixed(2) + " x: " + x.toFixed(2)+ " y: " + y.toFixed(2)+ " z: " + z.toFixed(2));
+                n++;
+            }
+
+            var curve = new THREE.CatmullRomCurve3( helix );
+            var geometry = new THREE.TubeGeometry( curve, n, 0.05, 6, false );
+
+            if (springMesh !== undefined) {
+                springMesh.geometry.dispose();
+                gfxScene.remove( springMesh );
+            }
+
+            springMesh = new THREE.Mesh(geometry, springMat);
+            springMesh.position.set(0,cylY,0);
+            gfxScene.add( springMesh );
+        }
+
+        function render( state ) {
+
+            //console.log("x,y,z: " + state.position.x.toFixed(2) + " " + state.position.y.toFixed(2) + " " +
+            //       state.position.z.toFixed(2));
+
+            ballMesh.position.set(state.position.x, state.position.y - 1, state.position.z);
+           
+            createSpring( state.position.y );
+        }
+        
+        // Calculate force and torque for physics state at time t.
+        // Due to the way that the RK4 integrator works we need to calculate
+        // force implicitly from state rather than explicitly applying forces
+        // to the rigid body once per update. This is because the RK4 achieves
+        // its accuracy by detecting curvature in derivative values over the
+        // timestep so we need our force values to supply the curvature.
+        function forces (state, t, derivative ) {
+            var DAMPING_TORQUE = -0.5;
+            var FORCE_X = 0;
+            var FORCE_Y = 2;
+            var FORCE_Z = 0;
+            var FORCE_SCALE = -5.0;
+            var TORQUE_X = 0.0;
+            var TORQUE_Y = 0.0;
+            var TORQUE_Z = 0.0;
+
+            // attract towards origin
+            derivative.force.copy(state.position);
+            derivative.force.multiplyScalar(FORCE_SCALE);
+
+            // add forces to the calculated derivative
+            derivative.force.x += FORCE_X;
+            derivative.force.y += FORCE_Y;
+            derivative.force.z += FORCE_Z;
+
+            // add torque to the calculated derivative
+            derivative.torque.x = TORQUE_X;
+            derivative.torque.y = TORQUE_Y;
+            derivative.torque.z = TORQUE_Z;
+
+            // damping torque so we don't spin too fast
+            derivative.torque.addScaledVector( state.angularVelocity, DAMPING_TORQUE );
+        }
+
+        /**
+         * Animate the scene and call rendering.
+         */
+        function animateScene() {
+
+            // Tell the browser to call this function when page is visible
+            requestAnimationFrame(animateScene);
+
+            // do one step in the physics part of the animation, which will call back to forces() and render()
+            // to alter the scene
+            physics3D.timeStep();
+
+            // Map the 3D scene down to the 2D screen (render the frame)
+            gfxScene.renderScene();
+        }
+    </script>
+</body>
+</html>

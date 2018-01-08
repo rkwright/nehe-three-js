@@ -1,0 +1,144 @@
+<!DOCTYPE html>	<!-- Tells the browser that the page uses the HTML5 standard -->
+<html>
+	<head>
+		<!-- -------------------------------------
+  			Roughly based (or inspired by) NeHe Tutorial 24
+  			Original:  http://nehe.gamedev.net/tutorial/sphere_mapping_quadrics_in_opengl/15005/
+  
+  			@author: rkwright@geofx.com
+		-------------------------------------- -->
+		<title>NEHE Lesson 24</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+		<!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+		<link rel="stylesheet" type="text/css" href="../css/NEHE.css" /> 
+
+		<!-- Include several libraries from THREE.js and the Scene class  -->
+		<script src="../three-js/three.js" type="text/javascript"></script>
+		<script src="../three-js/Detector.js" type="text/javascript"></script>
+		<script src="../three-js/stats.js" type="text/javascript"></script>
+		<script src="../gfx/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
+		<script src="../gfx/gfx-scene.js" type="text/javascript"></script>
+	</head>
+	<body>	
+		<script type="text/javascript">
+			var consoleScene;
+			var consoleCamera;
+
+            // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+			var gfxScene = new GFX.Scene( {
+				cameraPos : [0, 6, 12],
+				axesHeight:10,
+				controls:true,
+				displayStats:true });
+
+            // then initialize our demo's stuff
+			initializeDemo();
+	
+			// Animate the scene
+			animateScene();
+	
+			/**
+			 * Initialize the Demo.  
+			 */
+			function initializeDemo() {
+
+                var gl = gfxScene.renderer.getContext();
+                var available_extensions = gl.getSupportedExtensions();
+                var ext = gl.getExtension('ANGLE_instanced_arrays');
+                var render = gl.getParameter(gl.RENDERER);
+                var activeText = gl.getParameter(gl.ACTIVE_TEXTURE);
+
+                gfxScene.renderer.autoClear = false;
+
+                var geometry = new THREE.BoxGeometry( 2, 2, 2 );
+                var material = new THREE.MeshLambertMaterial( { color: 0x00ff00, opacity: 0.5, transparent:true } );
+
+                var cube = new THREE.Mesh( geometry, material );
+                cube.rotation.set(1, 1, 1);
+                gfxScene.add(cube);
+
+                consoleScene = new THREE.Scene();
+
+                var left = -window.innerWidth * 0.4;
+                var right = window.innerWidth * 1.0;
+                var top = window.innerHeight * 0.4;
+                var bottom = -window.innerHeight * 0.4;
+                consoleCamera = new THREE.OrthographicCamera(left, right, top, bottom, -100, 1000);
+                consoleCamera.position.set(0, 0, 100);
+
+                var ambientLight = new THREE.AmbientLight( 0xffffff );
+                consoleScene.add( ambientLight );
+
+                var canvas = document.createElement('canvas');
+                var context = canvas.getContext('2d');
+
+                // set a large-enough fixed-size canvas.  Both dimensions should be powers of 2.
+                canvas.width = 512;
+                canvas.height = 512;
+
+                context.strokeStyle = "rgba(255,0,0,1)";
+                context.lineWidth = 5;
+                context.strokeRect(0,0,512,512);
+
+                context.fillStyle = "rgba(0,255,255,1)";
+                context.fillRect(10,10,492,492);
+
+                context.font = 24 + "px " + "Georgia";
+                context.textBaseline = "alphabetic";
+                context.textAlign = "left";
+                context.fillStyle = "rgba(255,255,255,1)";
+
+                context.fillText("Under Construction", 256, 256);
+
+
+                // canvas contents will be used for a texture
+                var texture = new THREE.Texture(canvas);
+                texture.needsUpdate = true;
+
+                var spriteMaterial = new THREE.SpriteMaterial({map: texture});
+                var sprite = new THREE.Sprite(spriteMaterial);
+                sprite.scale.set(1000,1000,1000);
+                sprite.position.set(0, 0, 0);
+
+                consoleScene.add(sprite);
+
+                var helper = new THREE.CameraHelper( consoleCamera );
+                consoleScene.add( helper );
+
+
+                document.addEventListener("keypress", onDocumentKeyPress, false);
+			}
+	
+
+			function onDocumentKeyPress(event) {
+				// Get the key code of the pressed key
+				var keyChar = String.fromCharCode(event.which);
+                keyChar = keyChar.toLowerCase();
+			}
+	
+			/**
+			 * Animate the scene and call rendering.
+			 */
+			function animateScene() {
+	
+				// Tell the browser to call this function when page is visible
+				requestAnimationFrame(animateScene);
+
+                gfxScene.renderer.autoClear = false;
+                gfxScene.renderer.clear();
+
+                // Map the 3D scene down to the 2D screen (render the frame)
+                gfxScene.renderScene();
+                gfxScene.renderer.render(consoleScene, consoleCamera );
+            }
+
+		</script>
+
+		<!-- Create a DIV element, which will be shown over the WebGL canvas. -->
+		<div style="position: absolute; top: 10px; left: 10px;color:white">
+		'0 .. 2': Type of quadric<br/>
+        </div>
+	</body>
+</html>

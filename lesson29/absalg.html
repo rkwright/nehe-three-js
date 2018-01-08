@@ -1,0 +1,139 @@
+
+<html>
+<head>
+    <title>THREE.js</title>
+</head>
+<body style="overflow: hidden; background: black;">
+    <script src="../js/three.js"></script>
+</body>
+<script id="fragment_shh" type="x-shader/x-fragment">
+            #ifdef GL_ES
+            precision highp float;
+            #endif
+
+            uniform sampler2D tOne;
+            uniform sampler2D tSec;
+
+            varying vec2 vUv;
+            
+            void main(void)
+            {
+                vec3 c;
+                vec4 Ca = texture2D(tOne, vUv);
+                vec4 Cb = texture2D(tSec, vUv);
+                c = Ca.rgb * Ca.a + Cb.rgb * Cb.a * (1.0 - Ca.a);
+                gl_FragColor= vec4(c, 1.0);
+                
+            }
+            
+        </script>
+
+        <script id="vertex_shh" type="x-shader/x-vertex">
+        
+            varying vec2 vUv;
+            
+            void main()
+            {
+                vUv = uv;
+                vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+                gl_Position = projectionMatrix * mvPosition;
+            }
+            
+        </script>
+
+    <script type="text/javascript">
+
+
+        window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       || 
+              window.webkitRequestAnimationFrame || 
+              window.mozRequestAnimationFrame    || 
+              window.oRequestAnimationFrame      || 
+              window.msRequestAnimationFrame     || 
+              function(/* function */ callback, /* DOMElement */ element){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
+
+    // RENDERER
+    // --------------------------------------------
+    var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
+
+    var renderer = new THREE.WebGLRenderer({ clearAlpha: 1, clearColor: 0x222222, antialias: true });
+    renderer.setSize( WIDTH, HEIGHT );
+
+    var container = document.createElement( 'div' );
+    document.body.appendChild( container );
+    container.appendChild( renderer.domElement );
+
+    // SCENE
+    // --------------------------------------------
+    var scene = new THREE.Scene();
+
+    // CAMERA
+    // --------------------------------------------
+    var camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
+    camera.position.z = 400;
+    scene.add(camera);
+
+    // LIGHT
+    // --------------------------------------------
+    var pointLight = new THREE.PointLight(0xFFFFFF);
+    pointLight.position.set( 100, 100, 150);    // pozicija u prostoru
+    scene.add(pointLight);
+
+
+    // OBJECTS
+    // --------------------------------------------
+    var geom = new THREE.CubeGeometry( 80, 80, 80 );
+
+    var vertShader = document.getElementById('vertex_shh').innerHTML;
+
+    var fragShader = document.getElementById('fragment_shh').innerHTML;
+
+    var attributes = {};
+
+   // var tex1 = THREE.ImageUtils.loadTexture("images/grass.png", {}, function() { renderer.render(scene, camera);});
+   // var tex2 = THREE.ImageUtils.loadTexture("images/cover.png", {}, function() { renderer.render(scene, camera);});
+
+    var uniforms = {
+
+      tOne: { type: "t", value: THREE.ImageUtils.loadTexture( "images/cover.png" ) },
+      tSec: { type: "t", value: THREE.ImageUtils.loadTexture( "images/grass.png" ) }
+
+    };
+
+
+
+    var material_shh = new THREE.ShaderMaterial({
+
+      uniforms: uniforms,
+
+      attributes: attributes,
+
+      vertexShader: vertShader,
+
+      fragmentShader: fragShader
+
+    });
+
+    var me = new THREE.Mesh( geom, material_shh );
+    me.doubleSided = true;
+    scene.add(me);
+
+
+    // ANIMATION
+    // --------------------------------------------
+    var t = 0;
+    function animate() 
+    {
+        t += 0.05; 
+        me.rotation.set(0, 0.5*Math.sin(t), 0);
+        renderer.render( scene, camera );
+        requestAnimFrame(animate);
+    } 
+
+    requestAnimFrame(animate);
+
+    </script>
+</html>

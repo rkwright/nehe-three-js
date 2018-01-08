@@ -1,0 +1,6 @@
+# Ignore
+*.epub
+*.jar
+temp/**/*
+**/.idea
+

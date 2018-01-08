@@ -12,4 +12,8 @@
 	/* Define the font and the color for the usage, which is an ordinary HTML overlay. */
 	font-family: Monospace;
 	color: white;
+
+     /* we want the whole screen so turn off padding and margins */
+	 padding:0;
+	 margin:0;
 }

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- -------------------------------------
+    Roughly inspired by NeHe Tutorial 44
+	Original:  http://nehe.gamedev.net/tutorial/3d_lens_flare_with_occlusion_testing/16007/
+
+    @author: rkwright@geofx.com
+	-------------------------------------- -->
+	<title>NEHE Lesson 44</title>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+    <!-- Set the viewport size to the screen size, so it will be displayed maximized, but unscaled. -->
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="../css/NEHE.css" />
+
+    <!-- Include several libraries from THREE.js and the Scene class  -->
+	<script src="../three-js/three.js" type="text/javascript"></script>
+    <script src="../three-js/Detector.js" type="text/javascript"></script>
+    <script src="../three-js/stats.js" type="text/javascript"></script>
+    <script src="../gfx/OrbitControls-Touch-Ortho.js" type="text/javascript"></script>
+    <script src="../gfx/gfx-scene.js" type="text/javascript"></script>
+</head>
+<body>
+
+	<div style="position: absolute; top: 10px; left: 10px;color:white">
+		<p></p>
+	</div>
+
+    <script type="text/javascript">
+        // global vars (ick)
+        var plane;
+        var icoMesh1, icoMesh2;
+
+        // allocate the Scene object, request orbitControls, some of 3D axes 10 units high and the stats
+        var gfxScene = new GFX.Scene( {
+            cameraPos : [-13, 10, 30],
+            alphaBuffer: true,
+            defaultLights: false,
+            controls:true,
+            clearColor:0x4444aa,
+            shadowMapEnabled:true,
+            displayStats: true
+        });
+
+        gfxScene.addLight( 'ambient', { color:0x1c1c1c, intensity : 1 });
+        gfxScene.addLight( 'directional', { color:0xffffff, intensity:0.75,  position:[-40,60,10],
+            castShadow:true  });
+
+        initializeDemo();
+
+        // Start the animation
+        animateScene();
+
+        /**
+         * Initialize the Demo.
+         */
+        function initializeDemo() {
+
+            var textureGrass = THREE.ImageUtils.loadTexture("images/grass-big.jpg");
+            textureGrass.wrapS = THREE.RepeatWrapping;
+            textureGrass.wrapT = THREE.RepeatWrapping;
+            textureGrass.repeat.set(16, 16);
+
+            var planeGeometry = new THREE.PlaneGeometry(250, 250, 20, 20);
+            var planeMaterial = new THREE.MeshLambertMaterial({map: textureGrass });
+            plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.receiveShadow = true;
+
+            // rotate and position the plane
+            plane.rotation.x = -0.5 * Math.PI;
+            gfxScene.add(plane);
+
+            var monolith = new THREE.BoxGeometry(4.0, 20.0, 1.0);
+            var monoMat = new THREE.MeshPhongMaterial({ color: '#202020', emissive: 0x000000, shininess:100,
+                specular: 0x555555, shading: THREE.FlatShading  });
+            var monoMesh = new THREE.Mesh(monolith, monoMat);
+            monoMesh.position.set(0,0,0);
+            monoMesh.rotation.y += -Math.PI / 3;
+            monoMesh.castShadow = true;
+            gfxScene.add(monoMesh);
+
+            var wireMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true } );
+            var colorMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, transparent:true, opacity:0.35 } );
+
+            icoMesh1 = THREE.SceneUtils.createMultiMaterialObject(
+                new THREE.IcosahedronGeometry( 1, 0 ), [ colorMaterial, wireMaterial ] );
+            icoMesh1.position.set(2, 2, 2);
+            gfxScene.add(icoMesh1);
+
+            icoMesh2 = THREE.SceneUtils.createMultiMaterialObject(
+                new THREE.IcosahedronGeometry( 1, 0 ), [ colorMaterial, wireMaterial ] );
+            icoMesh2.position.set(-2, 2, -2);
+            gfxScene.add(icoMesh2);
+
+            addFlare();
+        }
+
+        function addFlare() {
+
+            var flareLight = new THREE.DirectionalLight(0xffffff);
+            flareLight.position.set(30, 20, -1000);
+            flareLight.target = plane;
+            flareLight.distance = 0;
+
+            gfxScene.add(flareLight);
+
+            var textureFlare0 = THREE.ImageUtils.loadTexture("images/lensflare0.png");
+            var textureFlare3 = THREE.ImageUtils.loadTexture("images/lensflare3.png");
+
+            var flareColor = new THREE.Color(0xffaacc);
+            var lensFlare = new THREE.LensFlare(textureFlare0, 350, 0.0, THREE.AdditiveBlending, flareColor);
+
+            lensFlare.add(textureFlare3, 60, 0.6, THREE.AdditiveBlending);
+            lensFlare.add(textureFlare3, 70, 0.7, THREE.AdditiveBlending);
+            lensFlare.add(textureFlare3, 120, 0.9, THREE.AdditiveBlending);
+            lensFlare.add(textureFlare3, 160, 1.1, THREE.AdditiveBlending);
+
+            lensFlare.position.copy(flareLight.position);
+            gfxScene.add(lensFlare);
+        }
+        /**
+         * Animate the scene and call rendering.
+         */
+        function animateScene() {
+
+            gfxScene.updateStats();
+
+            // Tell the browser to call this function when page is visible
+            requestAnimationFrame(animateScene);
+
+            var timer = Date.now() * 0.01;
+
+            icoMesh1.position.set(
+                Math.cos( timer * 0.1 ) * 5,
+                Math.abs( Math.cos( timer * 0.2 ) ) * 4 + 0.5,
+                Math.sin( timer * 0.1 ) * 5
+            );
+            icoMesh1.rotation.y = ( Math.PI / 2 ) - timer * 0.1;
+            icoMesh1.rotation.z = timer * 0.8;
+
+            icoMesh2.position.set(
+                Math.cos( -timer * 0.1 ) * 5,
+                Math.abs( Math.cos( -timer * 0.2 ) ) * 4 + 0.5,
+                Math.sin( -timer * 0.1 ) * 5
+            );
+            icoMesh2.rotation.y = ( Math.PI / 2 ) - -timer * 0.1;
+            icoMesh2.rotation.z = -timer * 0.8;
+
+            gfxScene.renderScene();
+        }
+    </script>
+</body>
+</html>

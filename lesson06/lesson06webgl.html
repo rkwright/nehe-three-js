@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<!-- The previous line tells the browser that the page uses the HTML5 standard. -->
+<html>
+	<head>
+		<title>Three.js tutorial - Lesson 06</title>
+		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+		<!-- The following meta line optimizes the site for mobile devices. It sets the viewport size
+		to the screen size, so it will be displayed maximized, but unscaled. -->
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+		<style type="text/css">
+			body {
+				/* Set the background color of the HTML page to black */
+				background-color: #000000;
+
+				/* Hide oversized content. This prevents the scroll bars. */
+				overflow: hidden;
+			}
+		</style>
+		<!-- Include two libraries
+		1. Three.js (core library)
+		2. Detector.js (checks the browsers WebGL capabilities) -->
+		<script src="../three-js/three.js"></script>
+		<script src="../three-js/Detector.js"></script>
+	</head>
+	<body>
+		<!-- This is the DIV element which will contain the WebGL canvas. To be identifiable later on,
+		the id 'WebGLCanvas' is applied to it. -->
+		<div id="WebGLCanvas" ></div>
+
+		<!-- This JavaScript block encloses the Three.js commands -->
+		<script>
+			// Global scene object
+			var scene;
+
+			// Global camera object
+			var camera;
+
+			// The cube has to rotate around all three axes, so we need three rotation values.
+
+			// x, y and z rotation
+			var xRotation = 0.0;
+			var yRotation = 0.0;
+			var zRotation = 0.0;
+
+			// Global mesh object of the cube
+			var cubeMesh;
+
+			// Initialize the scene
+			initializeScene();
+
+			// Animate the scene
+			animateScene();
+
+			/**
+			 * Initialze the scene.
+			 */
+			function initializeScene(){
+				// Check whether the browser supports WebGL. If so, instantiate the hardware accelerated
+				// WebGL renderer. For antialiasing, we have to enable it. The canvas renderer uses
+				// antialiasing by default.
+				// The approach of multiplse renderers is quite nice, because your scene can also be
+				// viewed in browsers, which don't support WebGL. The limitations of the canvas renderer
+				// in contrast to the WebGL renderer will be explained in the tutorials, when there is a
+				// difference.
+				if(Detector.webgl){
+					renderer = new THREE.WebGLRenderer({antialias:true});
+
+				// If its not supported, instantiate the canvas renderer to support all non WebGL
+				// browsers
+				} else {
+					renderer = new THREE.CanvasRenderer();
+				}
+
+				// Set the background color of the renderer to black, with full opacity
+				renderer.setClearColor(0x000000, 1);
+
+				// Get the size of the inner window (content area) to create a full size renderer
+				canvasWidth = window.innerWidth;
+				canvasHeight = window.innerHeight;
+
+				// Set the renderers size to the content areas size
+				renderer.setSize(canvasWidth, canvasHeight);
+
+				// Get the DIV element from the HTML document by its ID and append the renderers DOM
+				// object to it
+				document.getElementById("WebGLCanvas").appendChild(renderer.domElement);
+
+				// Create the scene, in which all objects are stored (e. g. camera, lights,
+				// geometries, ...)
+				scene = new THREE.Scene();
+
+				// Now that we have a scene, we want to look into it. Therefore we need a camera.
+				// Three.js offers three camera types:
+				//  - PerspectiveCamera (perspective projection)
+				//  - OrthographicCamera (parallel projection)
+				//  - CombinedCamera (allows to switch between perspective / parallel projection
+				//    during runtime)
+				// In this example we create a perspective camera. Parameters for the perspective
+				// camera are ...
+				// ... field of view (FOV),
+				// ... aspect ratio (usually set to the quotient of canvas width to canvas height)
+				// ... near and
+				// ... far.
+				// Near and far define the cliping planes of the view frustum. Three.js provides an
+				// example (http://mrdoob.github.com/three.js/examples/
+				// -> canvas_camera_orthographic2.html), which allows to play around with these
+				// parameters.
+				// The camera is moved 10 units towards the z axis to allow looking to the center of
+				// the scene.
+				// After definition, the camera has to be added to the scene.
+				camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 100);
+				camera.position.set(0, 0, 10);
+				camera.lookAt(scene.position);
+				scene.add(camera);
+
+				// Create the cube
+				var cubeGeometry = new THREE.BoxGeometry(2.0, 2.0, 2.0);
+
+				// When the CanvasRenderer is used, you will see, that the texture has some distortions.
+				// To get rid of this, you only have to increase the number of cube segments. The
+				// WebGLRenderer doesn't needs this workaround.
+				//var cubeGeometry = new THREE.CubeGeometry(2.0, 2.0, 2.0, 4, 4, 4);
+
+				// Load an image as texture
+                var neheTexture = new THREE.ImageUtils.loadTexture("images/NeHe.jpg");
+
+				// After creating a THREE.CubeGeometry, we load the texture by
+				// 'THREE.ImageUtils.loadTexture()'. On this object, we can configure the texture
+				// filtering. If we don't configure it, default values will be used. If you uncomment
+				// the texture configuration lines, you can modify the texture filtering or enable
+				// texture repeating. There are more attributes, which can be seen here.
+				// Now that we have a texture object, we assign it to the material via the attribute
+				// 'map'. That's it.
+
+				// Create a basic material with a texture. Activate the 'doubleSided'
+				// attribute to force the rendering of both sides of each face (front and back).
+				// This prevents the so called 'backface culling'. Usually, only the side is
+				// rendered, whose normal vector points towards the camera. The other side is not
+				// rendered (backface culling). But this performance optimization sometimes leads
+				// to holes in the surface. When this happens in your surface, simply set
+				// 'doubleSided' to 'true'.
+				var cubeMaterial = new THREE.MeshBasicMaterial({
+                    map: neheTexture,
+                    side: THREE.DoubleSide
+                });
+
+				// Create a mesh and insert the geometry and the material. Translate the whole mesh
+				// by 1.5 on the x axis and by 4 on the z axis and add the mesh to the scene.
+				cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
+				cubeMesh.position.set(0.0, 0.0, 4.0);
+				scene.add(cubeMesh);
+
+			}
+
+			/**
+			 * Animate the scene and call rendering.
+			 */
+			function animateScene(){
+				// At last, we update the rotation values and assign it to the mesh's rotation.
+
+				// Increase the x, y and z rotation of the cube
+				xRotation += 0.03;
+				yRotation += 0.02;
+				zRotation += 0.04;
+				cubeMesh.rotation.set(xRotation, yRotation, zRotation);
+
+				// Define the function, which is called by the browser supported timer loop. If the
+				// browser tab is not visible, the animation is paused. So 'animateScene()' is called
+				// in a browser controlled loop.
+				requestAnimationFrame(animateScene);
+
+				// Map the 3D scene down to the 2D screen (render the frame)
+				renderScene();
+			}
+
+			/**
+			 * Render the scene. Map the 3D world to the 2D screen.
+			 */
+			function renderScene(){
+				renderer.render(scene, camera);
+			}
+		</script>
+	</body>
+</html>

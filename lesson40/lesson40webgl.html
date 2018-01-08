@@ -65,7 +65,7 @@
          */
         function initializeDemo() {
 
-            rope = new GFX.Rope({
+            rope = new Rope.Rope({
                 numOfParticles: NUM_PARTICLES,
                 mass: 0.05,
                 springConstant: 12000,
@@ -87,7 +87,7 @@
 
             var ropeMat = new THREE.MeshLambertMaterial({ wireframe:false, color: 0xb7966f});
 
-            cylinderUtil = new GFX.CylinderUtil();
+            cylinderUtil = new CylinderUtil.CylinderUtil();
 
             var point0 = particles[0].curState.pos;
             for ( var i=1; i<particles.length; i++ ) {

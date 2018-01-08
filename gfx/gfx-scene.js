@@ -2,7 +2,7 @@
  *  @author rkwright   /  http://www.geofx.com
  */
 
-var GFX = { revision: '03' };
+var GFX = { revision: '5.0' };
 
 //some constants
 	var    	X_AXIS = 0;
@@ -43,6 +43,9 @@ GFX.Scene = function ( parameters ) {
     this.msStats = null;
     this.mbStats = null;
 
+    this.datgui = false;
+    this.gui = null;
+
 	this.defaultLights = true;
 	this.ambientLights = [];
 	this.directionalLights = [];
@@ -68,6 +71,8 @@ GFX.Scene = function ( parameters ) {
     this.initialize();
 };
 
+// the scene's parameters from the values JSON object
+// lifted from MrDoob's implementation in three.js
 GFX.setParameters = function( object, values ) {
 
     if ( values === undefined ) return;
@@ -82,31 +87,28 @@ GFX.setParameters = function( object, values ) {
         }
 
         if ( key in object ) {
-            var currentValue = object[ key ];
+            var currentValue = object[key];
 
-            if ( currentValue instanceof THREE.Color ) {
-                currentValue.set( newValue );
+            if (currentValue instanceof THREE.Color) {
+                currentValue.set(newValue);
             }
-            else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
-                currentValue.copy( newValue );
+            else if (currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3) {
+                currentValue.copy(newValue);
             }
-            else if ( key === 'overdraw' ) {
+            else if (key === 'overdraw') {
                 // ensure overdraw is backwards-compatible with legacy boolean type
-                object[ key ] = Number( newValue );
+                object[key] = Number(newValue);
             }
             else if (currentValue instanceof Array) {
-                object[ key ] = newValue.slice();
+                object[key] = newValue.slice();
             }
             else {
-                object[ key ] = newValue;
+                object[key] = newValue;
             }
-
         }
     }
 };
 
-// the scene's parameters from the values JSON object
-// lifted from MrDoob's implementation in three.js
 GFX.Scene.prototype = {
 
 	initialize: function () {
@@ -205,6 +207,9 @@ GFX.Scene.prototype = {
 
         // set up the stats window(s) if requested
 		this.setupStats( container );
+
+		// create data.gui container if requested
+		this.setupDatGUI( container );
 	},
 
 	add: function ( obj ) {
@@ -272,7 +277,7 @@ GFX.Scene.prototype = {
             if (jsonObj.perspective !== undefined)
                 perspective = jsonObj.perspective;
 
-            cameraPos   = jsonObj.cameraPos || this.camerPos;
+            cameraPos   = jsonObj.cameraPos || this.cameraPos;
             fov         = jsonObj.fov || this.fov;
             near        = jsonObj.near || this.near;
             far         = jsonObj.far || this.far;
@@ -422,7 +427,7 @@ GFX.Scene.prototype = {
             var pos = this.getLightProp('position', values, [0, 10, 0]);
 
             if (type === 'directional') {
-                var target = this.getLightProp('target', values, undefined);
+                this.getLightProp('target', values, undefined);
                 light = new THREE.DirectionalLight(color, intensity);
                 if (this.shadowMapEnabled === true) {
                     light.shadow.mapSize.x = 2048;
@@ -539,6 +544,19 @@ GFX.Scene.prototype = {
             this.msStats.update();
         if (this.mbStats !== null && typeof this.mbStats !== 'undefined')
             this.mbStats.update();
+    },
+
+    setupDatGUI: function( container ) {
+        if (this.datgui === false)
+            return;
+
+        this.gui = new dat.GUI({autoplace:false});
+
+        var guiContainer = document.createElement( 'div' );
+        guiContainer.setAttribute("style", "position:absolute;top:0;left:0;z-index:1000;");
+        container.appendChild( guiContainer );
+        guiContainer.appendChild(this.gui.domElement);
+
     },
 
 	addFog: function( values ) {

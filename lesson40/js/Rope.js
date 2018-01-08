@@ -6,12 +6,14 @@
  *      Spring
  *      Particle
  */
-GFX.State = function ( position, velocity ) {
+var State = { revision: '1.0' };
+
+State.State = function ( position, velocity ) {
     this.pos = position;
     this.vel = velocity;
 };
 
-GFX.State.prototype = {
+State.State.prototype = {
 
     copy: function( state ) {
 
@@ -20,15 +22,17 @@ GFX.State.prototype = {
     }
 };
 
-GFX.Particle = function ( mass ) {
+var Particle = { revision: '1.0' };
+
+Particle.Particle = function ( mass ) {
 
     this.mass = mass;
-    this.curState  = new GFX.State(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
-    this.prevState = new GFX.State(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
+    this.curState  = new State.State(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
+    this.prevState = new State.State(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
     this.forces = new THREE.Vector3(0, 0, 0);
 };
 
-GFX.Particle.prototype = {
+Particle.Particle.prototype = {
 
     applyForce: function( force ) {
         this.forces.add(force);
@@ -48,7 +52,9 @@ GFX.Particle.prototype = {
     }
 };
 
-GFX.Spring = function ( particle1, particle2, springConstant, springLen, friction ) {
+var Spring = { revision: '1.0' };
+
+Spring.Spring = function ( particle1, particle2, springConstant, springLen, friction ) {
 
     this.particle1 = particle1;
     this.particle2 = particle2;
@@ -57,7 +63,7 @@ GFX.Spring = function ( particle1, particle2, springConstant, springLen, frictio
     this.friction = friction;
 };
 
-GFX.Spring.prototype = {
+Spring.Spring.prototype = {
 
     solve: function() {
 
@@ -81,7 +87,9 @@ GFX.Spring.prototype = {
     }
 };
 
-GFX.Rope = function ( args ) {
+var Rope = { revision: '1.0' };
+
+Rope.Rope = function ( args ) {
 
     var i, particle, mass, numParticles;
     var springConstant, springFriction, springLen;
@@ -105,13 +113,13 @@ GFX.Rope = function ( args ) {
     this.initialize();
 };
 
-GFX.Rope.prototype = {
+Rope.Rope.prototype = {
 
     initialize: function() {
         this.particles = [];
 
         for ( i = 0; i < this.numParticles; i++ ) {
-            this.particles[i] = new GFX.Particle(this.mass);
+            this.particles[i] = new Particle.Particle(this.mass);
         }
 
         for ( i = 0; i<this.particles.length;  i++ ) {
@@ -124,7 +132,7 @@ GFX.Rope.prototype = {
         this.springs = [];
 
         for ( i = 0; i<this.numParticles - 1; i++ ) {
-            this.springs[i] = new GFX.Spring(this.particles[i], this.particles[i + 1], this.springConstant, this.springLen, this.springFriction);
+            this.springs[i] = new Spring.Spring(this.particles[i], this.particles[i + 1], this.springConstant, this.springLen, this.springFriction);
         }
 
         // time step variables - should be local to the timestep?

@@ -152,11 +152,7 @@
 
                 gui = new dat.GUI();
 
-                gui.add(options, "material", [
-                    materialList[0],
-                    materialList[1],
-                    materialList[2]
-                ]).onChange(function() {
+                gui.add(options, "material", materialList ).onChange(function() {
                     materialType = materialList.indexOf(options.material);
                     quadMaterial = makeMaterial(materialType);
                     quadric = makeQuad(quadType);
@@ -164,21 +160,7 @@
 
                 options.quad = quadList[0];
 
-                gui.add(options, "quad", [
-                    quadList[0],
-                    quadList[1],
-                    quadList[2],
-                    quadList[3],
-                    quadList[4],
-                    quadList[5],
-                    quadList[6],
-                    quadList[7],
-                    quadList[8],
-                    quadList[9],
-                    quadList[10],
-                    quadList[11]
-
-                ]).onChange(function() {
+                gui.add(options, "quad", quadList ).onChange(function() {
 
                     quadType = quadList.indexOf(options.quad);
                     quadric = makeQuad(quadType);
